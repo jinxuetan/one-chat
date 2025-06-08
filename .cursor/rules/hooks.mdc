@@ -1,0 +1,120 @@
+---
+description: React hooks
+globs: 
+alwaysApply: false
+---
+# Custom Hook Guidelines
+
+This rule outlines the guidelines for creating custom React hooks within this project.
+
+## Custom Hooks
+
+-   **Purpose:** Encapsulate reusable stateful logic, especially for data fetching or complex UI interactions.
+-   **Location:** Place custom hooks in the `apps/web/hooks/` directory.
+-   **Naming:** Use the `use` prefix (e.g., `useAccounts.ts`).
+-   **Data Fetching:** For fetching data from API endpoints, use **tRPC hooks** for type-safe data fetching. Follow the guidelines outlined in [data-fetching.mdc](mdc:.cursor/rules/data-fetching.mdc).
+    -   Create dedicated hooks that wrap tRPC queries for specific data types (e.g., `useAccounts`, `useLabels`).
+    -   The hook should typically wrap tRPC queries, handle input parameters, and return the data, loading state, error state, and utility functions from tRPC React Query integration.
+    -   Leverage tRPC's automatic batching, caching, and invalidation features.
+-   **Simplicity:** Keep hooks focused on a single responsibility.
+
+## Example Custom Hook Implementation
+
+```typescript
+// apps/web/hooks/useAccounts.ts
+import { api } from "~/lib/trpc/react";
+
+export function useAccounts(options?: { enabled?: boolean }) {
+  const {
+    data: accounts,
+    isLoading,
+    error,
+    refetch,
+  } = api.account.getAll.useQuery(
+    undefined, // No input parameters needed
+    {
+      enabled: options?.enabled ?? true,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      cacheTime: 1000 * 60 * 10, // 10 minutes
+    }
+  );
+
+  return {
+    accounts: accounts ?? [],
+    isLoading,
+    error,
+    refetch,
+  };
+}
+
+// Usage in component
+export function AccountsList() {
+  const { accounts, isLoading, error } = useAccounts();
+  
+  if (isLoading) return <div>Loading accounts...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  
+  return (
+    <div>
+      {accounts.map(account => (
+        <AccountCard key={account.id} account={account} />
+      ))}
+    </div>
+  );
+}
+```
+
+## Advanced Custom Hook Patterns
+
+```typescript
+// apps/web/hooks/useLabels.ts
+import { api } from "~/lib/trpc/react";
+import { useState } from "react";
+
+export function useLabels(chatId: string) {
+  const utils = api.useUtils();
+  
+  // Query for getting labels
+  const {
+    data: labels,
+    isLoading,
+    error,
+  } = api.label.getByChatId.useQuery({ chatId });
+
+  // Mutation for creating labels
+  const createLabel = api.label.create.useMutation({
+    onSuccess: () => {
+      // Invalidate and refetch labels
+      utils.label.getByChatId.invalidate({ chatId });
+    },
+  });
+
+  // Mutation for updating labels
+  const updateLabel = api.label.update.useMutation({
+    onSuccess: () => {
+      utils.label.getByChatId.invalidate({ chatId });
+    },
+  });
+
+  // Mutation for deleting labels
+  const deleteLabel = api.label.delete.useMutation({
+    onSuccess: () => {
+      utils.label.getByChatId.invalidate({ chatId });
+    },
+  });
+
+  return {
+    labels: labels ?? [],
+    isLoading,
+    error,
+    createLabel: createLabel.mutate,
+    updateLabel: updateLabel.mutate,
+    deleteLabel: deleteLabel.mutate,
+    isCreating: createLabel.isPending,
+    isUpdating: updateLabel.isPending,
+    isDeleting: deleteLabel.isPending,
+  };
+}
+```
+
+By adhering to these guidelines, we ensure a consistent approach to reusable logic and type-safe data fetching throughout the application using tRPC's powerful ecosystem.

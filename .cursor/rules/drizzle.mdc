@@ -1,0 +1,19 @@
+---
+description: How to use Drizzle
+globs: 
+alwaysApply: false
+---
+# Drizzle Usage
+
+We use PostgreSQL.
+
+This is how we import prisma in the project:
+
+```typescript
+import { db } from "@/utils/db";
+```
+
+- **Drizzle ORM Schema Definition**: Define all database tables and their relationships in this file using Drizzle ORM's syntax.
+- **Naming Conventions**: Use snake_case for all table and column names.
+
+The schema files are located at: `apps/web/lib/schema/*`.

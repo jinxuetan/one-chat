@@ -1,0 +1,105 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# T3 Chat Clone - Product Requirements Document
+
+## Vision
+Build a high-performance, open-source AI chat application that matches T3 Chat's speed and functionality using a local-first architecture.
+
+## Core Architecture Requirements
+
+### 1. Performance-First Design (CRITICAL)
+- **Fast Data Access**: Optimized PostgreSQL queries with proper indexing
+- **Instant Navigation**: Minimize loading states through efficient caching
+- **Client-Side Optimization**: Strategic state management and memoization
+- **Performance**: Eliminate unnecessary delays through optimized data flows
+
+### 2. Multi-Model AI Integration
+- Support multiple AI providers seamlessly
+- Real-time streaming responses character-by-character
+- Use Vercel AI SDK for backend streaming
+- Implement model switching without interruption
+
+### 3. Real-Time Sync Engine
+- **Redis Pub/Sub**: Primary messaging backbone for real-time updates
+- **Multi-Client Support**: Consistent state across all connected clients
+- **Persistent Storage**: Message history stored in PostgreSQL
+- **Live Updates**: Real-time message synchronization across sessions
+
+### 4. Basic User Management
+- Simple user authentication and session management
+- Personal chat history and preferences
+- Individual user settings and model preferences
+
+## Performance Requirements (NON-NEGOTIABLE)
+
+### Speed Benchmarks
+- **Target**: Match or exceed T3 Chat performance
+- **Navigation**: Instant page transitions (< 50ms)
+- **Rendering**: Use React Compiler + strategic memoization
+- **Streaming**: Real-time AI responses without lag
+
+### Technical Optimizations
+- Strategic component memoization
+- Efficient state management patterns
+- Custom routing for performance
+- Minimal re-renders and optimal bundle sizes
+
+## Tech Stack Implementation
+
+### Frontend
+- **React 19** with Next.js 15
+- **TypeScript 19** for type safety
+- **TailwindCSS 4** for styling
+- **tRPC** for type-safe data fetching with React Query integration
+
+### Backend & Data
+- **PostgreSQL 17 (Neon)** for persistent server data
+- **Drizzle ORM** for database operations
+- **Redis (Upstash)** for real-time messaging
+- **Vercel AI SDK** for AI model integration
+- **tRPC** for end-to-end type safety and API management
+
+### Development
+- **TurboRepo** for monorepo management
+- **tRPC** for efficient data fetching, caching, and real-time subscriptions
+
+## Feature Implementation Priorities
+
+### Phase 1: Core Chat (MVP)
+1. Basic chat interface with PostgreSQL storage
+2. Single AI model integration with tRPC streaming
+3. Real-time streaming responses via tRPC subscriptions
+4. User authentication and session management
+
+### Phase 2: Multi-Model & Performance
+1. Multiple AI provider support through tRPC routers
+2. Redis Pub/Sub implementation with tRPC subscriptions
+3. Performance optimizations and intelligent caching
+4. Cross-device synchronization via real-time tRPC updates
+
+### Phase 3: Polish & Enhancement
+1. Advanced UI/UX improvements
+2. Model preference management through tRPC mutations
+3. Chat history search and organization with optimized queries
+4. Performance monitoring and optimization
+
+## Success Criteria
+- **Performance**: Navigation faster than 50ms
+- **Streaming**: Character-by-character AI responses via tRPC subscriptions
+- **Sync**: Real-time updates across all clients through tRPC
+- **Database**: Fast PostgreSQL queries with Drizzle ORM integration
+- **Scalability**: Support multiple concurrent users efficiently
+- **Type Safety**: End-to-end type safety from database to frontend
+
+## Development Guidelines
+- Prioritize performance over features
+- Optimize PostgreSQL queries and database design
+- Use TypeScript strictly for all components
+- Follow React 19 best practices with hooks
+- Optimize for real-time streaming performance
+- Leverage tRPC for all client-server communication
+- Implement proper error handling and loading states
+- Use tRPC subscriptions for real-time features

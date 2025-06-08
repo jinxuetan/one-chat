@@ -1,0 +1,505 @@
+---
+description: Comprehensive performance optimization guidelines for Next.js 15 and React 19 applications focused on caching, rendering, and Core Web Vitals.
+globs: 
+alwaysApply: false
+---
+# Next.js 15 and React 19 Performance Optimization
+
+Comprehensive performance optimization guidelines for Next.js 15 and React 19 applications focused on caching, rendering, and Core Web Vitals.
+
+## Core Performance Principles
+
+### 1. Next.js 15 Caching Strategy (CRITICAL)
+- **Default Behavior**: Fetch requests use `no-store` by default (no automatic caching)
+- **Explicit Caching**: Use `cache: 'force-cache'` only when needed
+- **Predictable Behavior**: Opt-in caching prevents unexpected cache surprises
+
+```typescript
+// ✅ Good: Explicit caching when needed
+const data = await fetch('/api/data', { 
+  cache: 'force-cache',
+  next: { revalidate: 60 }
+});
+
+// ✅ Good: Fresh data by default
+const data = await fetch('/api/dynamic-data'); // Uses no-store by default
+
+// ❌ Bad: Assuming automatic caching
+const data = await fetch('/api/data'); // Don't expect this to cache
+```
+
+### 2. React 19 cache() Function Optimization
+- **Server Components Only**: Use `cache()` exclusively in Server Components
+- **Define Outside Components**: Always define cached functions outside component scope
+- **Prevent Duplicate Work**: Eliminate redundant data fetching across components
+
+```typescript
+// ✅ Good: cache() function usage
+import { cache } from 'react';
+
+const getUser = cache(async (id: string) => {
+  const response = await fetch(`/api/users/${id}`);
+  return response.json();
+});
+
+// Multiple components can call getUser(id) - only fetches once per request
+export default async function UserProfile({ userId }: { userId: string }) {
+  const user = await getUser(userId);
+  return <div>{user.name}</div>;
+}
+
+// ❌ Bad: Defining cache inside component
+export default async function UserProfile({ userId }: { userId: string }) {
+  const getUser = cache(async (id: string) => { // Don't do this
+    // ...
+  });
+}
+```
+
+## Server Components and Rendering Optimization
+
+### 3. Server Components Best Practices
+- **Minimize 'use client'**: Favor Server Components for data fetching
+- **Strategic Client Components**: Only use for interactivity and Web APIs
+- **Suspense Boundaries**: Wrap client components in Suspense with fallbacks
+
+```typescript
+// ✅ Good: Server Component for data fetching
+export default async function ProductPage({ params }: { params: { id: string } }) {
+  const product = await getProduct(params.id);
+  
+  return (
+    <div>
+      <ProductDetails product={product} />
+      <Suspense fallback={<div>Loading reviews...</div>}>
+        <ProductReviews productId={params.id} />
+      </Suspense>
+    </div>
+  );
+}
+
+// ✅ Good: Client Component only for interactivity
+'use client';
+export function AddToCartButton({ productId }: { productId: string }) {
+  const handleClick = () => {
+    // Interactive functionality
+  };
+  
+  return <button onClick={handleClick}>Add to Cart</button>;
+}
+
+// ❌ Bad: Client Component for data fetching
+'use client';
+export function ProductPage() {
+  const [product, setProduct] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/product').then(res => res.json()).then(setProduct);
+  }, []);
+  
+  // Don't fetch data in client components unless necessary
+}
+```
+
+### 4. Static Generation and ISR Implementation
+- **Static by Default**: Use static generation for stable content
+- **ISR for Dynamic**: Implement Incremental Static Regeneration for frequently updated content
+- **On-Demand Revalidation**: Use `revalidatePath` for immediate updates
+
+```typescript
+// ✅ Good: Static generation with ISR
+export const revalidate = 60; // Revalidate every 60 seconds
+
+export default async function BlogPost({ params }: { params: { slug: string } }) {
+  const post = await getBlogPost(params.slug);
+  
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div>{post.content}</div>
+    </article>
+  );
+}
+
+// ✅ Good: On-demand revalidation in API route
+import { revalidatePath } from 'next/cache';
+
+export async function POST(request: Request) {
+  const { slug } = await request.json();
+  
+  // Update content
+  await updateBlogPost(slug);
+  
+  // Immediately revalidate the page
+  revalidatePath(`/blog/${slug}`);
+  
+  return Response.json({ success: true });
+}
+
+// ❌ Bad: Unnecessary dynamic rendering
+export const dynamic = 'force-dynamic'; // Only use when actually needed
+```
+
+## Advanced Caching with dynamicIO
+
+### 5. use cache Directive (Experimental)
+- **Enable dynamicIO**: Add experimental flag for advanced caching
+- **Cache Granularity**: Apply at file, component, or function level
+- **Cache Profiles**: Use semantic cache lifetimes
+
+```typescript
+// ✅ Good: Function-level caching with profile
+'use cache';
+import { cacheLife } from 'next/cache';
+
+export async function getProducts() {
+  cacheLife('hours'); // Semantic cache lifetime
+  
+  const response = await fetch('/api/products');
+  return response.json();
+}
+
+// ✅ Good: Component-level caching
+'use cache';
+export async function ProductList() {
+  const products = await getProducts();
+  
+  return (
+    <div>
+      {products.map(product => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
+// ✅ Good: Custom cache configuration
+'use cache';
+export async function getCriticalData() {
+  cacheLife({
+    stale: 30,        // 30 seconds stale time
+    revalidate: 60,   // Revalidate every minute
+    expire: 3600      // Expire after 1 hour
+  });
+  
+  return await fetchCriticalData();
+}
+```
+
+## Performance Optimization Techniques
+
+### 6. Image Optimization and Core Web Vitals
+- **Next.js Image Component**: Always use for automatic optimization
+- **Priority Loading**: Set priority for above-the-fold images
+- **Modern Formats**: Leverage automatic WebP conversion
+
+```typescript
+// ✅ Good: Optimized image usage
+import Image from 'next/image';
+
+export function HeroBanner() {
+  return (
+    <Image
+      src="/hero-image.jpg"
+      alt="Hero banner"
+      width={1200}
+      height={600}
+      priority
+      fetchPriority="high"
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,..." // Prevent CLS
+    />
+  );
+}
+
+// ✅ Good: Lazy loading for below-the-fold images
+export function ProductGallery({ images }: { images: string[] }) {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {images.map((src, index) => (
+        <Image
+          key={index}
+          src={src}
+          alt={`Product image ${index + 1}`}
+          width={400}
+          height={400}
+          loading="lazy" // Default behavior
+        />
+      ))}
+    </div>
+  );
+}
+
+// ❌ Bad: Not using Next.js Image component
+export function ProductImage({ src }: { src: string }) {
+  return <img src={src} alt="Product" />; // No optimization
+}
+```
+
+### 7. Code Splitting and Dynamic Imports
+- **Automatic Splitting**: Leverage Next.js automatic code splitting
+- **Dynamic Imports**: Use for non-critical components
+- **Bundle Analysis**: Regular bundle size monitoring
+
+```typescript
+// ✅ Good: Dynamic import for non-critical components
+import { lazy, Suspense } from 'react';
+
+const ChatWidget = lazy(() => import('./ChatWidget'));
+const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard'));
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div>
+      {children}
+      <Suspense fallback={<div>Loading chat...</div>}>
+        <ChatWidget />
+      </Suspense>
+    </div>
+  );
+}
+
+// ✅ Good: Conditional dynamic imports
+export function AdminPanel() {
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  
+  return (
+    <div>
+      <button onClick={() => setShowAnalytics(true)}>
+        Show Analytics
+      </button>
+      {showAnalytics && (
+        <Suspense fallback={<div>Loading analytics...</div>}>
+          <AnalyticsDashboard />
+        </Suspense>
+      )}
+    </div>
+  );
+}
+
+// ❌ Bad: Importing heavy components that may not be used
+import AnalyticsDashboard from './AnalyticsDashboard'; // Always loaded
+```
+
+### 8. API and Data Fetching Optimization
+- **Request Batching**: Combine multiple API calls with Promise.all
+- **tRPC Integration**: Use for type-safe client-side caching and revalidation
+- **Timeout Handling**: Implement timeouts for external APIs
+
+```typescript
+// ✅ Good: Request batching
+export async function getPageData(userId: string) {
+  const [user, posts, preferences] = await Promise.all([
+    getUser(userId),
+    getUserPosts(userId),
+    getUserPreferences(userId)
+  ]);
+  
+  return { user, posts, preferences };
+}
+
+// ✅ Good: tRPC for client-side data fetching with React Query
+'use client';
+import { api } from "~/lib/trpc/react";
+
+export function UserProfile({ userId }: { userId: string }) {
+  const { data: user, error, isLoading } = api.user.getById.useQuery(
+    { userId },
+    {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      cacheTime: 1000 * 60 * 10, // 10 minutes
+      refetchOnWindowFocus: false,
+    }
+  );
+  
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading user</div>;
+  
+  return <div>{user.name}</div>;
+}
+
+// ✅ Good: tRPC query batching (automatic)
+'use client';
+export function Dashboard({ userId }: { userId: string }) {
+  // These queries are automatically batched by tRPC
+  const { data: user } = api.user.getById.useQuery({ userId });
+  const { data: posts } = api.post.getUserPosts.useQuery({ userId });
+  const { data: preferences } = api.user.getPreferences.useQuery({ userId });
+  
+  return (
+    <div>
+      <UserCard user={user} />
+      <PostsList posts={posts} />
+      <PreferencesPanel preferences={preferences} />
+    </div>
+  );
+}
+
+// ✅ Good: API timeout handling with tRPC
+export async function fetchWithTimeout(url: string, timeout = 5000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      cache: 'force-cache',
+      next: { revalidate: 300 }
+    });
+    
+    clearTimeout(timeoutId);
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    // Return cached data or default fallback
+    return getCachedDataOrFallback(url);
+  }
+}
+
+// ❌ Bad: Sequential API calls
+export async function getPageDataSequential(userId: string) {
+  const user = await getUser(userId);
+  const posts = await getUserPosts(userId); // Waits for previous
+  const preferences = await getUserPreferences(userId); // Waits for previous
+  
+  return { user, posts, preferences };
+}
+```
+
+## React 19 Compiler Optimization
+
+### 9. Automatic Optimization Guidelines
+- **Trust the Compiler**: Avoid manual memoization when React 19 compiler is enabled
+- **Component Structure**: Write clean, functional components
+- **State Management**: Use built-in hooks efficiently
+
+```typescript
+// ✅ Good: Clean component that compiler can optimize
+export function ProductCard({ product, onAddToCart }: {
+  product: Product;
+  onAddToCart: (id: string) => void;
+}) {
+  // Compiler automatically optimizes this
+  return (
+    <div className="border rounded-lg p-4">
+      <h3>{product.name}</h3>
+      <p>{product.price}</p>
+      <button onClick={() => onAddToCart(product.id)}>
+        Add to Cart
+      </button>
+    </div>
+  );
+}
+
+// ✅ Good: Efficient state usage
+export function ShoppingCart() {
+  const [items, setItems] = useState<CartItem[]>([]);
+  
+  const addItem = (product: Product) => {
+    setItems(prev => [...prev, { ...product, quantity: 1 }]);
+  };
+  
+  // Compiler handles optimization automatically
+  return (
+    <div>
+      {items.map(item => (
+        <CartItem key={item.id} item={item} />
+      ))}
+    </div>
+  );
+}
+
+// ❌ Avoid: Manual memoization when compiler is enabled
+export const ProductCard = memo(({ product }: { product: Product }) => {
+  // Unnecessary when React 19 compiler is active
+  return <div>{product.name}</div>;
+});
+```
+
+## Performance Monitoring and Validation
+
+### 10. Core Web Vitals Optimization
+- **LCP**: Optimize Largest Contentful Paint with priority images
+- **CLS**: Prevent Cumulative Layout Shift with proper sizing
+- **INP**: Optimize Interaction to Next Paint with efficient event handlers
+
+```typescript
+// ✅ Good: LCP optimization
+export function HeroSection() {
+  return (
+    <section>
+      <Image
+        src="/hero.jpg"
+        alt="Hero image"
+        width={1200}
+        height={600}
+        priority // Critical for LCP
+        fetchPriority="high"
+      />
+    </section>
+  );
+}
+
+// ✅ Good: CLS prevention
+export function ProductGrid({ products }: { products: Product[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {products.map(product => (
+        <div
+          key={product.id}
+          className="aspect-square" // Prevent layout shift
+        >
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ✅ Good: INP optimization with debouncing
+'use client';
+import { useDeferredValue, useState } from 'react';
+
+export function SearchBox() {
+  const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
+  
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search products..."
+      />
+      <SearchResults query={deferredQuery} />
+    </div>
+  );
+}
+```
+
+## Performance Checklist
+
+### Essential Performance Tasks
+1. **Caching Strategy**: Implement explicit caching with Next.js 15
+2. **Server Components**: Maximize Server Component usage
+3. **Image Optimization**: Use Next.js Image component with proper attributes
+4. **Code Splitting**: Implement dynamic imports for large components
+5. **Bundle Analysis**: Regular monitoring with Next Bundle Analyzer
+6. **Core Web Vitals**: Monitor and optimize LCP, CLS, and INP
+7. **API Optimization**: Implement batching, timeouts, and caching
+8. **Static Generation**: Use ISR for dynamic content with caching needs
+
+### Monitoring and Testing
+- Monitor Core Web Vitals in production
+- Use React DevTools Profiler for performance analysis
+- Implement performance budgets for bundle sizes
+- Regular Lighthouse audits for performance scoring
+- Test performance across different devices and network conditions
+
+Remember: Performance optimization is an iterative process. Profile first, optimize second, and measure the impact of changes.
