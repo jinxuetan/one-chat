@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { TRPCProvider } from "./trpc-provider";
 
 export const Providers = ({ children }: React.PropsWithChildren) => (
   <NextThemesProvider
@@ -10,6 +11,6 @@ export const Providers = ({ children }: React.PropsWithChildren) => (
     disableTransitionOnChange
     enableColorScheme
   >
-    {children}
+    <TRPCProvider>{children}</TRPCProvider>
   </NextThemesProvider>
 );
