@@ -28,8 +28,5 @@
     "formatter": {
       "quoteStyle": "double"
     }
-  },
-  "files": {
-    "ignore": ["packages/ui/**"]
   }
 }

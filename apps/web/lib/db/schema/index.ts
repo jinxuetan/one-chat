@@ -1,4 +1,5 @@
 import { timestamp } from "drizzle-orm/pg-core";
+import { customAlphabet } from "nanoid";
 
 export const timestamps = {
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -8,4 +9,6 @@ export const timestamps = {
     .$onUpdate(() => new Date()),
 };
 
-export { user, session, account, verification } from "./auth";
+export const nanoid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+);

@@ -14,26 +14,23 @@ const HealthStatusPage = () => {
     refetchOnWindowFocus: true,
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error {error.message}</p>;
+  if (isLoading) return <p className="font-mono">Loading...</p>;
+  if (error) return <p className="font-mono">Error {error.message}</p>;
 
   const healthData = health;
 
   return (
-    <>
+    <div className="flex flex-col gap-2 font-mono">
       {healthData &&
-        Object.entries(healthData.services).map(([name, service], i) => (
-          <div key={name}>
+        Object.entries(healthData.services).map(([name, service]) => (
+          <div key={name} className="flex flex-col gap-1">
             <h2>
               {name}: {service.status}
             </h2>
             <p>Latency: {service.latency}ms</p>
-            {i < Object.entries(healthData.services).length - 1 && (
-              <p>------------------</p>
-            )}
           </div>
         ))}
-    </>
+    </div>
   );
 };
 

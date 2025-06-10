@@ -90,9 +90,7 @@ export const getLanguageModel = (
   modelKey: Model
 ): LanguageModelV1 | OpenRouterLanguageModel => {
   const modelConfig = getModelByKey(modelKey);
-  if (!modelConfig) {
-    throw new Error(`Model ${modelKey} not found`);
-  }
+  if (!modelConfig) throw new Error(`Model ${modelKey} not found`);
 
   switch (modelConfig.provider) {
     case "openai": {
@@ -205,14 +203,10 @@ export const getCapabilitySummary = (modelKey: Model): string[] => {
   const capabilities: string[] = [];
   const caps = model.capabilities;
 
-  if (caps.streaming) capabilities.push("Streaming");
   if (caps.vision) capabilities.push("Vision");
-  if (caps.tools) capabilities.push("Tools");
   if (caps.search) capabilities.push("Web Search");
   if (caps.pdf) capabilities.push("PDF Processing");
   if (caps.reasoning) capabilities.push("Advanced Reasoning");
-  if (caps.coding) capabilities.push("Code Generation");
-  if (caps.multimodal) capabilities.push("Multimodal");
 
   return capabilities;
 };

@@ -39,7 +39,6 @@ export type Model =
   | "anthropic:claude-3.7-sonnet-reasoning"
   | "google:gemini-2.5-flash"
   | "google:gemini-2.5-pro"
-  | "google:gemini-2.5-flash-thinking"
   | "google:gemini-2.0-flash"
   | "google:gemini-2.0-flash-lite";
 
@@ -57,16 +56,13 @@ export type ModelConfig = {
   contextWindow: number;
   enabled: boolean;
   capabilities: {
-    streaming: boolean;
     vision: boolean;
-    tools: boolean;
     search: boolean;
     pdf: boolean;
     reasoning: boolean;
-    coding: boolean;
-    multimodal: boolean;
     effort: boolean;
   };
+  supportedFileTypes: string[];
   pricing?: {
     input: number; // per 1K tokens
     output: number; // per 1K tokens
@@ -87,6 +83,7 @@ export type UserModelPreferences = {
       temperature?: number;
       maxTokens?: number;
       topP?: number;
+      effort: false;
     }
   >;
 };
@@ -114,6 +111,10 @@ export type ModelFilters = {
   };
 };
 
+export const SUPPORTS_IMAGE_TYPES = ["png", "jpeg", "gif", "webp"];
+export const SUPPORTS_PDF_TYPES = ["pdf"];
+export const SUPPORTS_TEXT_TYPES = ["txt"];
+
 export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
   "meta:llama-4-scout": {
     id: "llama-4-scout",
@@ -124,16 +125,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 10000000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.19, output: 0.49 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -147,16 +145,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.19, output: 0.49 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -170,16 +165,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.5, output: 0.8 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -193,16 +185,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 64000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.07, output: 1.1 },
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
@@ -216,16 +205,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 64000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.07, output: 1.1 },
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
@@ -239,16 +225,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 64000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.14, output: 2.19 },
     performance: { speed: "slow", quality: "high" },
     tier: "standard",
@@ -262,16 +245,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 64000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.14, output: 2.19 },
     performance: { speed: "slow", quality: "high" },
     tier: "standard",
@@ -285,16 +265,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 64000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.14, output: 2.19 },
     performance: { speed: "slow", quality: "high" },
     tier: "standard",
@@ -308,16 +285,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 64000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.14, output: 2.19 },
     performance: { speed: "slow", quality: "high" },
     tier: "standard",
@@ -331,16 +305,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 131072,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 3, output: 15 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -354,16 +325,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 131072,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.3, output: 0.5 },
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
@@ -377,16 +345,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.4, output: 0.8 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -400,16 +365,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.4, output: 0.8 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -424,16 +386,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 256000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 5, output: 20 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -447,16 +406,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: true,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 1.1, output: 4.4 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -470,16 +426,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 2.5, output: 10 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -493,16 +446,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.15, output: 0.6 },
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
@@ -516,16 +466,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 2, output: 8 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -539,16 +486,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.4, output: 1.6 },
     performance: { speed: "fast", quality: "high" },
     tier: "standard",
@@ -562,16 +506,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      streaming: true,
-      vision: false,
-      tools: true,
+      vision: true,
       search: false,
       pdf: false,
       reasoning: false,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.1, output: 0.4 },
     performance: { speed: "fast", quality: "medium" },
     tier: "budget",
@@ -585,16 +526,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 10, output: 40 },
     performance: { speed: "slow", quality: "high" },
     tier: "premium",
@@ -608,16 +546,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: false,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: false,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 1.1, output: 4.4 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -631,16 +566,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 8000,
     enabled: true,
     capabilities: {
-      streaming: false,
       vision: true,
-      tools: false,
       search: false,
       pdf: false,
       reasoning: false,
-      coding: false,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 1, output: 2 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -654,16 +586,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 0.15, output: 0.6 },
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
@@ -677,42 +610,20 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: true,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 1.25, output: 10 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
-  },
-  "google:gemini-2.5-flash-thinking": {
-    id: "gemini-2.5-flash-thinking",
-    name: "Gemini 2.5 Flash (Thinking)",
-    provider: "google",
-    description: "Gemini 2.5 Flash with thinking mode enabled",
-    maxTokens: 100000,
-    contextWindow: 1000000,
-    enabled: true,
-    capabilities: {
-      streaming: true,
-      vision: true,
-      tools: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      coding: true,
-      multimodal: true,
-      effort: false,
-    },
-    pricing: { input: 0.15, output: 3.5 },
-    performance: { speed: "slow", quality: "high" },
-    tier: "standard",
   },
   "google:gemini-2.0-flash": {
     id: "gemini-2.0-flash",
@@ -723,16 +634,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 0.1, output: 0.4 },
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
@@ -746,16 +658,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 500000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: false,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 0.05, output: 0.2 },
     performance: { speed: "fast", quality: "medium" },
     tier: "budget",
@@ -769,16 +682,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 3, output: 15 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -792,16 +706,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: true,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 3, output: 15 },
     performance: { speed: "slow", quality: "high" },
     tier: "premium",
@@ -815,16 +730,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 15, output: 75 },
     performance: { speed: "slow", quality: "high" },
     tier: "premium",
@@ -838,16 +754,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 3, output: 15 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -861,16 +778,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: true,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 3, output: 15 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
@@ -884,16 +802,17 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
-      streaming: true,
       vision: true,
-      tools: true,
       search: false,
       pdf: true,
       reasoning: true,
-      coding: true,
-      multimodal: true,
       effort: false,
     },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
     pricing: { input: 3, output: 15 },
     performance: { speed: "slow", quality: "high" },
     tier: "premium",
@@ -906,3 +825,69 @@ export const DEFAULT_MODEL_CONFIG: ModelConfig =
   AVAILABLE_MODELS[DEFAULT_MODEL];
 
 export type AvailableModel = (typeof AVAILABLE_MODELS)[Model];
+
+/**
+ * Convert file extensions to MIME types for use in HTML accept attribute
+ */
+export const extensionToMimeTypeMap: Record<string, string[]> = {
+  // Images
+  png: ["image/png"],
+  jpeg: ["image/jpeg"],
+  jpg: ["image/jpeg"],
+  gif: ["image/gif"],
+  webp: ["image/webp"],
+  svg: ["image/svg+xml"],
+  // Documents
+  pdf: ["application/pdf"],
+  txt: ["text/plain"],
+  md: ["text/markdown"],
+  doc: ["application/msword"],
+  docx: [
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
+  ppt: ["application/vnd.ms-powerpoint"],
+  pptx: [
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ],
+  // Spreadsheets
+  xls: ["application/vnd.ms-excel"],
+  xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+  csv: ["text/csv"],
+  // Archives
+  zip: ["application/zip"],
+  rar: ["application/x-rar-compressed"],
+  tar: ["application/x-tar"],
+  gz: ["application/gzip"],
+};
+
+/**
+ * Get MIME types for a model's supported file types
+ */
+export const getModelAcceptTypes = (modelKey: Model): string[] => {
+  const model = AVAILABLE_MODELS[modelKey];
+  if (!model) return [];
+
+  const mimeTypes = new Set<string>();
+
+  for (const extension of model.supportedFileTypes) {
+    const mimeTypesForExtension = extensionToMimeTypeMap[extension];
+    if (mimeTypesForExtension) {
+      for (const mimeType of mimeTypesForExtension) {
+        mimeTypes.add(mimeType);
+      }
+    }
+  }
+
+  return Array.from(mimeTypes);
+};
+
+/**
+ * Check if a model supports a specific file type
+ */
+export const modelSupportsFileType = (
+  modelKey: Model,
+  mimeType: string
+): boolean => {
+  const acceptedTypes = getModelAcceptTypes(modelKey);
+  return acceptedTypes.includes(mimeType);
+};

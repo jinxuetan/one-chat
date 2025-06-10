@@ -24,6 +24,7 @@ export const RootLayout = ({ children }: Readonly<React.PropsWithChildren>) => (
         fontSans.variable,
         fontMono.variable
       )}
+      suppressHydrationWarning
     >
       <Providers>{children}</Providers>
     </body>
