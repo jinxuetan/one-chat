@@ -1,6 +1,14 @@
 "use client";
 
-import { ChevronDownIcon, LoaderIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  Loader,
+  Loader2,
+  LoaderIcon,
+} from "lucide-react";
+import { TextShimmer } from "@workspace/ui/components/text-shimmer";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { AIResponse } from "./ai-response";
@@ -29,32 +37,34 @@ export const MessageReasoning = ({
   isLoading,
   reasoning,
 }: MessageReasoningProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="flex flex-col">
-      {isLoading ? (
-        <div className="flex flex-row items-center gap-2">
-          <div className="font-medium">Reasoning</div>
+      <button
+        data-testid="message-reasoning-toggle"
+        type="button"
+        className="cursor-pointer flex flex-row items-center gap-2"
+        onClick={() => {
+          setIsExpanded(!isExpanded);
+        }}
+      >
+        {isExpanded ? (
+          <ChevronDownIcon className="size-4" />
+        ) : (
+          <ChevronRightIcon className="size-4" />
+        )}
+        {isLoading ? (
+          <TextShimmer>Reasoning</TextShimmer>
+        ) : (
+          <span>Reasoning</span>
+        )}
+        {isLoading && (
           <div className="animate-spin">
-            <LoaderIcon />
+            <Loader className="size-3" />
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-row items-center gap-2">
-          <div className="font-medium">Reasoned for a few seconds</div>
-          <button
-            data-testid="message-reasoning-toggle"
-            type="button"
-            className="cursor-pointer"
-            onClick={() => {
-              setIsExpanded(!isExpanded);
-            }}
-          >
-            <ChevronDownIcon />
-          </button>
-        </div>
-      )}
+        )}
+      </button>
 
       <AnimatePresence initial={false}>
         {isExpanded && (
@@ -67,7 +77,7 @@ export const MessageReasoning = ({
             variants={variants}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
-            className="flex flex-col gap-4 border-l pl-4 text-zinc-600 dark:text-zinc-400"
+            className="flex flex-col gap-4 border-l pl-4 text-zinc-600 dark:text-zinc-400 bg-zinc-50 p-2 rounded-r-xl rounded-l-md"
           >
             <AIResponse>{reasoning}</AIResponse>
           </motion.div>

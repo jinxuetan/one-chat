@@ -18,7 +18,7 @@ import {
   message as messageTable,
   thread,
 } from "@/lib/db/schema/thread";
-import type { JSONValue, UIMessage } from "ai";
+import type { Attachment, JSONValue, UIMessage } from "ai";
 import {
   and,
   desc,
@@ -141,15 +141,16 @@ export const upsertMessage = async ({
   id,
   model,
   status,
-  attachmentIds,
+  attachments = [],
 }: {
   id: string;
   threadId: string;
   message: UIMessage;
   model?: string;
   status?: "pending" | "streaming" | "done" | "error";
-  attachmentIds?: string[];
+  attachments?: Attachment[];
 }): Promise<typeof messageTable.$inferSelect | undefined> => {
+  console.log("attachments", attachments);
   const [result] = await db
     .insert(messageTable)
     .values({
@@ -161,7 +162,7 @@ export const upsertMessage = async ({
       role: message.role,
       model,
       status,
-      attachmentIds,
+      attachments,
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -174,7 +175,7 @@ export const upsertMessage = async ({
         threadId,
         model,
         status,
-        attachmentIds: attachmentIds ?? [],
+        attachments,
         updatedAt: new Date(),
       },
     })
@@ -187,13 +188,7 @@ export const upsertMessage = async ({
   return result;
 };
 
-export const loadChat = async (
-  chatId: string
-): Promise<
-  (typeof messageTable.$inferSelect & {
-    attachments: (typeof attachment.$inferSelect)[];
-  })[]
-> => {
+export const loadChat = async (chatId: string) => {
   return await getMessagesWithAttachments(chatId);
 };
 
@@ -277,6 +272,41 @@ export const deleteMessage = async (
 };
 
 export const deleteTrailingMessages = async ({
+  id,
+}: {
+  id: string;
+}): Promise<(typeof messageTable.$inferSelect)[]> => {
+  const [referenceMessage] = await db
+    .select({
+      threadId: messageTable.threadId,
+      createdAt: messageTable.createdAt,
+    })
+    .from(messageTable)
+    .where(eq(messageTable.id, id))
+    .limit(1);
+
+  if (!referenceMessage) {
+    return [];
+  }
+
+  const removed = await db
+    .delete(messageTable)
+    .where(
+      and(
+        eq(messageTable.threadId, referenceMessage.threadId),
+        gt(messageTable.createdAt, referenceMessage.createdAt)
+      )
+    )
+    .returning();
+
+  if (removed.length > 0) {
+    invalidateThreadCache(referenceMessage.threadId);
+  }
+
+  return removed;
+};
+
+export const deleteMessageAndTrailing = async ({
   id,
 }: {
   id: string;
@@ -495,55 +525,23 @@ export const getMessageAttachments = async (
 const getMessagesWithAttachments = async (threadId: string) => {
   const rows = await db
     .select({
-      message: {
-        id: messageTable.id,
-        threadId: messageTable.threadId,
-        content: messageTable.content,
-        parts: messageTable.parts,
-        role: messageTable.role,
-        model: messageTable.model,
-        status: messageTable.status,
-        annotations: messageTable.annotations,
-        attachmentIds: messageTable.attachmentIds,
-        createdAt: messageTable.createdAt,
-        updatedAt: messageTable.updatedAt,
-      },
-      attachment: attachment,
+      id: messageTable.id,
+      threadId: messageTable.threadId,
+      content: messageTable.content,
+      parts: messageTable.parts,
+      role: messageTable.role,
+      model: messageTable.model,
+      status: messageTable.status,
+      annotations: messageTable.annotations,
+      attachments: messageTable.attachments,
+      createdAt: messageTable.createdAt,
+      updatedAt: messageTable.updatedAt,
     })
     .from(messageTable)
-    .leftJoin(
-      messageAttachment,
-      eq(messageTable.id, messageAttachment.messageId)
-    )
-    .leftJoin(attachment, eq(messageAttachment.attachmentId, attachment.id))
     .where(eq(messageTable.threadId, threadId))
     .orderBy(messageTable.createdAt);
 
-  const messagesMap = new Map<
-    string,
-    typeof messageTable.$inferSelect & {
-      attachments: (typeof attachment.$inferSelect)[];
-    }
-  >();
-
-  for (const row of rows) {
-    const messageId = row.message.id;
-
-    if (!messagesMap.has(messageId)) {
-      console.info({ annotations: row.message.annotations });
-      messagesMap.set(messageId, {
-        ...row.message,
-        attachments: [],
-        annotations: row.message.annotations ?? [],
-      });
-    }
-
-    if (row.attachment) {
-      messagesMap.get(messageId)!.attachments.push(row.attachment);
-    }
-  }
-
-  return Array.from(messagesMap.values());
+  return rows;
 };
 
 export const branchOutFromMessage = async ({
@@ -605,7 +603,7 @@ export const branchOutFromMessage = async ({
     role: msg.role,
     model: msg.model,
     status: msg.status,
-    attachmentIds: msg.attachmentIds,
+    attachments: msg.attachments,
     createdAt: new Date(Date.now() + index),
     updatedAt: new Date(Date.now() + index),
   }));

@@ -3,25 +3,14 @@ export type Provider =
   | "anthropic"
   | "google"
   | "openrouter"
-  | "xai"
   | "deepseek"
   | "meta";
 
 export type Model =
-  | "meta:llama-4-scout"
-  | "meta:llama-4-maverick"
-  | "meta:llama-3.3-70b"
-  | "deepseek:deepseek-v3-fireworks"
-  | "deepseek:deepseek-v3-0324"
-  | "deepseek:deepseek-r1-openrouter"
-  | "deepseek:deepseek-r1-0528"
-  | "deepseek:deepseek-r1-qwen-distilled"
-  | "deepseek:deepseek-r1-llama-distilled"
-  | "xai:grok-3"
-  | "xai:grok-3-mini"
-  | "openrouter:qwen-qwq-32b"
-  | "openrouter:qwen-2.5-32b"
-  | "openai:gpt-4.5"
+  | "openrouter:meta-llama/llama-4-scout:free"
+  | "openrouter:meta-llama/llama-4-maverick:free"
+  | "openrouter:deepseek/deepseek-r1-0528:free"
+  | "openrouter:qwen/qwen3-30b-a3b:free"
   | "openai:o4-mini"
   | "openai:gpt-4o"
   | "openai:gpt-4o-mini"
@@ -31,14 +20,12 @@ export type Model =
   | "openai:o3"
   | "openai:o3-mini"
   | "openai:gpt-imagegen"
-  | "anthropic:claude-4-sonnet"
-  | "anthropic:claude-4-sonnet-reasoning"
-  | "anthropic:claude-4-opus"
-  | "anthropic:claude-3.5-sonnet"
-  | "anthropic:claude-3.7-sonnet"
-  | "anthropic:claude-3.7-sonnet-reasoning"
-  | "google:gemini-2.5-flash"
-  | "google:gemini-2.5-pro"
+  | "anthropic:claude-sonnet-4-0"
+  | "anthropic:claude-sonnet-4-0-reasoning"
+  | "anthropic:claude-3-7-sonnet-latest"
+  | "anthropic:claude-3-7-sonnet-latest-reasoning"
+  | "google:gemini-2.5-pro-preview-06-05"
+  | "google:gemini-2.5-flash-preview-05-20"
   | "google:gemini-2.0-flash"
   | "google:gemini-2.0-flash-lite";
 
@@ -51,16 +38,20 @@ export type ModelConfig = {
   id: ExtractModelName<Model>;
   name: string;
   provider: Provider;
+  apiProvider?: Provider;
   description: string;
   maxTokens: number;
   contextWindow: number;
   enabled: boolean;
   capabilities: {
+    tools: true,
     vision: boolean;
-    search: boolean;
+    nativeSearch: boolean;
     pdf: boolean;
     reasoning: boolean;
+    tools: boolean;
     effort: boolean;
+    image: boolean;
   };
   supportedFileTypes: string[];
   pricing?: {
@@ -111,291 +102,102 @@ export type ModelFilters = {
   };
 };
 
-export const SUPPORTS_IMAGE_TYPES = ["png", "jpeg", "gif", "webp"];
+export const SUPPORTS_IMAGE_TYPES = ["png", "jpeg", "gif", "webp", "heic"];
 export const SUPPORTS_PDF_TYPES = ["pdf"];
 export const SUPPORTS_TEXT_TYPES = ["txt"];
 
 export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
-  "meta:llama-4-scout": {
-    id: "llama-4-scout",
+  "openrouter:meta-llama/llama-4-scout:free": {
+    id: "meta-llama/llama-4-scout:free",
     name: "Llama 4 Scout",
     provider: "meta",
+    apiProvider: "openrouter",
     description: "17B active parameters, 16 experts, 10M token context",
     maxTokens: 100000,
     contextWindow: 10000000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
+      nativeSearch: false,
+      pdf: false,
+      reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.19, output: 0.49 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
   },
-  "meta:llama-4-maverick": {
-    id: "llama-4-maverick",
+  "openrouter:meta-llama/llama-4-maverick:free": {
+    id: "meta-llama/llama-4-maverick:free",
     name: "Llama 4 Maverick",
     provider: "meta",
+    apiProvider: "openrouter",
     description: "17B active parameters, 128 experts, 1M token context",
     maxTokens: 100000,
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
+      nativeSearch: false,
+      pdf: false,
+      reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.19, output: 0.49 },
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
   },
-  "meta:llama-3.3-70b": {
-    id: "llama-3.3-70b",
-    name: "Llama 3.3 70B",
-    provider: "meta",
-    description: "Large language model with 70B parameters",
-    maxTokens: 100000,
-    contextWindow: 128000,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.5, output: 0.8 },
-    performance: { speed: "medium", quality: "high" },
-    tier: "standard",
-  },
-  "deepseek:deepseek-v3-fireworks": {
-    id: "deepseek-v3-fireworks",
-    name: "DeepSeek v3 (Fireworks)",
+  "openrouter:deepseek/deepseek-r1-0528:free": {
+    id: "deepseek/deepseek-r1-0528:free",
+    name: "DeepSeek R1",
     provider: "deepseek",
-    description: "DeepSeek Chat V3 via Fireworks provider",
-    maxTokens: 100000,
-    contextWindow: 64000,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.07, output: 1.1 },
-    performance: { speed: "fast", quality: "high" },
-    tier: "budget",
-  },
-  "deepseek:deepseek-v3-0324": {
-    id: "deepseek-v3-0324",
-    name: "DeepSeek v3 (0324)",
-    provider: "deepseek",
-    description: "DeepSeek Chat V3 March 2024 version",
-    maxTokens: 100000,
-    contextWindow: 64000,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.07, output: 1.1 },
-    performance: { speed: "fast", quality: "high" },
-    tier: "budget",
-  },
-  "deepseek:deepseek-r1-openrouter": {
-    id: "deepseek-r1-openrouter",
-    name: "DeepSeek R1 (OpenRouter)",
-    provider: "deepseek",
-    description: "DeepSeek Reasoner R1 via OpenRouter",
-    maxTokens: 100000,
-    contextWindow: 64000,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: false,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.14, output: 2.19 },
-    performance: { speed: "slow", quality: "high" },
-    tier: "standard",
-  },
-  "deepseek:deepseek-r1-0528": {
-    id: "deepseek-r1-0528",
-    name: "DeepSeek R1 (0528)",
-    provider: "deepseek",
+    apiProvider: "openrouter",
     description: "DeepSeek Reasoner R1 May 2024 version",
     maxTokens: 100000,
     contextWindow: 64000,
     enabled: true,
     capabilities: {
+      tools: false,
       vision: false,
-      search: false,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.14, output: 2.19 },
     performance: { speed: "slow", quality: "high" },
     tier: "standard",
   },
-  "deepseek:deepseek-r1-qwen-distilled": {
-    id: "deepseek-r1-qwen-distilled",
-    name: "DeepSeek R1 (Qwen Distilled)",
-    provider: "deepseek",
-    description: "DeepSeek R1 distilled by Qwen team",
-    maxTokens: 100000,
-    contextWindow: 64000,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: false,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.14, output: 2.19 },
-    performance: { speed: "slow", quality: "high" },
-    tier: "standard",
-  },
-  "deepseek:deepseek-r1-llama-distilled": {
-    id: "deepseek-r1-llama-distilled",
-    name: "DeepSeek R1 (Llama Distilled)",
-    provider: "deepseek",
-    description: "DeepSeek R1 distilled for Llama compatibility",
-    maxTokens: 100000,
-    contextWindow: 64000,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: false,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.14, output: 2.19 },
-    performance: { speed: "slow", quality: "high" },
-    tier: "standard",
-  },
-  "xai:grok-3": {
-    id: "grok-3",
-    name: "Grok 3",
-    provider: "xai",
-    description: "Latest Grok model with 131K context window",
-    maxTokens: 100000,
-    contextWindow: 131072,
-    enabled: true,
-    capabilities: {
-      vision: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
-    pricing: { input: 3, output: 15 },
-    performance: { speed: "medium", quality: "high" },
-    tier: "premium",
-  },
-  "xai:grok-3-mini": {
-    id: "grok-3-mini",
-    name: "Grok 3 Mini",
-    provider: "xai",
-    description: "Efficient version of Grok 3 with lower cost",
-    maxTokens: 100000,
-    contextWindow: 131072,
-    enabled: true,
-    capabilities: {
-      vision: false,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.3, output: 0.5 },
-    performance: { speed: "fast", quality: "high" },
-    tier: "budget",
-  },
-  "openrouter:qwen-qwq-32b": {
-    id: "qwen-qwq-32b",
-    name: "Qwen QWQ-32B",
+  "openrouter:qwen/qwen3-30b-a3b:free": {
+    id: "qwen/qwen3-30b-a3b:free",
+    name: "Qwen 3 30B",
     provider: "openrouter",
-    description: "Qwen QWQ model with 32B parameters",
+    apiProvider: "openrouter",
+    description: "Qwen 3.3 model with 30B parameters",
     maxTokens: 100000,
     contextWindow: 128000,
     enabled: true,
     capabilities: {
-      vision: false,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
-    pricing: { input: 0.4, output: 0.8 },
-    performance: { speed: "medium", quality: "high" },
-    tier: "standard",
-  },
-  "openrouter:qwen-2.5-32b": {
-    id: "qwen-2.5-32b",
-    name: "Qwen 2.5 32B",
-    provider: "openrouter",
-    description: "Qwen 2.5 model with 32B parameters",
-    maxTokens: 100000,
-    contextWindow: 128000,
-    enabled: true,
-    capabilities: {
+      tools: false,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.4, output: 0.8 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
-  },
-  "openai:gpt-4.5": {
-    id: "gpt-4.5",
-    name: "GPT-4.5",
-    provider: "openai",
-    description:
-      "Advanced model with enhanced reasoning and multimodal capabilities",
-    maxTokens: 100000,
-    contextWindow: 256000,
-    enabled: true,
-    capabilities: {
-      vision: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
-    pricing: { input: 5, output: 20 },
-    performance: { speed: "medium", quality: "high" },
-    tier: "premium",
   },
   "openai:o4-mini": {
     id: "o4-mini",
@@ -406,11 +208,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
-      pdf: true,
+      nativeSearch: false,
+      pdf: false,
       reasoning: true,
       effort: true,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 1.1, output: 4.4 },
@@ -426,11 +230,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 2.5, output: 10 },
@@ -446,11 +252,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.15, output: 0.6 },
@@ -466,11 +274,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 2, output: 8 },
@@ -486,11 +296,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.4, output: 1.6 },
@@ -506,11 +318,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 128000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: false,
+      nativeSearch: false,
       pdf: false,
       reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 0.1, output: 0.4 },
@@ -526,11 +340,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 10, output: 40 },
@@ -546,11 +362,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: false,
-      search: false,
-      pdf: true,
+      nativeSearch: false,
+      pdf: false,
       reasoning: true,
-      effort: false,
+      effort: true,
+      image: false,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 1.1, output: 4.4 },
@@ -566,19 +384,21 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 8000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: false,
+      nativeSearch: false,
       pdf: false,
       reasoning: false,
       effort: false,
+      image: true,
     },
     supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
     pricing: { input: 1, output: 2 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
   },
-  "google:gemini-2.5-flash": {
-    id: "gemini-2.5-flash",
+  "google:gemini-2.5-flash-preview-05-20": {
+    id: "gemini-2.5-flash-preview-05-20",
     name: "Gemini 2.5 Flash",
     provider: "google",
     description: "Fast, efficient Gemini model with multimodal capabilities",
@@ -586,11 +406,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: true,
       pdf: true,
       reasoning: true,
-      effort: false,
+      effort: true,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -601,8 +423,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     performance: { speed: "fast", quality: "high" },
     tier: "budget",
   },
-  "google:gemini-2.5-pro": {
-    id: "gemini-2.5-pro",
+  "google:gemini-2.5-pro-preview-06-05": {
+    id: "gemini-2.5-pro-preview-06-05",
     name: "Gemini 2.5 Pro",
     provider: "google",
     description: "Advanced Gemini model with enhanced reasoning",
@@ -610,11 +432,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: true,
       pdf: true,
       reasoning: true,
       effort: true,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -634,11 +458,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 1000000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: true,
       pdf: true,
-      reasoning: true,
+      reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -658,11 +484,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 500000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
       reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -673,8 +501,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     performance: { speed: "fast", quality: "medium" },
     tier: "budget",
   },
-  "anthropic:claude-4-sonnet": {
-    id: "claude-4-sonnet",
+  "anthropic:claude-sonnet-4-0": {
+    id: "claude-sonnet-4-0",
     name: "Claude 4 Sonnet",
     provider: "anthropic",
     description: "Latest Claude model with enhanced capabilities",
@@ -682,11 +510,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
-      reasoning: true,
+      reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -697,8 +527,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
   },
-  "anthropic:claude-4-sonnet-reasoning": {
-    id: "claude-4-sonnet-reasoning",
+  "anthropic:claude-sonnet-4-0-reasoning": {
+    id: "claude-sonnet-4-0-reasoning",
     name: "Claude 4 Sonnet (Reasoning)",
     provider: "anthropic",
     description: "Claude 4 Sonnet optimized for reasoning tasks",
@@ -706,11 +536,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: false,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
       effort: true,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -721,56 +553,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     performance: { speed: "slow", quality: "high" },
     tier: "premium",
   },
-  "anthropic:claude-4-opus": {
-    id: "claude-4-opus",
-    name: "Claude 4 Opus",
-    provider: "anthropic",
-    description: "Most capable Claude model for complex tasks",
-    maxTokens: 100000,
-    contextWindow: 200000,
-    enabled: true,
-    capabilities: {
-      vision: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [
-      ...SUPPORTS_TEXT_TYPES,
-      ...SUPPORTS_IMAGE_TYPES,
-      ...SUPPORTS_PDF_TYPES,
-    ],
-    pricing: { input: 15, output: 75 },
-    performance: { speed: "slow", quality: "high" },
-    tier: "premium",
-  },
-  "anthropic:claude-3.5-sonnet": {
-    id: "claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet",
-    provider: "anthropic",
-    description: "Balanced Claude model with good performance",
-    maxTokens: 100000,
-    contextWindow: 200000,
-    enabled: true,
-    capabilities: {
-      vision: true,
-      search: true,
-      pdf: true,
-      reasoning: true,
-      effort: false,
-    },
-    supportedFileTypes: [
-      ...SUPPORTS_TEXT_TYPES,
-      ...SUPPORTS_IMAGE_TYPES,
-      ...SUPPORTS_PDF_TYPES,
-    ],
-    pricing: { input: 3, output: 15 },
-    performance: { speed: "medium", quality: "high" },
-    tier: "standard",
-  },
-  "anthropic:claude-3.7-sonnet": {
-    id: "claude-3.7-sonnet",
+  "anthropic:claude-3-7-sonnet-latest": {
+    id: "claude-3-7-sonnet-latest",
     name: "Claude 3.7 Sonnet",
     provider: "anthropic",
     description: "Enhanced Claude 3.5 with improved capabilities",
@@ -778,11 +562,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: true,
+      nativeSearch: false,
       pdf: true,
-      reasoning: true,
+      reasoning: false,
       effort: false,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -793,8 +579,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     performance: { speed: "medium", quality: "high" },
     tier: "premium",
   },
-  "anthropic:claude-3.7-sonnet-reasoning": {
-    id: "claude-3.7-sonnet-reasoning",
+  "anthropic:claude-3-7-sonnet-latest-reasoning": {
+    id: "claude-3-7-sonnet-latest-reasoning",
     name: "Claude 3.7 Sonnet (Reasoning)",
     provider: "anthropic",
     description: "Claude 3.7 Sonnet optimized for reasoning tasks",
@@ -802,11 +588,13 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     contextWindow: 200000,
     enabled: true,
     capabilities: {
+      tools: true,
       vision: true,
-      search: false,
+      nativeSearch: false,
       pdf: true,
       reasoning: true,
-      effort: false,
+      effort: true,
+      image: false,
     },
     supportedFileTypes: [
       ...SUPPORTS_TEXT_TYPES,
@@ -837,6 +625,7 @@ export const extensionToMimeTypeMap: Record<string, string[]> = {
   gif: ["image/gif"],
   webp: ["image/webp"],
   svg: ["image/svg+xml"],
+  heic: ["image/heic"],
   // Documents
   pdf: ["application/pdf"],
   txt: ["text/plain"],
@@ -890,4 +679,21 @@ export const modelSupportsFileType = (
 ): boolean => {
   const acceptedTypes = getModelAcceptTypes(modelKey);
   return acceptedTypes.includes(mimeType);
+};
+
+/**
+ * Get the API provider for a model (used for routing API calls)
+ * Falls back to the main provider if no apiProvider is specified
+ */
+export const getApiProvider = (modelKey: Model): Provider => {
+  const model = AVAILABLE_MODELS[modelKey];
+  return model?.apiProvider ?? model?.provider ?? "openai";
+};
+
+/**
+ * Get the display provider for a model (used in UI)
+ */
+export const getDisplayProvider = (modelKey: Model): Provider => {
+  const model = AVAILABLE_MODELS[modelKey];
+  return model?.provider ?? "openai";
 };

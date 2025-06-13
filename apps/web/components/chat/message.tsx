@@ -17,7 +17,15 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
-import { PencilIcon, RotateCcwIcon, Split } from "lucide-react";
+import {
+  PencilIcon,
+  RotateCcwIcon,
+  Split,
+  FileIcon,
+  ImageIcon,
+  VideoIcon,
+  FileTextIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import {
@@ -31,10 +39,12 @@ import { AIResponse } from "./ai-response";
 import { FilePreview } from "./file-preview";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
+import { MessageSources } from "./message-sources";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth/client";
 import { ProviderIcon } from "./select-model-button";
 import Image from "next/image";
+import Link from "next/link";
 
 interface MessageComponentProps {
   threadId: string;
@@ -64,8 +74,8 @@ export const Message = ({
   const { data: session } = useSession();
 
   const trpcUtils = trpc.useUtils();
-  const deleteTrailingMessagesMutation =
-    trpc.thread.deleteTrailingMessages.useMutation();
+  const deleteMessageAndTrailingMutation =
+    trpc.thread.deleteMessageAndTrailing.useMutation();
   const branchOutMutation = trpc.thread.branchOut.useMutation({
     onMutate: async ({ originalThreadId, newThreadId }) => {
       setIsBranchingThread(true);
@@ -125,7 +135,7 @@ export const Message = ({
 
   const handleMessageReload = useCallback(async () => {
     try {
-      await deleteTrailingMessagesMutation.mutateAsync({
+      await deleteMessageAndTrailingMutation.mutateAsync({
         messageId: message.id,
       });
 
@@ -134,7 +144,7 @@ export const Message = ({
           (m) => m.id === message.id
         );
         return messageIndex !== -1
-          ? currentMessages.slice(0, messageIndex + 1)
+          ? currentMessages.slice(0, messageIndex)
           : currentMessages;
       });
 
@@ -142,7 +152,7 @@ export const Message = ({
     } catch (error) {
       console.error("Failed to reload from message:", error);
     }
-  }, [deleteTrailingMessagesMutation, message.id, setMessages, reload]);
+  }, [deleteMessageAndTrailingMutation, message.id, setMessages, reload]);
 
   const handleThreadBranchOut = useCallback(async () => {
     const newThreadId = generateUUID();
@@ -172,13 +182,14 @@ export const Message = ({
     };
   }, [isBranchingThread]);
 
-  const isImageGen = resolvedModel === "openai:gpt-imagegen";
-  const imageGenAttachment =
-    isImageGen &&
-    (message.attachments?.at(0)?.attachmentUrl ??
-      (message.annotations as CustomAnnotation[])?.find(
-        (annotation) => annotation.type === "image-gen"
-      )?.attachment.attachmentUrl);
+  // Extract sources from message parts
+  const sources = useMemo(() => {
+    return (
+      message.parts
+        ?.filter((part) => part.type === "source")
+        ?.map((part: any) => part.source) || []
+    );
+  }, [message.parts]);
 
   console.info({ message });
 
@@ -207,19 +218,46 @@ export const Message = ({
                 message.role === "assistant" && requiresScrollPadding,
             })}
           >
-            {isLoading && isImageGen && (
-              <div className="h-64 w-64 animate-pulse rounded-lg border bg-muted" />
-            )}
-            {
-              imageGenAttachment && (
-                <Image
-                  src={imageGenAttachment}
-                  alt="Generated image"
-                  width={256}
-                  height={256}
-                />
-              )
-            }
+            <div className="flex flex-col gap-2 justify-center items-end">
+              {message.experimental_attachments?.map((attachment) => {
+                const isImage = attachment.contentType?.startsWith("image/");
+                const isVideo = attachment.contentType?.startsWith("video/");
+                const isText = attachment.contentType?.startsWith("text/");
+
+                const Icon = isImage
+                  ? ImageIcon
+                  : isVideo
+                  ? VideoIcon
+                  : isText
+                  ? FileTextIcon
+                  : FileIcon;
+
+                const fileName =
+                  (attachment.name?.split(".").at(0) ?? "File").substring(
+                    0,
+                    20
+                  ) + "...";
+                const fileExtension =
+                  attachment.name?.split(".").at(1) ?? "txt";
+
+                return (
+                  <div
+                    key={attachment.url}
+                    className="inline-flex w-fit items-center gap-2 rounded-lg border border-border bg-muted/50 px-2 py-1 text-sm hover:bg-muted transition-colors"
+                  >
+                    <Icon className="size-4 text-muted-foreground" />
+                    <Link
+                      href={attachment.url}
+                      className="font-medium hover:underline truncate"
+                      target="_blank"
+                    >
+                      {fileName}.{fileExtension}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+
             {message.parts?.map((messagePart, partIndex) => {
               const partKey = `message-${message.id}-part-${partIndex}`;
 
@@ -233,9 +271,20 @@ export const Message = ({
                 );
               }
 
+              if (messagePart.type === "source") {
+                // Sources are handled separately, skip individual source parts
+                return null;
+              }
+
               if (messagePart.type === "text") {
                 return (
-                  <div key={partKey} className="group relative mb-12 gap-2">
+                  <div
+                    key={partKey}
+                    className={cn("group relative mb-12 gap-2 w-fit", {
+                      "ml-auto": message.role === "user",
+                      "mr-auto": message.role === "assistant",
+                    })}
+                  >
                     <div className="flex w-full flex-col gap-3">
                       {displayMode === "view" ? (
                         <div
@@ -261,6 +310,10 @@ export const Message = ({
                           setMessages={setMessages}
                           reload={reload}
                         />
+                      )}
+
+                      {sources.length > 0 && (
+                        <MessageSources sources={sources} />
                       )}
                     </div>
 
@@ -294,7 +347,7 @@ export const Message = ({
                               className="group/edit"
                               onClick={handleMessageReload}
                               disabled={
-                                deleteTrailingMessagesMutation.isPending
+                                deleteMessageAndTrailingMutation.isPending
                               }
                             >
                               <RotateCcwIcon
@@ -377,6 +430,43 @@ export const Message = ({
                     )}
                   </div>
                 );
+              }
+
+              if (messagePart.type === "tool-invocation") {
+                const { toolInvocation } = messagePart;
+                const { toolName, state } = toolInvocation;
+
+                if (state === "call") {
+                  if (toolName === "generateImage") {
+                    return (
+                      <div key={partKey}>
+                        <p>Generating image...</p>
+                      </div>
+                    );
+                  }
+                }
+
+                if (state === "result") {
+                  if (toolName === "generateImage") {
+                    if (toolInvocation.result.error) {
+                      return (
+                        <div key={partKey}>
+                          <p>{toolInvocation.result.error}</p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={partKey}>
+                        <Image
+                          src={toolInvocation.result.downloadUrl}
+                          alt="Generated image"
+                          width={256}
+                          height={256}
+                        />
+                      </div>
+                    );
+                  }
+                }
               }
             })}
           </div>

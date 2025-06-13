@@ -1,13 +1,19 @@
 import { env } from "@/env";
+import { createImageGenerationTool } from "@/lib/actions/image";
+import { appendStreamId, loadStreams } from "@/lib/actions/stream";
 import {
   getOrCreateThread,
   loadChat,
   upsertMessage,
 } from "@/lib/actions/thread";
-import { appendStreamId, loadStreams } from "@/lib/actions/stream";
+import { webSearch } from "@/lib/actions/web-search";
 import { type Model, getLanguageModel } from "@/lib/ai";
+import { getModelByKey, ModelOptions } from "@/lib/ai/models";
 import { auth } from "@/lib/auth/server";
+import { EFFORT_MAP_FOR_ANTHROPIC } from "@/lib/constants";
 import { chatRequestSchema } from "@/lib/schema";
+import { AnthropicProviderOptions } from "@ai-sdk/anthropic";
+import { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import {
   type UIMessage,
   appendClientMessage,
@@ -19,7 +25,6 @@ import {
 import { Redis } from "ioredis";
 import { type NextRequest, after } from "next/server";
 import { createResumableStreamContext } from "resumable-stream/ioredis";
-import { handleImageGeneration } from "@/lib/actions/image";
 
 const publisher = new Redis(env.UPSTASH_REDIS_URL);
 const subscriber = new Redis(env.UPSTASH_REDIS_URL);
@@ -35,12 +40,13 @@ export const maxDuration = 150;
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { messages, message, id } = body as {
-      messages: UIMessage[];
+    const { message, id } = body as {
       message: UIMessage;
       id: string;
+      experimental_attachments: any[];
     };
-    const { selectedModel } = chatRequestSchema.parse(body);
+
+    const { selectedModel, effort, searchMode } = chatRequestSchema.parse(body);
 
     const session = await auth.api.getSession({ headers: req.headers });
     if (!session) return new Response("Unauthorized", { status: 401 });
@@ -60,6 +66,7 @@ export const POST = async (req: NextRequest) => {
         threadId: id,
         id: message.id,
         message,
+        attachments: message.experimental_attachments,
         model: selectedModel,
       }),
       appendStreamId({ chatId: id, streamId }),
@@ -77,22 +84,12 @@ export const POST = async (req: NextRequest) => {
       message,
     });
 
-    const model = getLanguageModel(selectedModel as Model);
+    const modelOptions: ModelOptions = {
+      enableSearch: searchMode === "native",
+    };
 
-    if (selectedModel === "openai:gpt-imagegen") {
-      return await handleImageGeneration({
-        userId: session.user.id,
-        thread: {
-          id,
-          prompt: message.content,
-          selectedModel,
-        },
-        stream: {
-          id: streamId,
-          context: streamContext,
-        },
-      });
-    }
+    const model = getLanguageModel(selectedModel as Model, modelOptions);
+    const modelConfig = getModelByKey(selectedModel as Model);
 
     const stream = createDataStream({
       execute: (dataStream) => {
@@ -102,13 +99,82 @@ export const POST = async (req: NextRequest) => {
         });
 
         const result = streamText({
-          model,
+          model:
+            selectedModel === "openai:gpt-imagegen"
+              ? getLanguageModel("openai:gpt-4.1-nano")
+              : model,
+          system:
+            selectedModel === "openai:gpt-imagegen"
+              ? "You are a helpful assistant that can generate images. You will be given a prompt and you will need to generate an image based on the prompt."
+              : searchMode === "tool"
+              ? "You are a helpful assistant that can answer questions and help with tasks. You can use the webSearch tool to search the web for up-to-date information. Answer based on the sources provided."
+              : "You are a helpful assistant that can answer questions and help with tasks.",
+          maxSteps: 10,
           messages: allMessages,
-          onFinish: async ({ response }) => {
-            const newMessage = appendResponseMessages({
+          ...(selectedModel === "openai:gpt-imagegen"
+            ? {
+                tools: {
+                  generateImage: createImageGenerationTool(
+                    session.user.id,
+                    env.OPENAI_API_KEY
+                  ),
+                },
+              }
+            : {}),
+          ...(searchMode === "tool" && {
+            tools: {
+              webSearch: webSearch,
+            },
+          }),
+          // temperature: 0.6,
+          // topP: 0.9,
+          providerOptions: {
+            ...(modelConfig?.provider === "openai" &&
+              !modelConfig.apiProvider &&
+              modelConfig.capabilities.reasoning && {
+                openai: {
+                  reasoningEffort: effort,
+                  reasoningSummary: "auto",
+                },
+              }),
+            ...(modelConfig?.provider === "google" &&
+              !modelConfig.apiProvider && {
+                google: {
+                  thinkingConfig: {
+                    includeThoughts: true,
+                  },
+                } satisfies GoogleGenerativeAIProviderOptions,
+              }),
+            ...(modelConfig?.provider === "anthropic" &&
+              !modelConfig.apiProvider &&
+              modelConfig.capabilities.reasoning && {
+                anthropic: {
+                  thinking: {
+                    type: "enabled",
+                    budgetTokens: EFFORT_MAP_FOR_ANTHROPIC[effort],
+                  },
+                } satisfies AnthropicProviderOptions,
+              }),
+          },
+          onFinish: async ({ response, sources, files }) => {
+            let newMessage = appendResponseMessages({
               messages: allMessages,
               responseMessages: response.messages,
             }).at(-1)!;
+
+            if (searchMode === "native") {
+              newMessage = {
+                ...newMessage,
+                parts: [
+                  ...(newMessage.parts ?? []),
+                  ...sources.map((source) => ({
+                    type: "source" as const,
+                    source,
+                  })),
+                ],
+              } satisfies UIMessage;
+              console.log("newMessage", newMessage);
+            }
 
             await upsertMessage({
               id: newMessage.id,

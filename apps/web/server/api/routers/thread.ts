@@ -2,6 +2,7 @@ import {
   branchOutFromMessageAlt as branchOutFromMessage,
   deleteChat,
   deleteTrailingMessages,
+  deleteMessageAndTrailing,
   generateAndUpdateThreadTitle,
   getUserThreadsCached,
 } from "@/lib/actions/thread";
@@ -76,6 +77,36 @@ export const threadRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: `Failed to delete trailing messages: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`,
+        });
+      }
+    }),
+
+  /**
+   * Delete a specific message and all messages after it in a thread
+   * Used for retrying AI messages
+   */
+  deleteMessageAndTrailing: protectedProcedure
+    .input(z.object({ messageId: z.string() }))
+    .mutation(async ({ input }) => {
+      try {
+        const deletedMessages = await deleteMessageAndTrailing({
+          id: input.messageId,
+        });
+
+        return {
+          success: true,
+          deletedCount: deletedMessages.length,
+        };
+      } catch (error) {
+        console.error("Error in deleteMessageAndTrailing:", error);
+
+        if (error instanceof TRPCError) throw error;
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to delete message and trailing messages: ${
             error instanceof Error ? error.message : "Unknown error"
           }`,
         });

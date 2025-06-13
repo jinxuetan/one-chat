@@ -86,61 +86,77 @@ export const getAvailableModels = (filters?: ModelFilters): ModelConfig[] => {
 export const getModelByKey = (modelKey: Model): ModelConfig | null =>
   AVAILABLE_MODELS[modelKey] || null;
 
+export interface ModelOptions {
+  enableSearch?: boolean;
+  effort?: "low" | "medium" | "high";
+  onlyOpenRouter?: boolean;
+}
+
 export const getLanguageModel = (
-  modelKey: Model
+  modelKey: Model,
+  options: ModelOptions = {
+    enableSearch: false,
+    effort: "medium",
+    onlyOpenRouter: false,
+  }
 ): LanguageModelV1 | OpenRouterLanguageModel => {
   const modelConfig = getModelByKey(modelKey);
   if (!modelConfig) throw new Error(`Model ${modelKey} not found`);
+  const providerKey = options.onlyOpenRouter
+    ? "openrouter"
+    : modelConfig.apiProvider || modelConfig.provider;
 
-  switch (modelConfig.provider) {
+  switch (providerKey) {
     case "openai": {
       const openAIProvider = createOpenAI({
         apiKey: env.OPENAI_API_KEY,
       });
+      if (modelConfig.capabilities.reasoning) {
+        return openAIProvider.responses(modelConfig.id);
+      }
       return openAIProvider(modelConfig.id);
     }
     case "anthropic": {
       const anthropicProvider = createAnthropic({
         apiKey: env.ANTHROPIC_API_KEY,
       });
-      return anthropicProvider(modelConfig.id);
+      return anthropicProvider(modelConfig.id.replace("-reasoning", ""));
     }
     case "google": {
       const googleProvider = createGoogleGenerativeAI({
         apiKey: env.GOOGLE_AI_API_KEY,
       });
-      return googleProvider(modelConfig.id);
+      return googleProvider(modelConfig.id, {
+        useSearchGrounding: options.enableSearch,
+      });
     }
     case "openrouter": {
       const openRouterProvider = createOpenRouter({
         apiKey: env.OPENROUTER_API_KEY,
       });
-      return openRouterProvider(modelConfig.id);
+      const effort = modelConfig.capabilities.effort && options.effort;
+      return openRouterProvider(
+        modelConfig.id,
+        effort ? { reasoning: { effort } } : undefined
+      );
     }
     default:
       throw new Error(`Provider ${modelConfig.provider} not supported`);
   }
 };
 
-export const getModelsByProvider = (provider: Provider): ModelConfig[] =>
-  Object.values(AVAILABLE_MODELS).filter(
-    (model) => model.provider === provider
-  );
-
 export const getRecommendedModels = (): ModelConfig[] => {
   const recommendedModels: Model[] = [
-    "google:gemini-2.5-flash",
-    "google:gemini-2.5-pro",
+    "google:gemini-2.5-flash-preview-05-20",
+    "google:gemini-2.5-pro-preview-06-05",
     "openai:gpt-imagegen",
     "openai:o4-mini",
-    "anthropic:claude-4-sonnet",
-    "anthropic:claude-4-sonnet-reasoning",
-    "deepseek:deepseek-r1-llama-distilled",
+    "anthropic:claude-sonnet-4-0",
+    "anthropic:claude-3-7-sonnet-latest",
+    "openrouter:deepseek/deepseek-r1-0528:free",
   ];
   return recommendedModels.map((model) => AVAILABLE_MODELS[model]);
 };
-
-// Capability-based filtering functions
 
 export const getModelsByCapability = (
   capability: keyof ModelConfig["capabilities"]
@@ -148,65 +164,3 @@ export const getModelsByCapability = (
   Object.values(AVAILABLE_MODELS).filter(
     (model) => model.capabilities[capability]
   );
-
-export const getModelsByTier = (tier: ModelConfig["tier"]): ModelConfig[] =>
-  Object.values(AVAILABLE_MODELS).filter((model) => model.tier === tier);
-
-export const getModelsByPerformance = (
-  speed?: ModelConfig["performance"]["speed"],
-  quality?: ModelConfig["performance"]["quality"]
-): ModelConfig[] =>
-  Object.values(AVAILABLE_MODELS).filter((model) => {
-    if (speed && model.performance.speed !== speed) return false;
-    if (quality && model.performance.quality !== quality) return false;
-    return true;
-  });
-
-// Utility functions for model management
-
-export const calculateTokenCost = (
-  modelKey: Model,
-  inputTokens: number,
-  outputTokens: number
-): number | null => {
-  const model = getModelByKey(modelKey);
-  if (!model?.pricing) return null;
-
-  const inputCost = (inputTokens / 1000) * model.pricing.input;
-  const outputCost = (outputTokens / 1000) * model.pricing.output;
-
-  return inputCost + outputCost;
-};
-
-export const isModelAvailable = (modelKey: Model): boolean =>
-  modelKey in AVAILABLE_MODELS;
-
-export const getProviderStatus = (provider: Provider): boolean => {
-  // This could be extended to check API health/status
-  const requiredEnvVars = {
-    openai: env.OPENAI_API_KEY,
-    anthropic: env.ANTHROPIC_API_KEY,
-    google: env.GOOGLE_AI_API_KEY,
-    openrouter: env.OPENROUTER_API_KEY,
-    meta: env.META_API_KEY,
-    deepseek: env.DEEPSEEK_API_KEY,
-    xai: env.XAI_API_KEY,
-  };
-
-  return Boolean(requiredEnvVars[provider]);
-};
-
-export const getCapabilitySummary = (modelKey: Model): string[] => {
-  const model = getModelByKey(modelKey);
-  if (!model) return [];
-
-  const capabilities: string[] = [];
-  const caps = model.capabilities;
-
-  if (caps.vision) capabilities.push("Vision");
-  if (caps.search) capabilities.push("Web Search");
-  if (caps.pdf) capabilities.push("PDF Processing");
-  if (caps.reasoning) capabilities.push("Advanced Reasoning");
-
-  return capabilities;
-};

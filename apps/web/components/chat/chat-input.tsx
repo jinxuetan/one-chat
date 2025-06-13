@@ -15,6 +15,7 @@ import { FileButton } from "./file-button";
 import { FilePreview } from "./file-preview";
 import { SearchButton } from "./search-button";
 import { SelectModelButton } from "./select-model-button";
+import { SearchMode } from "@/lib/types";
 
 interface SelectedFile {
   fileKey: string;
@@ -53,7 +54,7 @@ interface ChatInputProps {
     input: string;
     selectedModel: Model;
     effort: Effort;
-    isSearchActive: boolean;
+    searchMode: SearchMode;
     attachments?: Attachment[];
   }) => void;
   status: UseChatHelpers["status"];
@@ -83,8 +84,8 @@ export const ChatInput = memo(
     isAtBottom,
     scrollToBottom,
   }: ChatInputProps) => {
-    const [effort, setEffort] = useState<Effort>("high");
-    const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
+    const [effort, setEffort] = useState<Effort>("medium");
+    const [searchMode, setSearchMode] = useState<SearchMode>("off");
     const [selectedModel, setSelectedModel] = useState<Model>(initialChatModel);
     const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -99,13 +100,15 @@ export const ChatInput = memo(
           supportsEffort: false,
           supportsSearch: false,
           supportsFiles: false,
+          supportsTools: false,
         };
       }
 
       return {
         supportsEffort: modelConfig.capabilities.effort,
-        supportsSearch: modelConfig.capabilities.search,
+        supportsSearch: modelConfig.capabilities.nativeSearch,
         supportsFiles: modelConfig.supportedFileTypes.length > 0,
+        supportsTools: modelConfig.capabilities.tools,
       };
     }, [selectedModel]);
 
@@ -154,7 +157,7 @@ export const ChatInput = memo(
         input,
         selectedModel,
         effort,
-        isSearchActive,
+        searchMode,
         attachments,
       });
 
@@ -235,7 +238,7 @@ export const ChatInput = memo(
                 maxHeight: "384px",
               }}
               spellCheck={false}
-              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 text-sm outline-none ring-0 placeholder:text-gray-500 disabled:opacity-50"
+              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 text-sm outline-none ring-0 placeholder:text-neutral-500 disabled:opacity-50"
               placeholder={
                 isProcessing
                   ? "AI is responding..."
@@ -279,10 +282,12 @@ export const ChatInput = memo(
                 {modelCapabilities.supportsEffort && (
                   <EffortButton effort={effort} onEffortChange={setEffort} />
                 )}
-                {modelCapabilities.supportsSearch && (
+                {(modelCapabilities.supportsTools ||
+                  modelCapabilities.supportsSearch) && (
                   <SearchButton
-                    isSearchActive={isSearchActive}
-                    onSearchActiveChange={setIsSearchActive}
+                    searchMode={searchMode}
+                    onSearchModeChange={setSearchMode}
+                    supportsNativeSearch={modelCapabilities.supportsSearch}
                   />
                 )}
                 {modelCapabilities.supportsFiles && (

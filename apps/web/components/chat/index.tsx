@@ -15,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
+import { SearchMode } from "@/lib/types";
 
 interface ChatProps {
   threadId: string;
@@ -30,7 +31,7 @@ interface ChatSubmitData {
   input: string;
   selectedModel: Model;
   effort: Effort;
-  isSearchActive: boolean;
+  searchMode: SearchMode;
   attachments?: Attachment[];
 }
 
@@ -151,10 +152,13 @@ export const Chat = ({
       const request: ChatRequest = {
         effort: data.effort,
         selectedModel: data.selectedModel,
-        enableSearch: data.isSearchActive,
+        searchMode: data.searchMode,
       };
 
-      handleSubmit(undefined, { body: request });
+      handleSubmit(undefined, {
+        body: request,
+        experimental_attachments: data.attachments,
+      });
 
       if (isNewThread) {
         setIsNewThread(false);

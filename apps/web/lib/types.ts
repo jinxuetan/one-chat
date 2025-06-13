@@ -10,14 +10,4 @@ export type MessageWithMetadata = UIMessage & {
   attachments?: Attachment[];
 };
 
-export type ModelAnnotation = {
-  type: "model";
-  model: Model;
-};
-
-export type ImageGenAnnotation = {
-  type: "image-gen";
-  attachment: Attachment;
-};
-
-export type CustomAnnotation = ModelAnnotation | ImageGenAnnotation;
+export type SearchMode = "off" | "native" | "tool";

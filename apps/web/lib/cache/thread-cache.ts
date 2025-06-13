@@ -1,4 +1,5 @@
 import { redis } from "@/lib/redis";
+import { Attachment } from "ai";
 import { after } from "next/server";
 import { cache } from "react";
 
@@ -18,6 +19,7 @@ type ThreadWithMessages = {
     model: string | null;
     status: "pending" | "streaming" | "done" | "error" | null;
     createdAt: Date;
+    attachments: Attachment[] | null;
   }>;
 } | null;
 
@@ -103,6 +105,7 @@ export const prePopulateBranchedThreadCache = async (
     status: "pending" | "streaming" | "done" | "error" | null;
     createdAt: Date;
     updatedAt: Date;
+    attachments: Attachment[] | null;
   }>,
   threadInfo: {
     title: string | null;

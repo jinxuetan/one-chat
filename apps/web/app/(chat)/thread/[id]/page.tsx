@@ -59,7 +59,12 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
   return (
     <Chat
       threadId={id}
-      initialMessages={chat.messages as UIMessage[]}
+      initialMessages={
+        chat.messages.map((message) => ({
+          ...message,
+          experimental_attachments: message.attachments,
+        })) as UIMessage[]
+      }
       initialChatModel={chatModelFromCookie ?? DEFAULT_CHAT_MODEL}
       initialVisibilityType={chat.thread?.visibility}
       isReadonly={session.user?.id !== chat.thread?.userId}

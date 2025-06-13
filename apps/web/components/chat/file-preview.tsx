@@ -28,15 +28,15 @@ export const FilePreview = ({
         {fileType.startsWith("image/") ? (
           <Image className="size-4 text-blue-500" />
         ) : (
-          <FileText className="size-4 text-gray-500" />
+          <FileText className="size-4 text-neutral-500" />
         )}
       </div>
     )}
 
     <div className="min-w-0 flex-1">
-      <div className="truncate font-medium text-gray-900">{fileName}</div>
+      <div className="truncate font-medium text-neutral-900">{fileName}</div>
       {fileSize && (
-        <div className="text-gray-500 text-xs">{formatFileSize(fileSize)}</div>
+        <div className="text-neutral-500 text-xs">{formatFileSize(fileSize)}</div>
       )}
     </div>
 
@@ -45,7 +45,7 @@ export const FilePreview = ({
       size="icon"
       variant="ghost"
       onClick={onRemove}
-      className="h-6 w-6 flex-shrink-0 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+      className="h-6 w-6 flex-shrink-0 text-neutral-400 hover:text-neutral-600 disabled:opacity-50"
       title="Remove file"
     >
       <X className="size-3" />

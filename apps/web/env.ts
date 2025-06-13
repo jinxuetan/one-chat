@@ -3,25 +3,29 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
+    DATABASE_URL: z.string().url(),
+
     UPSTASH_REDIS_REST_URL: z.string().url(),
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
-    DATABASE_URL: z.string().url(),
+    UPSTASH_REDIS_URL: z.string().url(),
+
     OPENAI_API_KEY: z.string().startsWith("sk-").optional(),
     ANTHROPIC_API_KEY: z.string().startsWith("sk-").optional(),
     GOOGLE_AI_API_KEY: z.string().startsWith("AIza").optional(),
     OPENROUTER_API_KEY: z.string().startsWith("sk-").optional(),
-    META_API_KEY: z.string().startsWith("sk-").optional(),
-    DEEPSEEK_API_KEY: z.string().startsWith("sk-").optional(),
-    XAI_API_KEY: z.string().startsWith("sk-").optional(),
+
+    FIRECRAWL_API_KEY: z.string().startsWith("fc-").optional(),
+
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
-    UPSTASH_REDIS_URL: z.string().url(),
+
     VERCEL_BLOB_STORE_ID: z.string().min(1).startsWith("store_"),
     VERCEL_BLOB_STORE_BASE_URL: z.string().url(),
     VERCEL_BLOB_READ_WRITE_TOKEN: z
       .string()
       .min(1)
       .startsWith("vercel_blob_rw_"),
+
     NODE_ENV: z.enum(["development", "production"]).default("development"),
   },
 

@@ -82,10 +82,15 @@ const components: Options["components"] = {
 const remarkPlugins = [remarkGfm];
 
 export const AIResponse = memo(
-  ({ className, options, children, ...props }: AIResponseProps) => (
+  ({
+    className,
+    options,
+    children,
+    ...props
+  }: AIResponseProps) => (
     <div
       className={cn(
-        "prose prose-pink dark:prose-invert prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0",
+        "prose prose-neutral dark:prose-invert prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0",
         className
       )}
       {...props}

@@ -2,15 +2,8 @@ export {
   getAvailableModels,
   getModelByKey,
   getLanguageModel,
-  getModelsByProvider,
   getRecommendedModels,
   getModelsByCapability,
-  getModelsByTier,
-  getModelsByPerformance,
-  calculateTokenCost,
-  isModelAvailable,
-  getProviderStatus,
-  getCapabilitySummary,
 } from "./models";
 
 export {

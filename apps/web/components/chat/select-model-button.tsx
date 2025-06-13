@@ -36,7 +36,9 @@ import {
   FileText,
   Filter,
   Globe,
+  Globe2,
   Grid3X3,
+  Image,
   Layers,
   List,
   Search,
@@ -74,13 +76,14 @@ const CAPABILITY_ICONS = {
   reasoning: <Brain className="size-4" />,
   coding: <Code className="size-4" />,
   multimodal: <Layers className="size-4" />,
+  image: <Image className="size-4" />,
+  nativeSearch: <Globe2 className="size-4" />,
 } as const;
 
 const PROVIDER_ICONS: Record<Provider, React.ComponentType<any>> = {
   openai: OpenAI,
   anthropic: Anthropic,
   google: Google,
-  xai: XAI,
   deepseek: DeepSeek,
   meta: Meta,
   openrouter: Qwen,
@@ -334,7 +337,9 @@ export const SelectModelButton = ({
     () =>
       selectedModel
         ? allModels.find(
-            (model) => `${model.provider}:${model.id}` === selectedModel
+            (model) =>
+              `${model.apiProvider || model.provider}:${model.id}` ===
+              selectedModel
           )
         : null,
     [selectedModel]
@@ -361,6 +366,9 @@ export const SelectModelButton = ({
   );
 
   const getModelKey = (model: ModelConfig): Model => {
+    if (model.apiProvider) {
+      return `${model.apiProvider}:${model.id}` as Model;
+    }
     return `${model.provider}:${model.id}` as Model;
   };
 
