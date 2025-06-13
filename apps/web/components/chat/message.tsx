@@ -1,0 +1,469 @@
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { getModelByKey, Model } from "@/lib/ai";
+import { trpc } from "@/lib/trpc/client";
+import type {
+  CustomAnnotation,
+  MessageWithMetadata,
+  ModelAnnotation,
+} from "@/lib/types";
+import { generateUUID } from "@/lib/utils";
+import type { UseChatHelpers } from "@ai-sdk/react";
+import { Button } from "@workspace/ui/components/button";
+import { CopyButton } from "@workspace/ui/components/copy-button";
+import { toast } from "@workspace/ui/components/sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
+import { cn } from "@workspace/ui/lib/utils";
+import { PencilIcon, RotateCcwIcon, Split } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
+import {
+  type SVGProps,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { AIResponse } from "./ai-response";
+import { FilePreview } from "./file-preview";
+import { MessageEditor } from "./message-editor";
+import { MessageReasoning } from "./message-reasoning";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@/lib/auth/client";
+import { ProviderIcon } from "./select-model-button";
+import Image from "next/image";
+
+interface MessageComponentProps {
+  threadId: string;
+  message: MessageWithMetadata;
+  isLoading: boolean;
+  setMessages: UseChatHelpers["setMessages"];
+  reload: UseChatHelpers["reload"];
+  isReadonly: boolean;
+  requiresScrollPadding: boolean;
+  isLastMessage: boolean;
+}
+
+export const Message = ({
+  threadId,
+  message,
+  isLoading,
+  setMessages,
+  reload,
+  isReadonly,
+  requiresScrollPadding,
+}: MessageComponentProps) => {
+  const router = useRouter();
+  const [_, copyToClipboard] = useCopyToClipboard();
+  const [displayMode, setDisplayMode] = useState<"view" | "edit">("view");
+  const [isBranchingThread, setIsBranchingThread] = useState(false);
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const trpcUtils = trpc.useUtils();
+  const deleteTrailingMessagesMutation =
+    trpc.thread.deleteTrailingMessages.useMutation();
+  const branchOutMutation = trpc.thread.branchOut.useMutation({
+    onMutate: async ({ originalThreadId, newThreadId }) => {
+      setIsBranchingThread(true);
+      await trpcUtils.thread.getUserThreads.cancel();
+      const previousThreads = trpcUtils.thread.getUserThreads.getData();
+      if (!session?.user?.id) return { previousThreads };
+      // Optimistically add the new thread
+      trpcUtils.thread.getUserThreads.setData(undefined, (old) => {
+        if (!old) return old;
+        const optimisticThread = {
+          id: newThreadId,
+          title: "Cloning...",
+          userId: session.user.id,
+          originThreadId: originalThreadId ?? null,
+          visibility: "private" as const,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          lastMessageAt: new Date().toISOString() as string | null,
+        };
+        return [optimisticThread, ...old];
+      });
+      return { previousThreads };
+    },
+    onSuccess: (data) => router.push(`/thread/${data.newThreadId}`),
+    onError: (error, _vars, context) => {
+      if (context?.previousThreads) {
+        trpcUtils.thread.getUserThreads.setData(
+          undefined,
+          context.previousThreads
+        );
+      }
+      console.error("Failed to branch out:", error);
+      const errorMessage = error.message.includes("Unauthorized")
+        ? "You don't have permission to branch this thread"
+        : error.message.includes("not found")
+        ? "Message or thread not found"
+        : "Failed to branch out. Please try again.";
+      toast.error(errorMessage);
+    },
+    onSettled: () => {
+      setIsBranchingThread(false);
+      queryClient.invalidateQueries({ queryKey: ["thread-list"] });
+      trpcUtils.thread.getUserThreads.invalidate();
+    },
+  });
+
+  const resolvedModel =
+    message.model ??
+    ((message.annotations as CustomAnnotation[])?.find(
+      (annotation) => annotation.type === "model"
+    )?.model as Model);
+
+  const messageModelConfig = useMemo(
+    () => message.role === "assistant" && getModelByKey(resolvedModel),
+    [message.annotations]
+  );
+
+  const handleMessageReload = useCallback(async () => {
+    try {
+      await deleteTrailingMessagesMutation.mutateAsync({
+        messageId: message.id,
+      });
+
+      setMessages((currentMessages) => {
+        const messageIndex = currentMessages.findIndex(
+          (m) => m.id === message.id
+        );
+        return messageIndex !== -1
+          ? currentMessages.slice(0, messageIndex + 1)
+          : currentMessages;
+      });
+
+      await reload();
+    } catch (error) {
+      console.error("Failed to reload from message:", error);
+    }
+  }, [deleteTrailingMessagesMutation, message.id, setMessages, reload]);
+
+  const handleThreadBranchOut = useCallback(async () => {
+    const newThreadId = generateUUID();
+    branchOutMutation.mutate({
+      messageId: message.id,
+      originalThreadId: threadId,
+      newThreadId,
+    });
+    // Optimistically navigate immediately
+    router.push(`/thread/${newThreadId}?branch=true`);
+  }, [branchOutMutation, message.id, threadId, router]);
+
+  const toggleEditMode = useCallback(() => {
+    setDisplayMode((currentMode) => (currentMode === "view" ? "edit" : "view"));
+  }, []);
+
+  const handleTextCopy = useCallback(
+    async (textContent: string) => {
+      await copyToClipboard(textContent);
+    },
+    [copyToClipboard]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (isBranchingThread) setIsBranchingThread(false);
+    };
+  }, [isBranchingThread]);
+
+  const isImageGen = resolvedModel === "openai:gpt-imagegen";
+  const imageGenAttachment =
+    isImageGen &&
+    (message.attachments?.at(0)?.attachmentUrl ??
+      (message.annotations as CustomAnnotation[])?.find(
+        (annotation) => annotation.type === "image-gen"
+      )?.attachment.attachmentUrl);
+
+  console.info({ message });
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="mx-auto w-full max-w-3xl px-3"
+        initial={{ y: 4, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        data-role={message.role}
+      >
+        <div
+          className={cn(
+            "group/message flex w-fit gap-3 group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-3xl",
+            {
+              "w-full": displayMode === "edit",
+              "group-data-[role=user]/message:w-fit": displayMode !== "edit",
+              "ml-auto": message.role === "user",
+              "mr-auto": message.role === "assistant",
+            }
+          )}
+        >
+          <div
+            className={cn("flex w-full flex-col gap-4", {
+              "min-h-[24rem]":
+                message.role === "assistant" && requiresScrollPadding,
+            })}
+          >
+            {isLoading && isImageGen && (
+              <div className="h-64 w-64 animate-pulse rounded-lg border bg-muted" />
+            )}
+            {
+              imageGenAttachment && (
+                <Image
+                  src={imageGenAttachment}
+                  alt="Generated image"
+                  width={256}
+                  height={256}
+                />
+              )
+            }
+            {message.parts?.map((messagePart, partIndex) => {
+              const partKey = `message-${message.id}-part-${partIndex}`;
+
+              if (messagePart.type === "reasoning") {
+                return (
+                  <MessageReasoning
+                    key={partKey}
+                    isLoading={isLoading}
+                    reasoning={messagePart.reasoning}
+                  />
+                );
+              }
+
+              if (messagePart.type === "text") {
+                return (
+                  <div key={partKey} className="group relative mb-12 gap-2">
+                    <div className="flex w-full flex-col gap-3">
+                      {displayMode === "view" ? (
+                        <div
+                          className={cn("flex w-full flex-col gap-3", {
+                            "rounded-xl bg-primary px-3 py-2":
+                              message.role === "user",
+                          })}
+                        >
+                          <AIResponse
+                            className={cn({
+                              "text-primary-foreground":
+                                message.role === "user",
+                            })}
+                          >
+                            {messagePart.text}
+                          </AIResponse>
+                        </div>
+                      ) : (
+                        <MessageEditor
+                          key={message.id}
+                          message={message}
+                          setMode={setDisplayMode}
+                          setMessages={setMessages}
+                          reload={reload}
+                        />
+                      )}
+                    </div>
+
+                    {!isReadonly && (
+                      <div
+                        className={cn(
+                          "absolute mt-2 flex items-center gap-1 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 group-focus:opacity-100",
+                          {
+                            "right-0": message.role === "user",
+                            "left-0": message.role === "assistant",
+                          }
+                        )}
+                      >
+                        {messageModelConfig && (
+                          <div className="mr-2 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground whitespace-nowrap flex-shrink-0 flex items-center">
+                            <ProviderIcon
+                              provider={messageModelConfig.provider}
+                              className="size-3"
+                            />
+                            <span className="ml-1">
+                              {messageModelConfig.name}
+                            </span>
+                          </div>
+                        )}
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="group/edit"
+                              onClick={handleMessageReload}
+                              disabled={
+                                deleteTrailingMessagesMutation.isPending
+                              }
+                            >
+                              <RotateCcwIcon
+                                size={14}
+                                className="text-muted-foreground group-hover/edit:text-foreground"
+                              />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            Regenerate from here
+                          </TooltipContent>
+                        </Tooltip>
+
+                        {message.role === "user" && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="group/edit"
+                                onClick={toggleEditMode}
+                              >
+                                <PencilIcon
+                                  size={14}
+                                  className="text-muted-foreground group-hover/edit:text-foreground"
+                                />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              Edit message
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+
+                        {message.role !== "user" && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="group/edit"
+                                onClick={handleThreadBranchOut}
+                                disabled={
+                                  isBranchingThread ||
+                                  branchOutMutation.isPending
+                                }
+                              >
+                                <Split
+                                  size={14}
+                                  className={cn(
+                                    "text-muted-foreground group-hover/edit:text-foreground",
+                                    {
+                                      "animate-pulse":
+                                        isBranchingThread ||
+                                        branchOutMutation.isPending,
+                                    }
+                                  )}
+                                />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {isBranchingThread || branchOutMutation.isPending
+                                ? "Branching..."
+                                : "Branch Out"}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <CopyButton
+                              onCopy={() => handleTextCopy(messagePart.text)}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            Copy message
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+            })}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const LoadingBarsIcon = ({
+  size = 24,
+  ...props
+}: SVGProps<SVGSVGElement> & { size: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    {...props}
+  >
+    <title>Loading...</title>
+    <style>{`
+      .spinner-bar {
+        animation: spinner-bars-animation .8s linear infinite;
+        animation-delay: -.8s;
+      }
+      .spinner-bars-2 {
+        animation-delay: -.65s;
+      }
+      .spinner-bars-3 {
+        animation-delay: -0.5s;
+      }
+      @keyframes spinner-bars-animation {
+        0% {
+          y: 1px;
+          height: 22px;
+        }
+        93.75% {
+          y: 5px;
+          height: 14px;
+          opacity: 0.2;
+        }
+      }
+    `}</style>
+    <rect
+      className="spinner-bar"
+      x="1"
+      y="1"
+      width="6"
+      height="22"
+      fill="currentColor"
+    />
+    <rect
+      className="spinner-bar spinner-bars-2"
+      x="9"
+      y="1"
+      width="6"
+      height="22"
+      fill="currentColor"
+    />
+    <rect
+      className="spinner-bar spinner-bars-3"
+      x="17"
+      y="1"
+      width="6"
+      height="22"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+export const ThinkingMessage = () => (
+  <motion.div
+    className="group/message mx-auto min-h-[24rem] w-full max-w-3xl px-3"
+    initial={{ y: 4, opacity: 0 }}
+    animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
+    data-role="assistant"
+  >
+    <div
+      className={cn(
+        "flex w-full gap-3 rounded-xl group-data-[role=user]/message:ml-auto group-data-[role=user]/message:w-fit group-data-[role=user]/message:max-w-3xl group-data-[role=user]/message:px-3 group-data-[role=user]/message:py-2",
+        {
+          "group-data-[role=user]/message:bg-muted": true,
+        }
+      )}
+    >
+      <LoadingBarsIcon size={24} />
+    </div>
+  </motion.div>
+);

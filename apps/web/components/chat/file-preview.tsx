@@ -3,9 +3,9 @@ import { FileText, Image, X } from "lucide-react";
 
 interface FilePreviewProps {
   fileName: string;
-  fileType: string;
-  fileSize: number;
-  onRemove: () => Promise<void>;
+  fileType?: string;
+  fileSize?: number;
+  onRemove?: () => Promise<void>;
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -23,17 +23,21 @@ export const FilePreview = ({
   onRemove,
 }: FilePreviewProps) => (
   <div className="flex items-center gap-2 rounded-lg border border-alpha-300 bg-white px-3 py-2 text-sm shadow-sm">
-    <div className="flex-shrink-0">
-      {fileType.startsWith("image/") ? (
-        <Image className="size-4 text-blue-500" />
-      ) : (
-        <FileText className="size-4 text-gray-500" />
-      )}
-    </div>
+    {fileType && (
+      <div className="flex-shrink-0">
+        {fileType.startsWith("image/") ? (
+          <Image className="size-4 text-blue-500" />
+        ) : (
+          <FileText className="size-4 text-gray-500" />
+        )}
+      </div>
+    )}
 
     <div className="min-w-0 flex-1">
       <div className="truncate font-medium text-gray-900">{fileName}</div>
-      <div className="text-gray-500 text-xs">{formatFileSize(fileSize)}</div>
+      {fileSize && (
+        <div className="text-gray-500 text-xs">{formatFileSize(fileSize)}</div>
+      )}
     </div>
 
     <Button

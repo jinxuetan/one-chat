@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { attachment } from "@/lib/db/schema/chat";
+import { attachment, messageAttachment } from "@/lib/db/schema/thread";
 import { protectedProcedure, router } from "@/lib/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { del } from "@vercel/blob";
@@ -7,6 +7,33 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export const attachmentRouter = router({
+  /**
+   * Get attachments for a message
+   */
+  getMessageAttachments: protectedProcedure
+    .input(z.object({ messageId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db
+        .select({
+          id: attachment.id,
+          userId: attachment.userId,
+          fileKey: attachment.fileKey,
+          fileName: attachment.fileName,
+          fileSize: attachment.fileSize,
+          mimeType: attachment.mimeType,
+          attachmentType: attachment.attachmentType,
+          attachmentUrl: attachment.attachmentUrl,
+          createdAt: attachment.createdAt,
+          updatedAt: attachment.updatedAt,
+        })
+        .from(attachment)
+        .innerJoin(
+          messageAttachment,
+          eq(attachment.id, messageAttachment.attachmentId)
+        )
+        .where(eq(messageAttachment.messageId, input.messageId));
+    }),
+
   /**
    * Delete attachment (removes from both Vercel Blob and database)
    */
@@ -34,64 +61,27 @@ export const attachmentRouter = router({
       }
 
       try {
+        // Delete from Vercel Blob
         await del(existingAttachment.attachmentUrl, {
           token: env.VERCEL_BLOB_READ_WRITE_TOKEN,
         });
 
-        await ctx.db.delete(attachment).where(eq(attachment.id, input.url));
+        // Delete from database
+        await ctx.db
+          .delete(attachment)
+          .where(eq(attachment.id, existingAttachment.id));
 
-        return {
-          success: true,
-          deletedAttachment: existingAttachment,
-        };
+        return { success: true };
       } catch (error) {
-        console.error("❌ Error deleting attachment:", error);
-
-        if (error instanceof Error && error.message.includes("blob")) {
-          console.warn("⚠️ Blob deletion failed, cleaning up database record");
-          await ctx.db.delete(attachment).where(eq(attachment.id, input.url));
-        }
+        // If blob deletion fails, still clean up database
+        await ctx.db
+          .delete(attachment)
+          .where(eq(attachment.id, existingAttachment.id));
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to delete attachment completely",
+          message: "Failed to delete attachment",
         });
       }
     }),
-
-  /**
-   * Get attachment statistics for user
-   */
-  getStats: protectedProcedure.query(async ({ ctx }) => {
-    const attachments = await ctx.db
-      .select({
-        attachmentType: attachment.attachmentType,
-        fileSize: attachment.fileSize,
-      })
-      .from(attachment)
-      .where(eq(attachment.userId, ctx.user.id));
-
-    const stats = attachments.reduce(
-      (acc, curr) => {
-        acc.totalFiles += 1;
-        acc.totalSize += curr.fileSize;
-
-        if (curr.attachmentType === "image") {
-          acc.imageCount += 1;
-        } else {
-          acc.fileCount += 1;
-        }
-
-        return acc;
-      },
-      {
-        totalFiles: 0,
-        totalSize: 0,
-        imageCount: 0,
-        fileCount: 0,
-      }
-    );
-
-    return stats;
-  }),
 });

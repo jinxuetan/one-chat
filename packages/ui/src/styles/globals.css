@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@plugin "@tailwindcss/typography";
+
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
@@ -124,6 +126,21 @@
   }
 }
 
-* {
-  @apply overscroll-none;
+body {
+  overscroll-behavior-y: none;
+}
+
+@custom-variant prose-inline-code {
+  &.prose :where(:not(pre) > code):not(:where([class~="not-prose"] *)) {
+    @slot;
+  }
+}
+
+@utility prose {
+  code {
+    &::before,
+    &::after {
+      content: none;
+    }
+  }
 }

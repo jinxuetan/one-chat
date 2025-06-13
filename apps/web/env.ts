@@ -15,6 +15,7 @@ export const env = createEnv({
     XAI_API_KEY: z.string().startsWith("sk-").optional(),
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
+    UPSTASH_REDIS_URL: z.string().url(),
     VERCEL_BLOB_STORE_ID: z.string().min(1).startsWith("store_"),
     VERCEL_BLOB_STORE_BASE_URL: z.string().url(),
     VERCEL_BLOB_READ_WRITE_TOKEN: z

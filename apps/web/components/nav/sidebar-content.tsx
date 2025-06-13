@@ -11,12 +11,14 @@ export const SidebarContent = () => {
 
   return (
     <SidebarContentComponent className="px-3 py-1">
-      <Input
-        placeholder="Search your threads..."
-        icon={Search}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
+      <div className="sticky top-0 bg-background z-10">
+        <Input
+          placeholder="Search your threads..."
+          icon={Search}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+      </div>
       <ThreadList search={input} />
     </SidebarContentComponent>
   );

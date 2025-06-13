@@ -67,8 +67,7 @@ const initializeDatabase = (): NeonHttpDatabase => {
     // Configure Drizzle for optimal tRPC integration
     return drizzle({
       client: sql,
-      // Enable logging in development for tRPC procedure debugging
-      logger: env.NODE_ENV === "development",
+      logger: false,
     });
   } catch (error) {
     console.error("Failed to initialize database:", error);

@@ -1,7 +1,7 @@
 import { env } from "@/env";
 import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db";
-import { attachment } from "@/lib/db/schema/chat";
+import { attachment } from "@/lib/db/schema/thread";
 import { type HandleUploadBody, handleUpload } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
@@ -54,25 +54,21 @@ export async function POST(request: Request): Promise<NextResponse> {
             throw new Error("Missing user ID in token payload");
           }
 
-          await db
-            .insert(attachment)
-            .values({
-              userId,
-              fileKey: blob.pathname,
-              fileName:
-                originalFilename ||
-                blob.pathname.split("/").pop() ||
-                blob.pathname,
-              fileSize: 0, // Will be updated later if needed - Vercel Blob doesn't provide size in PutBlobResult
-              mimeType: blob.contentType || "application/octet-stream",
-              attachmentType: blob.contentType?.startsWith("image/")
-                ? "image"
-                : "file",
-              attachmentUrl: blob.url,
-            })
-            .returning();
+          await db.insert(attachment).values({
+            userId,
+            fileKey: blob.pathname,
+            fileName:
+              originalFilename ||
+              blob.pathname.split("/").pop() ||
+              blob.pathname,
+            fileSize: 0,
+            mimeType: blob.contentType || "application/octet-stream",
+            attachmentType: blob.contentType?.startsWith("image/")
+              ? "image"
+              : "file",
+            attachmentUrl: blob.url,
+          });
         } catch (error) {
-          console.error("Error storing attachment in database:", error);
           throw new Error("Failed to store file metadata in database");
         }
       },
@@ -80,11 +76,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
-    console.error("Upload handler error:", error);
-
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Upload failed" },
-      { status: 400 } // Return 400 so Vercel Blob will retry up to 5 times
+      { status: 400 }
     );
   }
 }

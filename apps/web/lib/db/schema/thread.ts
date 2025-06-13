@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { nanoid, timestamps } from "./index";
+import { JSONValue } from "ai";
 
 export const roleEnum = pgEnum("role", ["user", "assistant", "system", "data"]);
 export const statusEnum = pgEnum("status", [
@@ -17,6 +18,7 @@ export const statusEnum = pgEnum("status", [
   "done",
   "error",
 ]);
+export const visibilityEnum = pgEnum("visibility", ["private", "public"]);
 
 export const thread = pgTable(
   "thread",
@@ -28,6 +30,7 @@ export const thread = pgTable(
       .references(() => user.id, { onDelete: "cascade" })
       .notNull(),
     title: varchar("title").notNull().default("New Thread"),
+    visibility: visibilityEnum("visibility").notNull().default("private"),
     originThreadId: varchar("origin_thread_id"),
     ...timestamps,
   },
@@ -67,6 +70,7 @@ export const message = pgTable("message", {
   parts: jsonb("parts").notNull(),
   content: text("content"),
   role: roleEnum("role").notNull(),
+  annotations: jsonb("annotations").$type<JSONValue[]>().default([]),
   model: varchar("model"),
   status: statusEnum("status").notNull().default("done"),
   attachmentIds: jsonb("attachment_ids").$type<string[]>().default([]),

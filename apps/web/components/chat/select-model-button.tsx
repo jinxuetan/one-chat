@@ -76,14 +76,14 @@ const CAPABILITY_ICONS = {
   multimodal: <Layers className="size-4" />,
 } as const;
 
-const PROVIDER_ICONS: Record<Provider, React.ReactNode> = {
-  openai: <OpenAI className="size-5" />,
-  anthropic: <Anthropic className="size-5" />,
-  google: <Google className="size-5" />,
-  xai: <XAI className="size-5" />,
-  deepseek: <DeepSeek className="size-5" />,
-  meta: <Meta className="size-5" />,
-  openrouter: <Qwen className="size-5" />,
+const PROVIDER_ICONS: Record<Provider, React.ComponentType<any>> = {
+  openai: OpenAI,
+  anthropic: Anthropic,
+  google: Google,
+  xai: XAI,
+  deepseek: DeepSeek,
+  meta: Meta,
+  openrouter: Qwen,
 };
 
 const TIER_CONFIG = {
@@ -104,11 +104,20 @@ const TIER_CONFIG = {
   },
 } as const;
 
-const CapabilityIcon = ({ capability }: { capability: string }) =>
-  CAPABILITY_ICONS[capability as keyof typeof CAPABILITY_ICONS] || null;
+const CapabilityIcon = ({ capability }: { capability: string }) => {
+  return CAPABILITY_ICONS[capability as keyof typeof CAPABILITY_ICONS] ?? null;
+};
 
-const ProviderIcon = ({ provider }: { provider: Provider }) =>
-  PROVIDER_ICONS[provider] || null;
+export const ProviderIcon = ({
+  provider,
+  className,
+}: {
+  provider: Provider;
+  className?: string;
+}) => {
+  const Icon = PROVIDER_ICONS[provider];
+  return Icon ? <Icon className={cn("size-5", className)} /> : null;
+};
 
 const TierBadge = ({ tier }: { tier: string }) => {
   const config = TIER_CONFIG[tier as keyof typeof TIER_CONFIG];
@@ -377,7 +386,10 @@ export const SelectModelButton = ({
           <span className="truncate">
             {selectedModelConfig?.name ? (
               <div className="flex items-center gap-2">
-                <ProviderIcon provider={selectedModelConfig.provider} />
+                <ProviderIcon
+                  provider={selectedModelConfig.provider}
+                  className="size-4"
+                />
                 <span className="truncate">{selectedModelConfig.name}</span>
               </div>
             ) : (
@@ -389,7 +401,7 @@ export const SelectModelButton = ({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-[640px] rounded-lg p-0"
+        className="w-[640px] min-h-[50vh] rounded-lg p-0"
         align="start"
         sideOffset={8}
       >
@@ -469,7 +481,7 @@ export const SelectModelButton = ({
           </div>
         </div>
 
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-[50vh] overflow-y-auto overscroll-contain">
           {filteredRecommendedModels.length > 0 && (
             <div className="p-4">
               <div className="mb-3 flex items-center gap-2">

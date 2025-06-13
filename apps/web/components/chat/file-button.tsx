@@ -15,83 +15,122 @@ interface FileButtonProps {
     fileType: string;
     fileName: string;
   }) => void;
+  onUploadStateChange?: (isUploading: boolean) => void;
+  disabled?: boolean;
 }
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+const MAX_FILES = 10;
 
 export const FileButton = ({
   selectedModel,
   onFileChange,
+  onUploadStateChange,
+  disabled = false,
 }: FileButtonProps) => {
   const { data: session } = useSession();
-  const getAllowedFileTypes = (): string[] => {
-    if (!selectedModel) {
-      return ["text/plain"];
-    }
-    return getModelAcceptTypes(selectedModel);
-  };
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = () => {
-    fileInputRef.current?.click();
+  const getAllowedFileTypes = () => {
+    return selectedModel ? getModelAcceptTypes(selectedModel) : ["text/plain"];
+  };
+
+  const validateFile = (file: File): string | null => {
+    const allowedTypes = getAllowedFileTypes();
+
+    if (!allowedTypes.includes(file.type)) {
+      const modelName = selectedModel?.split(":")[1] || "selected model";
+      return `File "${file.name}" is not supported by ${modelName}`;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      return `File "${file.name}" is too large (max 8MB)`;
+    }
+
+    return null;
+  };
+
+  const uploadFile = async (file: File) => {
+    const blob = await upload(
+      `${session?.user?.id}/attachments/${file.name}`,
+      file,
+      {
+        access: "public",
+        handleUploadUrl: "/api/files/upload",
+      }
+    );
+
+    return {
+      fileKey: blob.pathname,
+      fileUrl: blob.url,
+      fileSize: file.size,
+      fileType: file.type,
+      fileName: file.name,
+    };
   };
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    const allowedTypes = getAllowedFileTypes();
-
-    // Validate file type against model capabilities
-    if (!allowedTypes.includes(file.type)) {
-      const modelName = selectedModel
-        ? `${selectedModel.split(":")[1]}`
-        : "selected model";
-      toast.error(
-        `File type "${file.type}" is not supported by ${modelName}. Please select a compatible file.`
-      );
+    if (files.length > MAX_FILES) {
+      toast.error(`Maximum ${MAX_FILES} files allowed`);
       return;
     }
 
-    // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("File size too large. Maximum size is 10MB.");
-      return;
+    const validFiles: File[] = [];
+    const errors: string[] = [];
+
+    // Validate all files first
+    for (const file of Array.from(files)) {
+      const error = validateFile(file);
+      if (error) {
+        errors.push(error);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    // Show validation errors
+    if (errors.length > 0) {
+      errors.forEach((error) => toast.error(error));
+      if (validFiles.length === 0) return;
     }
 
     setIsUploading(true);
+    onUploadStateChange?.(true);
 
     try {
-      // Upload to Vercel Blob
-      const blob = await upload(
-        `${session?.user?.id}/attachments/${file.name}`,
-        file,
-        {
-          access: "public",
-          handleUploadUrl: "/api/files/upload",
-        }
-      );
+      // Upload all valid files
+      const results = await Promise.allSettled(validFiles.map(uploadFile));
 
-      // Call parent callback with file info
-      // Note: Database storage is handled automatically by the server's onUploadCompleted callback
-      onFileChange({
-        fileKey: blob.pathname,
-        fileUrl: blob.url,
-        fileSize: file.size,
-        fileType: file.type,
-        fileName: file.name,
+      let successCount = 0;
+      let errorCount = 0;
+
+      results.forEach((result) => {
+        if (result.status === "fulfilled") {
+          onFileChange(result.value);
+          successCount++;
+        } else {
+          errorCount++;
+        }
       });
 
-      toast.success("File uploaded successfully!");
+      if (errorCount > 0) {
+        toast.error(
+          errorCount === 1
+            ? "1 file failed to upload"
+            : `${errorCount} files failed to upload`
+        );
+      }
     } catch (error) {
-      console.error("File upload error:", error);
-      toast.error("Failed to upload file. Please try again.");
+      toast.error("Upload failed. Please try again.");
     } finally {
       setIsUploading(false);
-      // Reset file input
+      onUploadStateChange?.(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -103,27 +142,25 @@ export const FileButton = ({
       <input
         ref={fileInputRef}
         type="file"
+        multiple
         className="hidden"
         onChange={handleFileChange}
         accept={getAllowedFileTypes().join(",")}
+        disabled={disabled || isUploading}
       />
       <Button
         type="button"
         size="sm"
         variant="outline"
-        disabled={isUploading}
-        onClick={handleFileSelect}
-        title={isUploading ? "Uploading..." : "Attach file"}
+        disabled={disabled || isUploading}
+        onClick={() => fileInputRef.current?.click()}
       >
         {isUploading ? (
           <Loader2 className="size-3.5 animate-spin" />
         ) : (
           <Paperclip className="size-3.5" />
         )}
-        <span>Attach</span>
-        <span className="sr-only">
-          {isUploading ? "Uploading file..." : "Attach file"}
-        </span>
+        <span>{isUploading ? "Uploading..." : "Attach"}</span>
       </Button>
     </>
   );
