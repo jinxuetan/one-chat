@@ -44,7 +44,6 @@ export type ModelConfig = {
   contextWindow: number;
   enabled: boolean;
   capabilities: {
-    tools: true,
     vision: boolean;
     nativeSearch: boolean;
     pdf: boolean;

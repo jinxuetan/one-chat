@@ -40,13 +40,16 @@ export const maxDuration = 150;
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { message, id } = body as {
+    const { message, id, isRestrictedToOpenRouter } = body as {
       message: UIMessage;
       id: string;
       experimental_attachments: any[];
+      isRestrictedToOpenRouter: boolean;
     };
 
-    const { selectedModel, effort, searchMode } = chatRequestSchema.parse(body);
+    // modelIdentifier, reasoningEffort
+    const { selectedModel, effort, searchStrategy } =
+      chatRequestSchema.parse(body);
 
     const session = await auth.api.getSession({ headers: req.headers });
     if (!session) return new Response("Unauthorized", { status: 401 });
@@ -85,7 +88,8 @@ export const POST = async (req: NextRequest) => {
     });
 
     const modelOptions: ModelOptions = {
-      enableSearch: searchMode === "native",
+      enableSearch: searchStrategy === "native",
+      onlyOpenRouter: isRestrictedToOpenRouter,
     };
 
     const model = getLanguageModel(selectedModel as Model, modelOptions);
@@ -106,7 +110,7 @@ export const POST = async (req: NextRequest) => {
           system:
             selectedModel === "openai:gpt-imagegen"
               ? "You are a helpful assistant that can generate images. You will be given a prompt and you will need to generate an image based on the prompt."
-              : searchMode === "tool"
+              : searchStrategy === "tool"
               ? "You are a helpful assistant that can answer questions and help with tasks. You can use the webSearch tool to search the web for up-to-date information. Answer based on the sources provided."
               : "You are a helpful assistant that can answer questions and help with tasks.",
           maxSteps: 10,
@@ -121,7 +125,7 @@ export const POST = async (req: NextRequest) => {
                 },
               }
             : {}),
-          ...(searchMode === "tool" && {
+          ...(searchStrategy === "tool" && {
             tools: {
               webSearch: webSearch,
             },
@@ -162,7 +166,7 @@ export const POST = async (req: NextRequest) => {
               responseMessages: response.messages,
             }).at(-1)!;
 
-            if (searchMode === "native") {
+            if (searchStrategy === "native") {
               newMessage = {
                 ...newMessage,
                 parts: [

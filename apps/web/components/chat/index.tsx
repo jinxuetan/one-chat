@@ -152,7 +152,7 @@ export const Chat = ({
       const request: ChatRequest = {
         effort: data.effort,
         selectedModel: data.selectedModel,
-        searchMode: data.searchMode,
+        searchStrategy: data.searchMode,
       };
 
       handleSubmit(undefined, {
