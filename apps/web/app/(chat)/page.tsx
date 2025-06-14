@@ -3,7 +3,7 @@ import type { Model } from "@/lib/ai";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { getSessionCookie } from "better-auth/cookies";
 
-import { generateUUID } from "@/lib/utils";
+import { generateUUID, resolveInitialModel } from "@/lib/utils";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -17,12 +17,18 @@ const ChatPage = async () => {
     | Model
     | undefined;
 
+  const resolvedInitialModel = resolveInitialModel(
+    [],
+    modelIdFromCookie ?? null,
+    DEFAULT_CHAT_MODEL
+  );
+
   return (
     <Chat
       key={uuid}
       threadId={uuid}
       initialMessages={[]}
-      initialChatModel={modelIdFromCookie ?? DEFAULT_CHAT_MODEL}
+      initialChatModel={resolvedInitialModel}
       isReadonly={false}
       initialVisibilityType="private"
       autoResume={false}

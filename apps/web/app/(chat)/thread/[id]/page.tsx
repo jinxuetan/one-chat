@@ -3,7 +3,8 @@ import { getThreadWithMessagesCached } from "@/lib/actions/thread";
 import type { Model } from "@/lib/ai";
 import { auth } from "@/lib/auth/server";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
-import type { UIMessage } from "ai";
+import { resolveInitialModel } from "@/lib/utils";
+import type { MessageWithMetadata } from "@/types";
 import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
@@ -38,12 +39,18 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
       | Model
       | undefined;
 
+    const resolvedInitialModel = resolveInitialModel(
+      [],
+      chatModelFromCookie ?? null,
+      DEFAULT_CHAT_MODEL
+    );
+
     // Return empty chat for optimistic branch creation
     return (
       <Chat
         threadId={id}
         initialMessages={[]}
-        initialChatModel={chatModelFromCookie ?? DEFAULT_CHAT_MODEL}
+        initialChatModel={resolvedInitialModel}
         initialVisibilityType="private"
         isReadonly={false}
         autoResume={false}
@@ -56,16 +63,22 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
     | Model
     | undefined;
 
+  const messagesWithMetadata = chat.messages.map((message) => ({
+    ...message,
+    experimental_attachments: message.attachments,
+  })) as MessageWithMetadata[];
+
+  const resolvedInitialModel = resolveInitialModel(
+    messagesWithMetadata,
+    chatModelFromCookie ?? null,
+    DEFAULT_CHAT_MODEL
+  );
+
   return (
     <Chat
       threadId={id}
-      initialMessages={
-        chat.messages.map((message) => ({
-          ...message,
-          experimental_attachments: message.attachments,
-        })) as UIMessage[]
-      }
-      initialChatModel={chatModelFromCookie ?? DEFAULT_CHAT_MODEL}
+      initialMessages={messagesWithMetadata}
+      initialChatModel={resolvedInitialModel}
       initialVisibilityType={chat.thread?.visibility}
       isReadonly={session.user?.id !== chat.thread?.userId}
       autoResume={true}

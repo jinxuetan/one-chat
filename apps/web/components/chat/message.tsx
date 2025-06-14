@@ -1,13 +1,11 @@
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { getModelByKey, Model } from "@/lib/ai";
+import { useSession } from "@/lib/auth/client";
 import { trpc } from "@/lib/trpc/client";
-import type {
-  CustomAnnotation,
-  MessageWithMetadata,
-  ModelAnnotation,
-} from "@/lib/types";
-import { generateUUID } from "@/lib/utils";
+import { generateUUID, resolveModel } from "@/lib/utils";
+import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@workspace/ui/components/button";
 import { CopyButton } from "@workspace/ui/components/copy-button";
 import { toast } from "@workspace/ui/components/sonner";
@@ -18,15 +16,17 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import {
+  FileIcon,
+  FileTextIcon,
+  ImageIcon,
   PencilIcon,
   RotateCcwIcon,
   Split,
-  FileIcon,
-  ImageIcon,
   VideoIcon,
-  FileTextIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   type SVGProps,
@@ -36,15 +36,10 @@ import {
   useState,
 } from "react";
 import { AIResponse } from "./ai-response";
-import { FilePreview } from "./file-preview";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
 import { MessageSources } from "./message-sources";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSession } from "@/lib/auth/client";
 import { ProviderIcon } from "./select-model-button";
-import Image from "next/image";
-import Link from "next/link";
 
 interface MessageComponentProps {
   threadId: string;
@@ -122,37 +117,42 @@ export const Message = ({
     },
   });
 
-  const resolvedModel =
-    message.model ??
-    ((message.annotations as CustomAnnotation[])?.find(
-      (annotation) => annotation.type === "model"
-    )?.model as Model);
+  const resolvedModel = resolveModel(message);
 
   const messageModelConfig = useMemo(
-    () => message.role === "assistant" && getModelByKey(resolvedModel),
+    () =>
+      message.role === "assistant" &&
+      resolvedModel &&
+      getModelByKey(resolvedModel),
     [message.annotations]
   );
 
   const handleMessageReload = useCallback(async () => {
     try {
-      await deleteMessageAndTrailingMutation.mutateAsync({
-        messageId: message.id,
-      });
+      setMessages((messages) => {
+        const currentIndex = messages.findIndex((m) => m.id === message.id);
+        if (currentIndex === -1) return messages;
 
-      setMessages((currentMessages) => {
-        const messageIndex = currentMessages.findIndex(
-          (m) => m.id === message.id
-        );
-        return messageIndex !== -1
-          ? currentMessages.slice(0, messageIndex)
-          : currentMessages;
-      });
+        // For user messages: delete from next message, for assistant: delete from current
+        const deleteFromIndex =
+          message.role === "user" ? currentIndex + 1 : currentIndex;
+        const targetMessage = messages[deleteFromIndex];
 
+        if (!targetMessage) return messages;
+
+        // Delete from database
+        deleteMessageAndTrailingMutation.mutate({
+          messageId: targetMessage.id,
+        });
+
+        // Update local state
+        return messages.slice(0, deleteFromIndex);
+      });
       await reload();
     } catch (error) {
       console.error("Failed to reload from message:", error);
     }
-  }, [deleteMessageAndTrailingMutation, message.id, setMessages, reload]);
+  }, [deleteMessageAndTrailingMutation, message.id, message.role, setMessages]);
 
   const handleThreadBranchOut = useCallback(async () => {
     const newThreadId = generateUUID();
@@ -190,8 +190,6 @@ export const Message = ({
         ?.map((part: any) => part.source) || []
     );
   }, [message.parts]);
-
-  console.info({ message });
 
   return (
     <AnimatePresence>

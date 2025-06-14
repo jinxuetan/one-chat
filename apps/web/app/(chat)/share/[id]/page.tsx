@@ -3,7 +3,8 @@ import { getThreadWithMessagesCached } from "@/lib/actions/thread";
 import type { Model } from "@/lib/ai";
 import { auth } from "@/lib/auth/server";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
-import type { UIMessage } from "ai";
+import { resolveInitialModel } from "@/lib/utils";
+import type { MessageWithMetadata } from "@/types";
 import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
@@ -37,11 +38,18 @@ const SharePage = async ({ params }: SharePageProps) => {
     | Model
     | undefined;
 
+  const messagesWithMetadata = chat.messages as MessageWithMetadata[];
+  const resolvedInitialModel = resolveInitialModel(
+    messagesWithMetadata,
+    chatModelFromCookie ?? null,
+    DEFAULT_CHAT_MODEL
+  );
+
   return (
     <Chat
       threadId={id}
-      initialMessages={chat.messages as UIMessage[]}
-      initialChatModel={chatModelFromCookie ?? DEFAULT_CHAT_MODEL}
+      initialMessages={messagesWithMetadata}
+      initialChatModel={resolvedInitialModel}
       initialVisibilityType={chat.thread?.visibility}
       isReadonly={!isOwner}
       autoResume={true}

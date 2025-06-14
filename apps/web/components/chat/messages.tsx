@@ -4,7 +4,7 @@ import type { UIMessage } from "ai";
 import { motion } from "motion/react";
 import { Message, ThinkingMessage } from "./message";
 import React, { useEffect, useRef } from "react";
-import { MessageWithMetadata } from "@/lib/types";
+import { MessageWithMetadata } from "@/types";
 
 interface MessagesProps {
   threadId: string;

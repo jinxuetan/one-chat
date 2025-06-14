@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
-import { SearchMode } from "@/lib/types";
+import { SearchMode } from "@/types";
 
 interface ChatProps {
   threadId: string;

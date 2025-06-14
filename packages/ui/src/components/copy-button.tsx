@@ -2,7 +2,7 @@
 
 import { Button } from "@workspace/ui/components/button";
 import { Copy } from "lucide-react";
-import { type Variants, motion } from "motion/react";
+import { type Variants, motion, cubicBezier } from "motion/react";
 import type React from "react";
 import { useRef, useState } from "react";
 
@@ -10,21 +10,23 @@ interface CopyButtonProps {
   onCopy: () => Promise<void> | void;
 }
 
+const easeOut = cubicBezier(0.4, 0, 0.2, 1);
+
 const copyIconVariants: Variants = {
   idle: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
   copying: {
     opacity: 0,
     scale: 0.8,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
   copied: {
     opacity: 0,
     scale: 0.8,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
 };
 
@@ -32,17 +34,17 @@ const checkIconVariants: Variants = {
   idle: {
     opacity: 0,
     scale: 0.8,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
   copying: {
     opacity: 0,
     scale: 0.8,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
   copied: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
 };
 
@@ -50,17 +52,17 @@ const checkPathVariants: Variants = {
   idle: {
     pathLength: 0,
     opacity: 0,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
   copying: {
     pathLength: 0,
     opacity: 1,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: easeOut },
   },
   copied: {
     pathLength: 1,
     opacity: 1,
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3, ease: easeOut },
   },
 };
 
@@ -156,7 +158,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ onCopy }) => {
           x: 0,
           y: 0,
           scale: 1,
-          transition: { duration: 0.15, ease: "easeOut" },
+          transition: { duration: 0.15, ease: easeOut },
         };
       case "leaving":
         return {
@@ -164,7 +166,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ onCopy }) => {
           x: leaveDirection.x,
           y: leaveDirection.y,
           scale: 1,
-          transition: { duration: 0.15, ease: "easeOut" },
+          transition: { duration: 0.15, ease: easeOut },
         };
       default:
         return {
@@ -182,6 +184,12 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ onCopy }) => {
       {/* animated Background */}
       <motion.div
         className="absolute inset-0 rounded-md bg-border/50 dark:bg-border"
+        style={{
+          opacity: 0,
+          x: 0,
+          y: 0,
+          scale: 0.6,
+        }}
         animate={getBackgroundAnimation()}
       />
 

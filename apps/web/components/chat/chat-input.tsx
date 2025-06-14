@@ -3,6 +3,7 @@
 import type { Effort, Model } from "@/lib/ai/config";
 import { getModelByKey } from "@/lib/ai/models";
 import { trpc } from "@/lib/trpc/client";
+import { setModelCookie } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
@@ -15,7 +16,7 @@ import { FileButton } from "./file-button";
 import { FilePreview } from "./file-preview";
 import { SearchButton } from "./search-button";
 import { SelectModelButton } from "./select-model-button";
-import { SearchMode } from "@/lib/types";
+import { SearchMode } from "@/types";
 
 interface SelectedFile {
   fileKey: string;
@@ -120,6 +121,11 @@ export const ChatInput = memo(
     const handleUploadStateChange = useCallback((uploading: boolean) => {
       setIsUploading(uploading);
     }, []);
+
+    useEffect(() => {
+      // Set cookie when model changes
+      setModelCookie(selectedModel);
+    }, [selectedModel]);
 
     const handleRemoveFile = async (file: SelectedFile) => {
       setSelectedFiles((prev) =>
