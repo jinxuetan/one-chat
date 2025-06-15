@@ -1,8 +1,8 @@
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { getModelByKey } from "@/lib/ai";
+import { type Model, getModelByKey } from "@/lib/ai";
 import { useSession } from "@/lib/auth/client";
 import { trpc } from "@/lib/trpc/client";
-import { generateUUID, resolveModel } from "@/lib/utils";
+import { generateUUID, resolveModel, setModelCookie } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ interface UseMessageLogicProps {
   message: MessageWithMetadata;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
+  messageModel: Model;
 }
 
 export const useMessageLogic = ({
@@ -22,6 +23,7 @@ export const useMessageLogic = ({
   message,
   setMessages,
   reload,
+  messageModel,
 }: UseMessageLogicProps) => {
   const router = useRouter();
   const [_, copyToClipboard] = useCopyToClipboard();
@@ -34,7 +36,13 @@ export const useMessageLogic = ({
   const deleteMessageAndTrailingMutation =
     trpc.thread.deleteMessageAndTrailing.useMutation();
   const branchOutMutation = trpc.thread.branchOut.useMutation({
-    onMutate: async ({ originalThreadId, newThreadId }) => {
+    onMutate: async ({
+      originalThreadId,
+      newThreadId,
+    }: {
+      originalThreadId: string;
+      newThreadId: string;
+    }) => {
       setIsBranchingThread(true);
       await trpcUtils.thread.getUserThreads.cancel();
       const previousThreads = trpcUtils.thread.getUserThreads.getData();
@@ -100,53 +108,60 @@ export const useMessageLogic = ({
   }, [message.parts]);
 
   // Event handlers
-  const handleMessageReload = useCallback(async () => {
-    try {
-      setMessages((messages) => {
-        const currentIndex = messages.findIndex((m) => m.id === message.id);
-        if (currentIndex === -1) return messages;
+  const handleMessageReload = useCallback(
+    async (model?: Model) => {
+      try {
+        setMessages((messages) => {
+          const currentIndex = messages.findIndex((m) => m.id === message.id);
+          if (currentIndex === -1) return messages;
 
-        // For user messages: delete from next message, for assistant: delete from current
-        const deleteFromIndex =
-          message.role === "user" ? currentIndex + 1 : currentIndex;
-        const targetMessage = messages[deleteFromIndex];
+          // For user messages: delete from next message, for assistant: delete from current
+          const deleteFromIndex =
+            message.role === "user" ? currentIndex + 1 : currentIndex;
+          const targetMessage = messages[deleteFromIndex];
 
-        if (!targetMessage) return messages;
+          if (!targetMessage) return messages;
 
-        // Delete from database
-        deleteMessageAndTrailingMutation.mutate({
-          messageId: targetMessage.id,
+          // Delete from database
+          deleteMessageAndTrailingMutation.mutate({
+            messageId: targetMessage.id,
+          });
+
+          // Update local state
+          return messages.slice(0, deleteFromIndex);
         });
+        await reload({
+          body: {
+            selectedModel: model || messageModel,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to reload from message:", error);
+      }
+    },
+    [
+      deleteMessageAndTrailingMutation,
+      message.id,
+      message.role,
+      setMessages,
+      reload,
+    ]
+  );
 
-        // Update local state
-        return messages.slice(0, deleteFromIndex);
+  const handleThreadBranchOut = useCallback(
+    async (model?: Model) => {
+      const newThreadId = generateUUID();
+      if (model) setModelCookie(model);
+      branchOutMutation.mutate({
+        messageId: message.id,
+        originalThreadId: threadId,
+        newThreadId,
       });
-      await reload({
-        body: {
-          selectedModel: resolvedModel,
-        },
-      });
-    } catch (error) {
-      console.error("Failed to reload from message:", error);
-    }
-  }, [
-    deleteMessageAndTrailingMutation,
-    message.id,
-    message.role,
-    setMessages,
-    reload,
-  ]);
-
-  const handleThreadBranchOut = useCallback(async () => {
-    const newThreadId = generateUUID();
-    branchOutMutation.mutate({
-      messageId: message.id,
-      originalThreadId: threadId,
-      newThreadId,
-    });
-    // Optimistically navigate immediately
-    router.push(`/thread/${newThreadId}?branch=true`);
-  }, [branchOutMutation, message.id, threadId, router]);
+      // Optimistically navigate immediately
+      router.push(`/thread/${newThreadId}?branch=true`);
+    },
+    [branchOutMutation, message.id, threadId, router]
+  );
 
   const handleTextCopy = useCallback(
     async (textContent: string) => {

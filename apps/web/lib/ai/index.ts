@@ -4,6 +4,8 @@ export {
   getLanguageModel,
   getRecommendedModels,
   getModelsByCapability,
+  getBestAvailableDefaultModel,
+  getDefaultModelConfig,
 } from "./models";
 
 export {

@@ -1,4 +1,4 @@
-import type { ModelConfig } from "@/lib/ai";
+import type { Model, ModelConfig } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { SourceUIPart } from "@ai-sdk/ui-utils";
@@ -10,14 +10,14 @@ import { MessageToolInvocation } from "./message-tool-invocation";
 
 interface MessagePartRendererProps {
   message: MessageWithMetadata;
-  messageModel?: ModelConfig;
+  model: Model;
   sources: SourceUIPart["source"][];
   displayMode: "view" | "edit";
   isReadonly: boolean;
   isLoading: boolean;
   onModeChange: Dispatch<SetStateAction<"view" | "edit">>;
-  onReload: () => void;
-  onBranchOut: () => void;
+  onReload: (model?: Model) => void;
+  onBranchOut: (model?: Model) => void;
   onCopy: (text: string) => void;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
@@ -26,7 +26,7 @@ interface MessagePartRendererProps {
 }
 
 export const MessagePartRenderer = memo<MessagePartRendererProps>((props) => {
-  const { message, isLoading } = props;
+  const { message, isLoading, model } = props;
 
   if (!message.parts?.length) return null;
 
@@ -60,10 +60,14 @@ export const MessagePartRenderer = memo<MessagePartRendererProps>((props) => {
         }
         if (messagePart.type === "text") {
           return (
-            <MessageTextPart key={partKey} {...props} text={messagePart.text} />
+            <MessageTextPart
+              key={partKey}
+              {...props}
+              text={messagePart.text}
+              model={model}
+            />
           );
         }
-
 
         return null;
       })}

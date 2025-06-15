@@ -1,5 +1,6 @@
 "use client";
 
+import { useApiKeys } from "@/hooks/use-api-keys";
 import type { Effort, Model } from "@/lib/ai/config";
 import { getModelByKey } from "@/lib/ai/models";
 import { trpc } from "@/lib/trpc/client";
@@ -15,8 +16,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EffortButton } from "./effort-button";
 import { FileButton } from "./file-button";
 import { FilePreview } from "./file-preview";
+import { ModelSelectionPopover } from "./model-selection-popover";
 import { SearchButton } from "./search-button";
-import { SelectModelButton } from "./select-model-button";
 
 interface SelectedFile {
   fileKey: string;
@@ -270,15 +271,15 @@ export const ChatInput = memo(
           </div>
           {/* Error Display */}
           {status === "error" && (
-            <div className="rounded-lg border border-b-0 border-rose-200 bg-rose-50 rounded-b-none w-[95%] mx-auto p-2">
+            <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-rose-200 border-b-0 bg-rose-50 p-2">
               <div className="flex items-center justify-between">
-                <p className="text-rose-900  text-sm">Something went wrong</p>
+                <p className="text-rose-900 text-sm">Something went wrong</p>
                 {reload && (
                   <Button
                     onClick={async () => await reload()}
                     size="sm"
                     variant="outline"
-                    className="border-rose-300 text-rose-900 bg-rose-50 border-rose-300 h-6 rounded-sm hover:bg-rose-100"
+                    className="h-6 rounded-sm border-rose-300 border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100"
                   >
                     Retry
                   </Button>
@@ -339,7 +340,7 @@ export const ChatInput = memo(
 
             <div className="flex items-center gap-1 p-3">
               <div className="flex items-end gap-0.5 sm:gap-1">
-                <SelectModelButton
+                <ModelSelectionPopover
                   selectedModel={selectedModel}
                   onSelect={setSelectedModel}
                   isRestrictedToOpenRouter={isRestrictedToOpenRouter}

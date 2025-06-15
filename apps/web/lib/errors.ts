@@ -117,7 +117,7 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
     case "model_not_found:models":
       return "The requested AI model was not found. Please select a different model.";
     case "api_key_missing:models":
-      return "API key is missing for the selected model. Please contact support.";
+      return "API key is missing for the selected model.";
 
     // File errors
     case "unauthorized:files":

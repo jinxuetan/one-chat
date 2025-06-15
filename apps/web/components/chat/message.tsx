@@ -2,14 +2,17 @@ import { useMessageLogic } from "@/hooks/use-message-logic";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { cn } from "@workspace/ui/lib/utils";
+import { AlertTriangle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { SVGProps } from "react";
 import { MessageAttachments } from "./message-attachments";
 import { MessagePartRenderer } from "./message-part-renderer";
+import type { Model } from "@/lib/ai";
 
 interface MessageComponentProps {
   threadId: string;
   message: MessageWithMetadata;
+  resolvedMessageModel: Model;
   isLoading: boolean;
   // TODO: Remove this once we have a better way to handle this
   isPending: boolean;
@@ -23,6 +26,7 @@ interface MessageComponentProps {
 export const Message = ({
   threadId,
   message,
+  resolvedMessageModel,
   isLoading,
   isPending,
   setMessages,
@@ -33,7 +37,6 @@ export const Message = ({
   const {
     displayMode,
     setDisplayMode,
-    messageModelConfig,
     sources,
     isBranchingThread,
     isReloading,
@@ -45,6 +48,7 @@ export const Message = ({
     message,
     setMessages,
     reload,
+    messageModel: resolvedMessageModel,
   });
 
   return (
@@ -80,7 +84,7 @@ export const Message = ({
 
             <MessagePartRenderer
               message={message}
-              messageModel={messageModelConfig || undefined}
+              model={resolvedMessageModel}
               sources={sources}
               displayMode={displayMode}
               isReadonly={isReadonly}
@@ -96,13 +100,17 @@ export const Message = ({
             />
 
             {message.isErrored && (
-              <div className="text-rose-900 text-sm">
-                Error: {message.errorMessage}
+              <div className="flex w-fit items-center gap-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900 text-sm">
+                <AlertTriangle className="size-4" />
+                <p>Error: {message.errorMessage || "Unknown error"}</p>
               </div>
             )}
 
             {message.isStopped && (
-              <div className="text-rose-900 text-sm">Stopped</div>
+              <div className="flex w-fit items-center gap-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900 text-sm">
+                <AlertTriangle className="size-4" />
+                <p>Stopped</p>
+              </div>
             )}
           </div>
         </div>

@@ -17,6 +17,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
+import { getRoutingFromCookie } from "@/lib/utils/cookie";
 
 interface ChatProps {
   threadId: string;
@@ -114,6 +115,7 @@ export const Chat = ({
       id,
       message: messages.at(-1),
       userApiKeys,
+      forceOpenRouter: getRoutingFromCookie() ?? false,
       ...requestBody,
     }),
     onError: (error) => {

@@ -76,7 +76,7 @@ export const MessageReasoning = ({
             variants={variants}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
-            className="flex flex-col gap-4 rounded-r-xl rounded-l-md border shadow-xs bg-neutral-50 p-2 pl-4 text-neutral-600 dark:text-neutral-400"
+            className="flex flex-col gap-4 rounded-r-xl rounded-l-md border bg-neutral-50 p-2 pl-3 text-neutral-600 shadow-xs dark:text-neutral-400"
           >
             <AIResponse className="text-sm">{reasoning}</AIResponse>
           </motion.div>

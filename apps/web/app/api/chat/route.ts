@@ -106,7 +106,7 @@ export const POST = async (request: NextRequest) => {
           ({
             ...messageItem,
             content: "",
-          } as UIMessage)
+          }) as UIMessage
       ),
       message: userMessage,
     });
@@ -128,7 +128,7 @@ export const POST = async (request: NextRequest) => {
     );
 
     const { model: fallbackModel } = getLanguageModel(FALLBACK_MODEL, {
-      apiKeys: { openai: userApiKeys?.openai },
+      apiKeys: { openai: userApiKeys?.openai || env.OPENAI_API_KEY },
     });
 
     let hasFirstChunk = false;

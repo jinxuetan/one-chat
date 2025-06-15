@@ -2,7 +2,7 @@
 
 import { Loader, Pin, PinOff, Split, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { usePinnedThreads } from "@/hooks/use-pinned-threads";

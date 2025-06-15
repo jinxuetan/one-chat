@@ -1,8 +1,10 @@
 "use client";
 
+import { Model } from "@/lib/ai";
 import { trpc } from "@/lib/trpc/client";
+import { resolveModel } from "@/lib/utils";
+import { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
-import type { Message } from "ai";
 import {
   type Dispatch,
   type SetStateAction,
@@ -11,19 +13,21 @@ import {
   useState,
 } from "react";
 
-export type MessageEditorProps = {
-  message: Message;
+export type EditMessageProps = {
+  message: MessageWithMetadata;
   setMode: Dispatch<SetStateAction<"view" | "edit">>;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
+  model: Model;
 };
 
-export const MessageEditor = ({
+export const EditMessage = ({
   message,
   setMode,
   setMessages,
   reload,
-}: MessageEditorProps) => {
+  model,
+}: EditMessageProps) => {
   const [draftContent, setDraftContent] = useState<string>(message.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -77,7 +81,13 @@ export const MessageEditor = ({
           messageId: message.id,
         });
 
-        reload();
+        console.log("selected model", model);
+
+        reload({
+          body: {
+            selectedModel: model,
+          },
+        });
       } catch (error) {
         console.error("Failed to delete trailing messages:", error);
         setMode("view");
@@ -87,10 +97,10 @@ export const MessageEditor = ({
   };
 
   return (
-    <div className="ml-auto inline-block w-full max-w-[80%] break-words rounded-xl border py-2 px-2 text-left shadow-xs">
+    <div className="ml-auto inline-block w-full max-w-[80%] break-words rounded-xl border px-2 py-2 text-left shadow-xs">
       <textarea
         ref={textareaRef}
-        className="text-base size-full resize-none overflow-hidden border-none bg-transparent text-secondary-foreground leading-6 shadow-none outline-none [vertical-align:unset] focus-visible:ring-0"
+        className="size-full resize-none overflow-hidden border-none bg-transparent text-base text-secondary-foreground leading-6 shadow-none outline-none [vertical-align:unset] focus-visible:ring-0"
         value={draftContent}
         onChange={handleInput}
         style={{

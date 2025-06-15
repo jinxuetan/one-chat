@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 import { Copy } from "lucide-react";
 import { type Variants, cubicBezier, motion } from "motion/react";
 import type React from "react";
 import { useRef, useState } from "react";
-import { cn } from "@workspace/ui/lib/utils";
 
 interface CopyButtonProps {
   onCopy: () => Promise<void> | void;

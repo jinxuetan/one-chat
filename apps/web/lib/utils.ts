@@ -45,12 +45,18 @@ export const getModelFromCookie = (): Model | null => {
  * Resolves the initial model for a chat based on messages and cookie fallback
  * 1. If messages exist, use model from latest assistant message
  * 2. If no messages, use model from cookie
- * 3. If no cookie, use default model
+ * 3. If no cookie, use default model (now supports dynamic selection based on API keys)
  */
 export const resolveInitialModel = (
   messages: MessageWithMetadata[],
   cookieModel: Model | null,
-  defaultModel: Model
+  defaultModel: Model,
+  apiKeys?: {
+    openai?: string;
+    anthropic?: string;
+    google?: string;
+    openrouter?: string;
+  }
 ): Model => {
   if (cookieModel) return cookieModel;
 
@@ -66,6 +72,17 @@ export const resolveInitialModel = (
       if (modelFromMessage) {
         return modelFromMessage;
       }
+    }
+  }
+
+  // If API keys are provided, try to get the best available model
+  if (apiKeys) {
+    try {
+      const { getBestAvailableDefaultModel } = require("@/lib/ai/models");
+      return getBestAvailableDefaultModel(apiKeys);
+    } catch {
+      // Fallback to provided default if dynamic selection fails
+      return defaultModel;
     }
   }
 

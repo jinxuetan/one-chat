@@ -1,6 +1,6 @@
+import { env } from "@/env";
 import { generateText } from "ai";
 import { getLanguageModel } from "./models";
-import { env } from "@/env";
 
 export type GenerateThreadTitlePayload = {
   userQuery: string;

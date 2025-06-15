@@ -24,11 +24,11 @@ export const useScrollToBottom = () => {
   );
 
   function onViewportEnter() {
-    setIsAtBottom(true);
+    if (!isAtBottom) setIsAtBottom(true);
   }
 
   function onViewportLeave() {
-    setIsAtBottom(false);
+    if (isAtBottom) setIsAtBottom(false);
   }
 
   return {

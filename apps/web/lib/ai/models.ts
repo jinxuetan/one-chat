@@ -14,6 +14,8 @@ import {
   type ModelConfig,
   type ModelFilters,
   type Provider,
+  DEFAULT_MODEL,
+  DEFAULT_MODEL_PRIORITY,
 } from "./config";
 
 // Core Functions
@@ -211,3 +213,51 @@ export const getModelsByCapability = (
   Object.values(AVAILABLE_MODELS).filter(
     (model) => model.capabilities[capability]
   );
+
+/**
+ * Get the best available default model based on API keys
+ * Falls back through priority list until finding an available model
+ */
+export const getBestAvailableDefaultModel = (keys: {
+  openai?: string;
+  anthropic?: string;
+  google?: string;
+  openrouter?: string;
+}): Model => {
+  // Helper function to check if model can be used
+  const canUseModel = (modelKey: string): boolean => {
+    // If user has OpenRouter, they can use any model
+    if (keys.openrouter) return true;
+
+    // Check specific provider requirements
+    if (modelKey.startsWith("openai:")) return Boolean(keys.openai);
+    if (modelKey.startsWith("anthropic:")) return Boolean(keys.anthropic);
+    if (modelKey.startsWith("google:")) return Boolean(keys.google);
+    if (modelKey.startsWith("openrouter:")) return Boolean(keys.openrouter);
+    
+    return false;
+  };
+
+  // Find first available model from priority list
+  for (const model of DEFAULT_MODEL_PRIORITY) {
+    if (canUseModel(model)) {
+      return model;
+    }
+  }
+
+  // Ultimate fallback to the static default (should not happen in normal usage)
+  return DEFAULT_MODEL;
+};
+
+/**
+ * Get the default model configuration for a user based on their API keys
+ */
+export const getDefaultModelConfig = (keys: {
+  openai?: string;
+  anthropic?: string;
+  google?: string;
+  openrouter?: string;
+}): ModelConfig => {
+  const model = getBestAvailableDefaultModel(keys);
+  return AVAILABLE_MODELS[model];
+};

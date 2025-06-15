@@ -1,4 +1,4 @@
-import type { ModelConfig } from "@/lib/ai";
+import type { Model, ModelConfig } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { SourceUIPart } from "@ai-sdk/ui-utils";
@@ -6,20 +6,21 @@ import { cn } from "@workspace/ui/lib/utils";
 import { memo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { AIResponse } from "./ai-response";
+import { EditMessage } from "./edit-message";
 import { MessageActions } from "./message-actions";
-import { MessageEditor } from "./message-editor";
 import { MessageSources } from "./message-sources";
+import { resolveModel } from "@/lib/utils";
 
 interface MessageTextPartProps {
   message: MessageWithMetadata;
-  messageModel?: ModelConfig;
+  model: Model;
   text: string;
   sources: SourceUIPart["source"][];
   displayMode: "view" | "edit";
   isReadonly: boolean;
   onModeChange: Dispatch<SetStateAction<"view" | "edit">>;
-  onReload: () => void;
-  onBranchOut: () => void;
+  onReload: (model?: Model) => void;
+  onBranchOut: (model?: Model) => void;
   onCopy: (text: string) => void;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
@@ -30,7 +31,7 @@ interface MessageTextPartProps {
 export const MessageTextPart = memo<MessageTextPartProps>(
   ({
     message,
-    messageModel,
+    model,
     text,
     sources,
     displayMode,
@@ -68,12 +69,13 @@ export const MessageTextPart = memo<MessageTextPartProps>(
               </AIResponse>
             </div>
           ) : (
-            <MessageEditor
+            <EditMessage
               key={message.id}
               message={message}
               setMode={onModeChange}
               setMessages={setMessages}
               reload={reload}
+              model={model}
             />
           )}
 
@@ -82,7 +84,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
 
         <MessageActions
           message={message}
-          messageModel={messageModel}
+          model={model}
           isReadonly={isReadonly}
           onReload={onReload}
           onEdit={() =>

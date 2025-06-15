@@ -1,5 +1,6 @@
 import type { Model } from "@/lib/ai";
 import { type ModelConfig, OPENROUTER_MODEL_MAP } from "@/lib/ai/config";
+import { useCallback, useState } from "react";
 
 /**
  * Sets the model preference cookie (client-side only)
@@ -16,6 +17,27 @@ export const setModelCookie = (model: Model): void => {
  */
 export const getModelFromCookie = (): Model | null => {
   return getCookie("chat-model") as Model | null;
+};
+
+/**
+ * Sets the routing preference cookie (client-side only)
+ * @param isRestrictedToOpenRouter - true for OpenRouter, false for native APIs
+ */
+export const setRoutingCookie = (isRestrictedToOpenRouter: boolean): void => {
+  setCookie("model-routing", isRestrictedToOpenRouter.toString(), {
+    maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
+    sameSite: "lax",
+  });
+};
+
+/**
+ * Gets the routing preference from cookie (client-side only)
+ * @returns boolean - true for OpenRouter, false for native APIs, null if not set
+ */
+export const getRoutingFromCookie = (): boolean | null => {
+  const value = getCookie("model-routing");
+  if (value === null) return null;
+  return value === "true";
 };
 
 export const getOpenRouterModel = (model: ModelConfig) => {
@@ -156,4 +178,24 @@ export const getAllCookies = (): Record<string, string> => {
   }
 
   return cookies;
+};
+
+/**
+ * React hook for managing routing preference with automatic cookie persistence
+ * @param defaultValue - Default routing preference if no cookie is set
+ * @returns [isRestrictedToOpenRouter, setIsRestrictedToOpenRouter]
+ */
+export const useRoutingPreference = (defaultValue = false) => {
+  const [isRestrictedToOpenRouter, setIsRestrictedToOpenRouterState] =
+    useState<boolean>(() => {
+      const cookieValue = getRoutingFromCookie();
+      return cookieValue !== null ? cookieValue : defaultValue;
+    });
+
+  const setIsRestrictedToOpenRouter = useCallback((value: boolean) => {
+    setIsRestrictedToOpenRouterState(value);
+    setRoutingCookie(value);
+  }, []);
+
+  return [isRestrictedToOpenRouter, setIsRestrictedToOpenRouter] as const;
 };

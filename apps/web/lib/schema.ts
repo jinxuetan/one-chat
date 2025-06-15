@@ -5,7 +5,7 @@ const modelKeys = Object.keys(AVAILABLE_MODELS) as [Model, ...Model[]];
 
 export const chatRequestSchema = z.object({
   id: z.string(),
-  selectedModel: z.enum(modelKeys).optional(),
+  selectedModel: z.enum(modelKeys),
   reasoningEffort: z.enum(["low", "medium", "high"]).default("medium"),
   searchStrategy: z.enum(["off", "native", "tool"]).default("off"),
   forceOpenRouter: z.boolean().default(false),

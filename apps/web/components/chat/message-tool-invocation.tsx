@@ -1,9 +1,9 @@
+import { Button } from "@workspace/ui/components/button";
 import type { ToolInvocation } from "ai";
+import { Download } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
-import { Download } from "lucide-react";
-import { Button } from "@workspace/ui/components/button";
 
 interface MessageToolInvocationProps {
   toolInvocation: ToolInvocation;
@@ -15,7 +15,7 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
 
     if (state === "call" && toolName === "generateImage") {
       return (
-        <div className="size-[256px] animate-pulse bg-muted rounded-md border flex items-center justify-center shadow-inner">
+        <div className="flex size-[256px] animate-pulse items-center justify-center rounded-md border bg-muted shadow-inner">
           <p>Generating image...</p>
         </div>
       );
@@ -24,9 +24,9 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
     if (state === "result" && toolName === "generateImage") {
       if (toolInvocation.result.error) {
         return (
-          <div className="flex items-center px-6 flex-col justify-center size-[256px] bg-rose-50 rounded-md border border-rose-100 shadow-inner shadow-rose-100 space-y-2">
+          <div className="flex size-[256px] flex-col items-center justify-center space-y-2 rounded-md border border-rose-100 bg-rose-50 px-6 shadow-inner shadow-rose-100">
             <p className="text-rose-900">Image generation failed</p>
-            <p className="text-sm text-center">
+            <p className="text-center text-sm">
               If you're using OpenAI, your organization must be verified to use
               image generation. Use{" "}
               <Link
@@ -52,7 +52,7 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
       };
 
       return (
-        <div className="relative group w-fit">
+        <div className="group relative w-fit">
           <Image
             src={toolInvocation.result.downloadUrl}
             alt="Generated image"
@@ -63,7 +63,7 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
           <Button
             size="sm"
             variant="secondary"
-            className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg rounded-sm"
+            className="absolute right-2 bottom-2 rounded-sm opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100"
             onClick={handleDownload}
           >
             <Download className="size-4" />

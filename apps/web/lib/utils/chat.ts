@@ -73,10 +73,7 @@ export const createToolsConfig = (
   const tools: Record<string, any> = {};
 
   if (selectedModel === IMAGE_GENERATION_MODEL) {
-    tools.generateImage = createImageGenerationTool(
-      userId,
-      apiKeys?.openai || env.OPENAI_API_KEY
-    );
+    tools.generateImage = createImageGenerationTool(userId, apiKeys?.openai);
   }
 
   if (searchStrategy === "tool") {

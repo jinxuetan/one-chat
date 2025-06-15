@@ -136,7 +136,7 @@ export const ProviderCard = ({
   };
 
   return (
-    <div className={cn("space-y-3 border-b border-muted/20 last:border-b-0")}>
+    <div className={cn("space-y-3 border-muted/20 border-b last:border-b-0")}>
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -182,7 +182,7 @@ export const ProviderCard = ({
           {config.name} API Key
         </label>
 
-        <div className="flex gap-2 w-full">
+        <div className="flex w-full gap-2">
           <div className="relative flex-1">
             <form autoComplete="off">
               <Input
@@ -204,11 +204,11 @@ export const ProviderCard = ({
                 aria-describedby={
                   validationResult?.error ? `${provider}-error` : undefined
                 }
-                className="pr-10 text-base h-9"
+                className="h-9 pr-10 text-base"
               />
 
               {hasExistingKey ? (
-                <div className="absolute top-0 right-0 size-9 flex items-center justify-center">
+                <div className="absolute top-0 right-0 flex size-9 items-center justify-center">
                   <CopyButton onCopy={handleCopyKey} className="rounded-sm" />
                 </div>
               ) : (
@@ -237,7 +237,7 @@ export const ProviderCard = ({
                   variant="outline"
                   size="sm"
                   onClick={handleRemoveKey}
-                  className="h-9 text-sm text-muted-foreground hover:text-destructive"
+                  className="h-9 text-muted-foreground text-sm hover:text-destructive"
                 >
                   <Trash2 className="size-3" />
                 </Button>
@@ -263,10 +263,10 @@ export const ProviderCard = ({
             id={`${provider}-error`}
             role="alert"
             aria-live="polite"
-            className="flex items-start gap-1.5 text-destructive text-sm border-l-2 border-destructive/50 pl-2 max-w-full"
+            className="flex max-w-full items-start gap-1.5 border-destructive/50 border-l-2 pl-2 text-destructive text-sm"
           >
-            <XCircle className="size-3 mt-0.5 flex-shrink-0" />
-            <span className="break-words min-w-0 flex-1">
+            <XCircle className="mt-0.5 size-3 flex-shrink-0" />
+            <span className="min-w-0 flex-1 break-words">
               {validationResult.error.includes("format")
                 ? getValidationHint()
                 : validationResult.error}
@@ -275,7 +275,7 @@ export const ProviderCard = ({
         )}
       </div>
       {provider === "openrouter" && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           One key unlocks all models available through OpenRouter
         </p>
       )}

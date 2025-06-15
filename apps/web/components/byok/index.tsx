@@ -33,11 +33,12 @@ export const BYOK = () => {
         <div className="space-y-2">
           <h1 className="font-semibold text-xl">Connect Your AI Models</h1>
           <p className="text-muted-foreground text-sm">
-            Use your own API keys for unlimited access. Stored securely in your browser.
+            Use your own API keys for unlimited access. Stored securely in your
+            browser.
           </p>
         </div>
 
-        <div className="flex justify-center gap-6 text-sm text-muted-foreground">
+        <div className="flex justify-center gap-6 text-muted-foreground text-sm">
           <div className="flex items-center gap-1.5">
             <Shield className="h-3 w-3" />
             <span>Private</span>
@@ -67,7 +68,7 @@ export const BYOK = () => {
       </div>
 
       {/* Footer Info */}
-      <div className="pt-6 text-center text-sm text-muted-foreground">
+      <div className="pt-6 text-center text-muted-foreground text-sm">
         <div className="space-y-1">
           <p className="font-medium text-foreground">Your keys, your control</p>
           <p>Stored locally • Never shared • Always private</p>

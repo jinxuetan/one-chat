@@ -4,6 +4,7 @@ export type Provider =
   | "google"
   | "openrouter"
   | "deepseek"
+  | "qwen"
   | "meta";
 
 export type Model =
@@ -202,7 +203,7 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
   "openrouter:qwen/qwen3-32b:free": {
     id: "qwen/qwen3-32b:free",
     name: "Qwen 3 32B",
-    provider: "openrouter",
+    provider: "qwen",
     apiProvider: "openrouter",
     description: "Qwen 3 model with 32B parameters",
     maxTokens: 40_960,
@@ -657,9 +658,44 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
 };
 
 // Default model configuration
-export const DEFAULT_MODEL: Model = "openai:gpt-4.1-mini";
+export const DEFAULT_MODEL: Model = "openai:gpt-4.1-nano";
 export const DEFAULT_MODEL_CONFIG: ModelConfig =
   AVAILABLE_MODELS[DEFAULT_MODEL];
+
+/**
+ * Priority order for default model selection based on quality, performance, and cost
+ * This represents the preferred fallback order when determining default models
+ */
+export const DEFAULT_MODEL_PRIORITY: Model[] = [
+  // Start with balanced, high-quality models
+  "openai:gpt-4.1-nano", // Fast, cost-effective, good quality
+  "openai:gpt-4o-mini", // Fast, budget-friendly with high quality
+  "google:gemini-2.0-flash", // Fast, budget-friendly
+  "google:gemini-2.5-flash-preview-05-20", // Fast, efficient with good capabilities
+  "openai:gpt-4.1-mini", // Standard tier, balanced performance
+  "openai:o4-mini", // Reasoning capabilities
+  "google:gemini-2.0-flash-lite", // Lightweight option
+  
+  // Premium models (higher cost but better quality)
+  "openai:gpt-4o", // Premium multimodal
+  "openai:gpt-4.1", // Premium with large context
+  "anthropic:claude-3-7-sonnet-latest", // Premium Claude
+  "anthropic:claude-sonnet-4-0", // Latest Claude
+  "google:gemini-2.5-pro-preview-06-05", // Premium Gemini
+  
+  // Reasoning-focused models
+  "openai:o3-mini", // Efficient reasoning
+  "google:gemini-2.5-flash-preview-05-20-thinking", // Thinking mode
+  "anthropic:claude-3-7-sonnet-latest-reasoning", // Claude reasoning
+  "anthropic:claude-sonnet-4-0-reasoning", // Latest Claude reasoning
+  "openai:o3", // Most capable reasoning (expensive)
+  
+  // OpenRouter models (require OpenRouter key)
+  "openrouter:meta-llama/llama-4-scout:free",
+  "openrouter:meta-llama/llama-4-maverick:free",
+  "openrouter:deepseek/deepseek-r1-0528:free",
+  "openrouter:qwen/qwen3-32b:free",
+];
 
 export type AvailableModel = (typeof AVAILABLE_MODELS)[Model];
 

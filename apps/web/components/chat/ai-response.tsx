@@ -5,9 +5,9 @@ import Link from "next/link";
 import { memo } from "react";
 import type { HTMLAttributes } from "react";
 import ReactMarkdown, { type Options } from "react-markdown";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { CodeComponent } from "./code-component";
 
@@ -80,6 +80,7 @@ const components: Options["components"] = {
       {children}
     </h6>
   ),
+  hr: ({ children, ...props }) => <hr className="!my-4" {...props} />,
 };
 
 const remarkPlugins = [remarkGfm, remarkMath];

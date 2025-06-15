@@ -1,12 +1,16 @@
 import { useMessages } from "@/hooks/use-messages";
+import { useDefaultModel } from "@/hooks/use-default-model";
+import { resolveModel, getModelFromCookie } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
 import { motion } from "motion/react";
-import { useEffect, useRef } from "react";
-import { Message, ThinkingMessage } from "./message";
+import { useEffect, useRef, useMemo } from "react";
 import { BYOK } from "../byok";
 import { EmptyMessage } from "./empty-message";
+import { Message, ThinkingMessage } from "./message";
+import type { Model } from "@/lib/ai";
+import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 
 interface MessagesProps {
   threadId: string;
@@ -45,14 +49,34 @@ export const Messages = ({
     status,
   });
 
-  // Store callback to prevent unnecessary effect calls
+  const defaultModel = useDefaultModel();
+
   const onScrollStateChangeRef = useRef(onScrollStateChange);
   onScrollStateChangeRef.current = onScrollStateChange;
 
-  // Notify parent component of scroll state changes
   useEffect(() => {
     onScrollStateChangeRef.current?.(isAtBottom, scrollToBottom);
   }, [isAtBottom, scrollToBottom]);
+
+  const resolveMessageModel = useMemo(() => {
+    return (message: MessageWithMetadata, index: number): Model => {
+      if (message.role === "assistant")
+        return resolveModel(message) || DEFAULT_CHAT_MODEL;
+
+      if (message.role === "user") {
+        const nextMessage = messages[index + 1] as MessageWithMetadata;
+
+        if (nextMessage?.role === "assistant") {
+          const nextMessageModel = resolveModel(nextMessage);
+          if (nextMessageModel) return nextMessageModel;
+        }
+
+        return getModelFromCookie() || defaultModel;
+      }
+
+      return DEFAULT_CHAT_MODEL;
+    };
+  }, [messages, defaultModel]);
 
   const shouldShowThinkingMessage =
     (status === "submitted" || status === "streaming") &&
@@ -73,15 +97,18 @@ export const Messages = ({
       ref={containerRef}
       className="relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10"
     >
-      {messages.length === 0 && (!hasKeys ? <EmptyMessage /> : <BYOK />)}
+      {messages.length === 0 && (!hasKeys ? <BYOK /> : <EmptyMessage />)}
 
       {messages.map((message, index) => (
         <Message
           key={message.id}
           threadId={threadId}
           message={message as MessageWithMetadata}
+          resolvedMessageModel={resolveMessageModel(
+            message as MessageWithMetadata,
+            index
+          )}
           isLoading={isMessageLoading(index)}
-          // This is a workaround to show the thinking message until the first chunk is received
           isPending={shouldShowThinkingMessage}
           setMessages={setMessages}
           reload={reload}
