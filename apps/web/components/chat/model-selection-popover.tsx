@@ -61,6 +61,7 @@ import {
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApiKeys } from "@/hooks/use-api-keys";
+import { useDefaultModel } from "@/hooks/use-default-model";
 
 type ViewMode = "grid" | "list";
 type CapabilityFilter = Exclude<keyof typeof CAPABILITY_ICONS, "tools">;
@@ -324,9 +325,14 @@ const ModelCard = memo(
     onSelect,
     isRestrictedToOpenRouter,
   }: ModelComponentProps) => {
-    const { canUseModelWithKeys } = useApiKeys();
+    const { canUseModelWithKeys, keys } = useApiKeys();
     const capabilities = getModelCapabilities(model);
-    const canUse = isRestrictedToOpenRouter || canUseModelWithKeys(modelKey);
+    
+    // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
+    const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
+    const canUse = requiresOpenAIDirectly 
+      ? Boolean(keys.openai)
+      : (isRestrictedToOpenRouter || canUseModelWithKeys(modelKey));
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -414,9 +420,14 @@ const ModelListItem = memo(
     onSelect,
     isRestrictedToOpenRouter,
   }: ModelComponentProps) => {
-    const { canUseModelWithKeys } = useApiKeys();
+    const { canUseModelWithKeys, keys } = useApiKeys();
     const capabilities = getModelCapabilities(model);
-    const canUse = isRestrictedToOpenRouter || canUseModelWithKeys(modelKey);
+    
+    // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
+    const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
+    const canUse = requiresOpenAIDirectly 
+      ? Boolean(keys.openai)
+      : (isRestrictedToOpenRouter || canUseModelWithKeys(modelKey));
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -825,6 +836,7 @@ export const ModelSelectionPopover = ({
   onIsRestrictedToOpenRouterChange,
   disabled = false,
 }: ModelSelectionPopoverProps) => {
+  const defaultModel = useDefaultModel();
   const { keys, hasOpenRouter } = useApiKeys();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -855,10 +867,10 @@ export const ModelSelectionPopover = ({
   );
   const selectedModelConfig = useMemo(
     () =>
-      selectedModel
+      selectedModel || defaultModel
         ? ALL_MODELS.find((model) => getModelKey(model) === selectedModel)
         : null,
-    [selectedModel]
+    [selectedModel, defaultModel]
   );
   const hasNoResults =
     recommendedModels.length === 0 && additionalModels.length === 0;

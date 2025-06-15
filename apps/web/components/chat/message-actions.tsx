@@ -53,7 +53,7 @@ export const MessageActions = memo<MessageActionsProps>(
           }
         )}
       >
-        {modelConfig && (
+        {modelConfig && message.role === "assistant" && (
           <div className="mr-2 flex flex-shrink-0 items-center whitespace-nowrap rounded-md bg-muted px-2 py-1 text-muted-foreground text-xs">
             <ProviderIcon provider={modelConfig.provider} className="size-3" />
             <span className="ml-1">{modelConfig.name}</span>

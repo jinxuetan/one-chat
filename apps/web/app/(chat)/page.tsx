@@ -16,6 +16,7 @@ const ChatPage = async () => {
   const modelIdFromCookie = cookieStore.get("chat-model")?.value as
     | Model
     | undefined;
+  const hasKeysFromCookie = cookieStore.get("has-api-keys")?.value === "true";
 
   const resolvedInitialModel = resolveInitialModel(
     [],
@@ -32,7 +33,8 @@ const ChatPage = async () => {
       isReadonly={false}
       initialVisibilityType="private"
       autoResume={false}
-      initialIsNewThread={true}
+      initialIsNewThread={true} 
+      hasKeys={hasKeysFromCookie}
     />
   );
 };

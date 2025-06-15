@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { UserButton } from "../auth/user-button";
 import { SidebarContent } from "./sidebar-content";
+import { BYOKModel } from "../byok/model";
 
 export const AppSidebar = () => (
   <Sidebar variant="sidebar">
@@ -34,6 +35,7 @@ export const AppSidebar = () => (
     </SidebarHeader>
     <SidebarContent />
     <SidebarFooter>
+      <BYOKModel />
       <UserButton />
     </SidebarFooter>
   </Sidebar>

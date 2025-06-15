@@ -51,6 +51,7 @@ export const Messages = ({
 
   const defaultModel = useDefaultModel();
 
+
   const onScrollStateChangeRef = useRef(onScrollStateChange);
   onScrollStateChangeRef.current = onScrollStateChange;
 

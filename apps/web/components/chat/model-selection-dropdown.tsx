@@ -13,8 +13,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { Brain, Eye, FileText, Image, Search } from "lucide-react";
+import { Brain, Eye, FileText, Image, Lock, Search } from "lucide-react";
 import { memo, useCallback, useMemo } from "react";
+import { useApiKeys } from "@/hooks/use-api-keys";
 import { ProviderIcon } from "./model-selection-popover";
 
 interface ModelSelectionDropdownProps {
@@ -39,6 +40,8 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
     align = "start",
     className,
   }) => {
+    const { canUseModelWithKeys, keys } = useApiKeys();
+
     const groupedModels = useMemo<GroupedModels>(() => {
       const models = getAvailableModels({
         // Show all enabled models
@@ -61,6 +64,25 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
       },
       [onSelect]
     );
+
+    const getModelKey = useCallback((model: ModelConfig): Model => {
+      return (
+        model.apiProvider
+          ? `${model.apiProvider}:${model.id}`
+          : `${model.provider}:${model.id}`
+      ) as Model;
+    }, []);
+
+    const canUseModel = useCallback((model: ModelConfig): boolean => {
+      const modelKey = getModelKey(model);
+      
+      // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
+      const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
+      
+      return requiresOpenAIDirectly 
+        ? Boolean(keys.openai)
+        : canUseModelWithKeys(modelKey);
+    }, [keys, canUseModelWithKeys, getModelKey]);
 
     const providerOrder: Provider[] = [
       "openai",
@@ -141,23 +163,32 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
                         .filter(([key]) => key !== "effort" && key !== "tools")
                         .map(([key]) => key);
 
+                      const modelKey = getModelKey(model);
+                      const canUse = canUseModel(model);
+
                       return (
                         <DropdownMenuItem
                           key={model.id}
-                          onClick={() =>
-                            handleSelect(
-                              (model.apiProvider
-                                ? `${model.apiProvider}:${model.id}`
-                                : `${model.provider}:${model.id}`) as Model
-                            )
-                          }
-                          className="flex min-h-[44px] items-center justify-between gap-3 px-3 py-2"
+                          onClick={() => {
+                            if (canUse) {
+                              handleSelect(modelKey);
+                            }
+                          }}
+                          disabled={!canUse}
+                          className={`flex min-h-[44px] items-center justify-between gap-3 px-3 py-2 ${
+                            !canUse 
+                              ? "opacity-50 cursor-not-allowed" 
+                              : "cursor-pointer"
+                          }`}
                         >
                           {/* Model name */}
                           <div className="flex items-center gap-2 flex-1">
                             <span className="truncate font-medium text-sm">
                               {model.name}
                             </span>
+                            {!canUse && (
+                              <Lock className="size-3 text-muted-foreground" />
+                            )}
                           </div>
 
                           {/* Capabilities */}

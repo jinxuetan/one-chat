@@ -44,6 +44,7 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
       chatModelFromCookie ?? null,
       DEFAULT_CHAT_MODEL
     );
+    const hasKeysFromCookie = cookieStore.get("has-api-keys")?.value === "true";
 
     // Return empty chat for optimistic branch creation
     return (
@@ -54,6 +55,7 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
         initialVisibilityType="private"
         isReadonly={false}
         autoResume={false}
+        hasKeys={hasKeysFromCookie}
       />
     );
   }
@@ -74,6 +76,8 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
     DEFAULT_CHAT_MODEL
   );
 
+  const hasKeysFromCookie = cookieStore.get("has-api-keys")?.value === "true";
+
   return (
     <Chat
       threadId={id}
@@ -82,6 +86,7 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
       initialVisibilityType={chat.thread?.visibility}
       isReadonly={session.user?.id !== chat.thread?.userId}
       autoResume={true}
+      hasKeys={hasKeysFromCookie}
     />
   );
 };

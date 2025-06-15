@@ -670,8 +670,8 @@ export const DEFAULT_MODEL_PRIORITY: Model[] = [
   // Start with balanced, high-quality models
   "openai:gpt-4.1-nano", // Fast, cost-effective, good quality
   "openai:gpt-4o-mini", // Fast, budget-friendly with high quality
-  "google:gemini-2.0-flash", // Fast, budget-friendly
   "google:gemini-2.5-flash-preview-05-20", // Fast, efficient with good capabilities
+  "google:gemini-2.0-flash", // Fast, budget-friendly
   "openai:gpt-4.1-mini", // Standard tier, balanced performance
   "openai:o4-mini", // Reasoning capabilities
   "google:gemini-2.0-flash-lite", // Lightweight option
@@ -679,8 +679,8 @@ export const DEFAULT_MODEL_PRIORITY: Model[] = [
   // Premium models (higher cost but better quality)
   "openai:gpt-4o", // Premium multimodal
   "openai:gpt-4.1", // Premium with large context
-  "anthropic:claude-3-7-sonnet-latest", // Premium Claude
   "anthropic:claude-sonnet-4-0", // Latest Claude
+  "anthropic:claude-3-7-sonnet-latest", // Premium Claude
   "google:gemini-2.5-pro-preview-06-05", // Premium Gemini
   
   // Reasoning-focused models
@@ -691,9 +691,9 @@ export const DEFAULT_MODEL_PRIORITY: Model[] = [
   "openai:o3", // Most capable reasoning (expensive)
   
   // OpenRouter models (require OpenRouter key)
+  "openrouter:deepseek/deepseek-r1-0528:free",
   "openrouter:meta-llama/llama-4-scout:free",
   "openrouter:meta-llama/llama-4-maverick:free",
-  "openrouter:deepseek/deepseek-r1-0528:free",
   "openrouter:qwen/qwen3-32b:free",
 ];
 

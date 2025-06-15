@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { getBestAvailableDefaultModel, getModelByKey } from "@/lib/ai";
 import type { ApiKeys, ApiProvider } from "@/lib/api-keys";
 import {
   PROVIDER_CONFIGS,
@@ -13,8 +14,10 @@ import {
   validateApiKeyFormat,
 } from "@/lib/api-keys";
 import { useSession } from "@/lib/auth/client";
+import { setModelCookie } from "@/lib/utils";
 import { toast } from "@workspace/ui/components/sonner";
 import { useCallback, useState } from "react";
+import { setRoutingCookie, setHasKeysCookie, getHasKeysFromCookie } from "@/lib/utils/cookie";
 
 interface ValidationResult {
   isValid: boolean;
@@ -149,7 +152,12 @@ export const useApiKeys = (): UseApiKeysReturn => {
       : undefined,
   };
 
-  const hasKeys = Object.values(keys).some(Boolean);
+  // Use cookie flag to prevent flash on initial load
+  const hasKeysFromCookie = getHasKeysFromCookie();
+  const hasKeysFromLocalStorage = Object.values(keys).some(Boolean);
+  
+  // Use cookie value if available, otherwise fallback to localStorage
+  const hasKeys = hasKeysFromCookie !== null ? hasKeysFromCookie : hasKeysFromLocalStorage;
   const availableProviders = getAvailableProviders(keys);
   const hasOpenRouter = hasOpenRouterAccess(keys);
 
@@ -183,11 +191,30 @@ export const useApiKeys = (): UseApiKeysReturn => {
       const encryptedKey = encryptKey(key, userId);
       setStoredKeys((prev) => ({ ...prev, [provider]: encryptedKey }));
 
+      // Get updated keys including the new one
+      const updatedKeys = {
+        ...keys,
+        [provider]: key,
+      };
+
+      // Get the best available model with the new keys
+      const bestModel = getBestAvailableDefaultModel(updatedKeys);
+
+      // Set the new model as the default
+      setModelCookie(bestModel);
+
+      // Update the has-keys cookie flag
+      setHasKeysCookie(true);
+
+      // Get model config for display name
+      const modelConfig = getModelByKey(bestModel);
+      const modelName = modelConfig?.name || bestModel;
+
       toast.success(
-        `${PROVIDER_CONFIGS[provider].name} key added successfully`
+        `${PROVIDER_CONFIGS[provider].name} key added successfully. Switched to ${modelName}.`
       );
     },
-    [validateKey, setStoredKeys, userId]
+    [validateKey, setStoredKeys, userId, keys]
   );
 
   const removeKey = useCallback(
@@ -195,8 +222,16 @@ export const useApiKeys = (): UseApiKeysReturn => {
       setStoredKeys((prev) => {
         const newKeys = { ...prev };
         delete newKeys[provider];
+        
+        // Check if there are any remaining keys
+        const hasRemainingKeys = Object.keys(newKeys).length > 0;
+        setHasKeysCookie(hasRemainingKeys);
+        
         return newKeys;
       });
+      if (provider === "openrouter") {
+        setRoutingCookie(false);
+      }
       setValidationStatus((prev) => ({ ...prev, [provider]: null }));
       toast.success(`${PROVIDER_CONFIGS[provider].name} key removed`);
     },
@@ -205,6 +240,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
 
   const clearAllKeys = useCallback(() => {
     clearStoredKeys();
+    setHasKeysCookie(false);
     setValidationStatus({
       openai: null,
       anthropic: null,

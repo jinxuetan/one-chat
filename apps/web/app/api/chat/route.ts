@@ -106,7 +106,7 @@ export const POST = async (request: NextRequest) => {
           ({
             ...messageItem,
             content: "",
-          }) as UIMessage
+          } as UIMessage)
       ),
       message: userMessage,
     });
@@ -128,7 +128,8 @@ export const POST = async (request: NextRequest) => {
     );
 
     const { model: fallbackModel } = getLanguageModel(FALLBACK_MODEL, {
-      apiKeys: { openai: userApiKeys?.openai || env.OPENAI_API_KEY },
+      // TODO: Remove this once we have a better way to handle this
+      apiKeys: { openai: userApiKeys?.openai || "" },
     });
 
     let hasFirstChunk = false;
@@ -203,6 +204,7 @@ export const POST = async (request: NextRequest) => {
               } satisfies UIMessage;
             }
 
+            // Idk, i'll just leave this here for now. Maybe we'll need it later.
             console.log("YES");
 
             await upsertMessage({
@@ -217,8 +219,6 @@ export const POST = async (request: NextRequest) => {
           onError: async (err) => {
             const error = err.error as Error;
             const isAborted = error.name === "AbortError";
-
-            console.log("YES IN ERROR", error);
 
             if (!isAborted) {
               console.error("Error in streamText:", error);

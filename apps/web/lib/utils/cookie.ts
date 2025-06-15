@@ -181,6 +181,27 @@ export const getAllCookies = (): Record<string, string> => {
 };
 
 /**
+ * Sets the has-keys flag cookie (client-side only)
+ * @param hasKeys - true if user has at least one API key configured
+ */
+export const setHasKeysCookie = (hasKeys: boolean): void => {
+  setCookie("has-api-keys", hasKeys.toString(), {
+    maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
+    sameSite: "lax",
+  });
+};
+
+/**
+ * Gets the has-keys flag from cookie (client-side only)
+ * @returns boolean - true if user has keys, false if not, null if not set
+ */
+export const getHasKeysFromCookie = (): boolean | null => {
+  const value = getCookie("has-api-keys");
+  if (value === null) return null;
+  return value === "true";
+};
+
+/**
  * React hook for managing routing preference with automatic cookie persistence
  * @param defaultValue - Default routing preference if no cookie is set
  * @returns [isRestrictedToOpenRouter, setIsRestrictedToOpenRouter]

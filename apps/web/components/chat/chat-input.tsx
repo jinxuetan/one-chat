@@ -1,6 +1,7 @@
 "use client";
 
 import { useApiKeys } from "@/hooks/use-api-keys";
+import { useBestModel } from "@/hooks/use-best-model";
 import type { Effort, Model } from "@/lib/ai/config";
 import { getModelByKey } from "@/lib/ai/models";
 import { trpc } from "@/lib/trpc/client";
@@ -151,6 +152,12 @@ export const ChatInput = memo(
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const deleteAttachment = trpc.attachment.delete.useMutation();
+
+    // Auto-switch to best model when API keys change
+    useBestModel({
+      onModelChange: setSelectedModel,
+      autoSwitch: true,
+    });
 
     const modelCapabilities = useMemo(() => {
       const modelConfig = getModelByKey(selectedModel);

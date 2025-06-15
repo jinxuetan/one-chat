@@ -27,6 +27,7 @@ interface ChatProps {
   isReadonly: boolean;
   autoResume: boolean;
   initialIsNewThread?: boolean;
+  hasKeys?: boolean;
 }
 
 export const Chat = ({
@@ -37,10 +38,11 @@ export const Chat = ({
   isReadonly,
   autoResume,
   initialIsNewThread = false,
+  hasKeys: hasKeysFromProps = false,
 }: ChatProps) => {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
-  const { keys: userApiKeys, hasKeys } = useApiKeys();
+  const { keys: userApiKeys, hasKeys: hasKeysFromApiKeys } = useApiKeys();
   const trpcUtils = trpc.useUtils();
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
@@ -48,6 +50,7 @@ export const Chat = ({
   const [hasAppendedQuery, setHasAppendedQuery] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const scrollToBottomRef = useRef<(() => void) | null>(null);
+  const [hasKeys, setHasKeys] = useState(hasKeysFromProps);
 
   const { mutate: generateAndUpdateThreadTitle } =
     trpc.thread.generateAndUpdateThreadTitle.useMutation({
@@ -215,6 +218,10 @@ export const Chat = ({
     },
     []
   );
+
+  useEffect(() => {
+    setHasKeys(hasKeysFromApiKeys);
+  }, [hasKeysFromApiKeys]);
 
   const scrollToBottom = useCallback(() => {
     scrollToBottomRef.current?.();

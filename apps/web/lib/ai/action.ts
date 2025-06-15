@@ -14,14 +14,10 @@ export const generateThreadTitle = async ({
   userQuery,
   apiKeys,
 }: GenerateThreadTitlePayload) => {
-  const effectiveApiKeys = {
-    openai: apiKeys.openai || env.OPENAI_API_KEY,
-    openrouter: apiKeys.openrouter || env.OPENROUTER_API_KEY,
-  };
-
   const { model } = getLanguageModel("openai:gpt-4.1-nano", {
-    apiKeys: effectiveApiKeys,
-    forceOpenRouter: !effectiveApiKeys.openai,
+    apiKeys: {
+      openai: apiKeys.openai || env.OPENAI_API_KEY,
+    },
   });
 
   const { text } = await generateText({
