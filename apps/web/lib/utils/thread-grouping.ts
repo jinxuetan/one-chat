@@ -34,7 +34,9 @@ const getDateBoundaries = (() => {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
       const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const thirtyDaysAgo = new Date(
+        today.getTime() - 30 * 24 * 60 * 60 * 1000
+      );
 
       cached = {
         today,
@@ -53,27 +55,27 @@ const isToday = (date: Date | string): boolean => {
   const dateObj = ensureDate(date);
   const { todayStart } = getDateBoundaries();
   const nextDay = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-  
+
   return dateObj >= todayStart && dateObj < nextDay;
 };
 
 const isYesterday = (date: Date | string): boolean => {
   const dateObj = ensureDate(date);
   const { yesterdayStart, todayStart } = getDateBoundaries();
-  
+
   return dateObj >= yesterdayStart && dateObj < todayStart;
 };
 
 const isWithinDays = (date: Date | string, days: number): boolean => {
   const dateObj = ensureDate(date);
   const boundaries = getDateBoundaries();
-  
+
   if (days === 7) {
     return dateObj >= boundaries.sevenDaysAgo;
   } else if (days === 30) {
     return dateObj >= boundaries.thirtyDaysAgo;
   }
-  
+
   const daysBefore = new Date();
   daysBefore.setDate(daysBefore.getDate() - days);
   return dateObj >= daysBefore;
@@ -123,7 +125,7 @@ export const filterThreads = (
   if (!searchTerm.trim()) return threads;
 
   const normalizedSearch = searchTerm.toLowerCase().trim();
-  
+
   return threads.filter((thread) =>
     thread.title.toLowerCase().includes(normalizedSearch)
   );
@@ -159,4 +161,4 @@ export const getThreadGroupsForDisplay = (
   }
 
   return groups;
-}; 
+};

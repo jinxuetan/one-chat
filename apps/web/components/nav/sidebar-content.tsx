@@ -11,7 +11,7 @@ export const SidebarContent = () => {
 
   return (
     <SidebarContentComponent className="px-3 py-1">
-      <div className="sticky top-0 bg-background z-10">
+      <div className="sticky top-0 z-10 bg-background">
         <Input
           placeholder="Search your threads..."
           icon={Search}

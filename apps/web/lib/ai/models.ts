@@ -1,4 +1,3 @@
-import { env } from "@/env";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -7,6 +6,8 @@ import {
   type OpenRouterLanguageModel,
   createOpenRouter,
 } from "@openrouter/ai-sdk-provider";
+import { OneChatSDKError } from "../errors";
+import { getOpenRouterModel } from "../utils";
 import {
   AVAILABLE_MODELS,
   type Model,
@@ -87,62 +88,108 @@ export const getModelByKey = (modelKey: Model): ModelConfig | null =>
   AVAILABLE_MODELS[modelKey] || null;
 
 export interface ModelOptions {
-  enableSearch?: boolean;
+  search?: boolean;
   effort?: "low" | "medium" | "high";
-  onlyOpenRouter?: boolean;
+  forceOpenRouter?: boolean;
+  apiKeys: {
+    openai?: string;
+    anthropic?: string;
+    google?: string;
+    openrouter?: string;
+  };
 }
 
 export const getLanguageModel = (
   modelKey: Model,
-  options: ModelOptions = {
-    enableSearch: false,
-    effort: "medium",
-    onlyOpenRouter: false,
-  }
-): LanguageModelV1 | OpenRouterLanguageModel => {
+  options: ModelOptions
+): {
+  model: LanguageModelV1 | OpenRouterLanguageModel;
+  config: ModelConfig;
+} => {
   const modelConfig = getModelByKey(modelKey);
-  if (!modelConfig) throw new Error(`Model ${modelKey} not found`);
-  const providerKey = options.onlyOpenRouter
+
+  if (!modelConfig) {
+    throw new OneChatSDKError(
+      "model_not_found:models",
+      `Model "${modelKey}" is not available or supported`
+    );
+  }
+
+  const provider: Provider = options.forceOpenRouter
     ? "openrouter"
     : modelConfig.apiProvider || modelConfig.provider;
 
-  switch (providerKey) {
-    case "openai": {
-      const openAIProvider = createOpenAI({
-        apiKey: env.OPENAI_API_KEY,
-      });
-      if (modelConfig.capabilities.reasoning) {
-        return openAIProvider.responses(modelConfig.id);
+  const clients = {
+    openai: () => {
+      if (!options.apiKeys.openai) {
+        throw new OneChatSDKError(
+          "api_key_missing:models",
+          "OpenAI API key is required to use this model"
+        );
       }
-      return openAIProvider(modelConfig.id);
-    }
-    case "anthropic": {
-      const anthropicProvider = createAnthropic({
-        apiKey: env.ANTHROPIC_API_KEY,
+      const client = createOpenAI({ apiKey: options.apiKeys.openai });
+      return modelConfig.capabilities.reasoning
+        ? client.responses(modelConfig.id)
+        : client(modelConfig.id);
+    },
+
+    anthropic: () => {
+      if (!options.apiKeys.anthropic) {
+        throw new OneChatSDKError(
+          "api_key_missing:models",
+          "Anthropic API key is required to use this model"
+        );
+      }
+      const client = createAnthropic({ apiKey: options.apiKeys.anthropic });
+      const modelId = modelConfig.id.replace("-reasoning", "");
+      return client(modelId);
+    },
+
+    google: () => {
+      if (!options.apiKeys.google) {
+        throw new OneChatSDKError(
+          "api_key_missing:models",
+          "Google AI API key is required to use this model"
+        );
+      }
+      const client = createGoogleGenerativeAI({
+        apiKey: options.apiKeys.google,
       });
-      return anthropicProvider(modelConfig.id.replace("-reasoning", ""));
-    }
-    case "google": {
-      const googleProvider = createGoogleGenerativeAI({
-        apiKey: env.GOOGLE_AI_API_KEY,
+      const modelId = modelConfig.id.replace("-thinking", "");
+      return client(modelId, {
+        useSearchGrounding: options.search,
       });
-      return googleProvider(modelConfig.id, {
-        useSearchGrounding: options.enableSearch,
+    },
+
+    openrouter: () => {
+      if (!options.apiKeys.openrouter) {
+        throw new OneChatSDKError(
+          "api_key_missing:models",
+          "OpenRouter API key is required to use this model"
+        );
+      }
+      const client = createOpenRouter({ apiKey: options.apiKeys.openrouter });
+      const modelId = getOpenRouterModel(modelConfig);
+      return client(modelId, {
+        reasoning: modelConfig.capabilities.reasoning
+          ? { effort: options.effort || "medium" }
+          : undefined,
       });
-    }
-    case "openrouter": {
-      const openRouterProvider = createOpenRouter({
-        apiKey: env.OPENROUTER_API_KEY,
-      });
-      const effort = modelConfig.capabilities.effort && options.effort;
-      return openRouterProvider(
-        modelConfig.id,
-        effort ? { reasoning: { effort } } : undefined
-      );
-    }
-    default:
-      throw new Error(`Provider ${modelConfig.provider} not supported`);
+    },
+  };
+
+  const clientFactory = clients[provider as keyof typeof clients];
+  if (!clientFactory) {
+    throw new OneChatSDKError(
+      "model_not_found:models",
+      `Provider "${provider}" is not supported or configured`
+    );
   }
+
+  return {
+    model: clientFactory(),
+    config: modelConfig,
+  };
 };
 
 export const getRecommendedModels = (): ModelConfig[] => {

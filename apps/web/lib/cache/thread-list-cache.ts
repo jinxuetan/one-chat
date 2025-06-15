@@ -1,6 +1,5 @@
 import { redis } from "@/lib/redis";
 import { after } from "next/server";
-import { cache } from "react";
 
 // Thread list item type for sidebar display
 // Note: tRPC returns date strings, so we handle both Date objects and strings
@@ -16,7 +15,8 @@ export type ThreadListItem = {
 };
 
 // Cache key pattern for user thread lists
-export const getUserThreadsCacheKey = (userId: string) => `user:${userId}:threads`;
+export const getUserThreadsCacheKey = (userId: string) =>
+  `user:${userId}:threads`;
 
 // Cache TTL in seconds (5 minutes for thread lists)
 const THREAD_LIST_CACHE_TTL = 300;
@@ -72,7 +72,7 @@ export const invalidateUserThreadsCache = (userId: string) => {
 
 // Create cached version of getUserThreads function
 export const createCachedThreadsFunction = <
-  T extends (userId: string) => Promise<ThreadListItem[]>
+  T extends (userId: string) => Promise<ThreadListItem[]>,
 >(
   getUserThreads: T
 ) => {

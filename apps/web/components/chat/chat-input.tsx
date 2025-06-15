@@ -4,19 +4,19 @@ import type { Effort, Model } from "@/lib/ai/config";
 import { getModelByKey } from "@/lib/ai/models";
 import { trpc } from "@/lib/trpc/client";
 import { setModelCookie } from "@/lib/utils";
+import type { ChatSubmitData, SearchMode } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import type { Attachment } from "ai";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EffortButton } from "./effort-button";
 import { FileButton } from "./file-button";
 import { FilePreview } from "./file-preview";
 import { SearchButton } from "./search-button";
 import { SelectModelButton } from "./select-model-button";
-import { SearchMode } from "@/types";
 
 interface SelectedFile {
   fileKey: string;
@@ -27,23 +27,81 @@ interface SelectedFile {
 }
 
 interface StopButtonProps {
+  threadId: string;
   onStop: () => void;
   setMessages: UseChatHelpers["setMessages"];
 }
 
-const StopButton = ({ onStop, setMessages }: StopButtonProps) => (
-  <Button
-    className="rounded-full border dark:border-zinc-600"
-    size="icon"
-    onClick={(event) => {
-      event.preventDefault();
+const StopButton = ({ threadId, onStop, setMessages }: StopButtonProps) => {
+  const [isStopping, setIsStopping] = useState(false);
+
+  const handleStop = async (event: React.MouseEvent) => {
+    event.preventDefault();
+
+    if (isStopping) return;
+
+    setIsStopping(true);
+
+    try {
+      // Update messages state to mark as stopped
+      setMessages((messages) => {
+        // Find the last message in the array
+        const lastMessage = messages.at(-1);
+        if (!lastMessage) return messages;
+
+        if (lastMessage.role === "assistant") {
+          // If the last message is assistant, add `isStopped: true` to it
+          return [
+            ...messages.slice(0, -1),
+            {
+              ...lastMessage,
+              isStopped: true,
+            },
+          ];
+        } else if (lastMessage.role === "user") {
+          // If the last message is user, add a new empty assistant message with `isStopped: true`
+          return [
+            ...messages,
+            {
+              id: crypto.randomUUID(),
+              role: "assistant" as const,
+              content: "",
+              isStopped: true,
+            },
+          ];
+        }
+
+        return messages;
+      });
+
+      // Call the original onStop function
       onStop();
-      setMessages((messages) => messages);
-    }}
-  >
-    <div className="size-3.5 rounded-xs bg-neutral-50 dark:bg-neutral-900" />
-  </Button>
-);
+
+      await fetch(`/api/chat?chatId=${threadId}`, {
+        method: "DELETE",
+      });
+
+      toast.success("Stream stopped successfully");
+    } catch (error) {
+      console.error("Failed to stop stream:", error);
+      toast.error("Failed to stop stream. Please try again.");
+    } finally {
+      setIsStopping(false);
+    }
+  };
+
+  return (
+    <Button
+      className="rounded-full border dark:border-zinc-600"
+      size="icon"
+      onClick={handleStop}
+      disabled={isStopping}
+      title={isStopping ? "Stopping..." : "Stop generation"}
+    >
+      <div className="size-3.5 rounded-xs bg-neutral-50 dark:bg-neutral-900" />
+    </Button>
+  );
+};
 
 interface ChatInputProps {
   threadId: string;
@@ -51,19 +109,14 @@ interface ChatInputProps {
   input: UseChatHelpers["input"];
   setInput: UseChatHelpers["setInput"];
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSubmit: (data: {
-    input: string;
-    selectedModel: Model;
-    effort: Effort;
-    searchMode: SearchMode;
-    attachments?: Attachment[];
-  }) => void;
+  onSubmit: (data: ChatSubmitData) => void;
   status: UseChatHelpers["status"];
   onStop: () => void;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
   isAtBottom: boolean;
   scrollToBottom: () => void;
+  disabled?: boolean;
 }
 
 const convertToAttachment = (file: SelectedFile): Attachment => ({
@@ -74,6 +127,7 @@ const convertToAttachment = (file: SelectedFile): Attachment => ({
 
 export const ChatInput = memo(
   ({
+    threadId,
     input,
     initialChatModel,
     onInputChange,
@@ -84,10 +138,13 @@ export const ChatInput = memo(
     reload,
     isAtBottom,
     scrollToBottom,
+    disabled = false,
   }: ChatInputProps) => {
-    const [effort, setEffort] = useState<Effort>("medium");
-    const [searchMode, setSearchMode] = useState<SearchMode>("off");
+    const [reasoningEffort, setReasoningEffort] = useState<Effort>("medium");
+    const [searchStrategy, setSearchStrategy] = useState<SearchMode>("off");
     const [selectedModel, setSelectedModel] = useState<Model>(initialChatModel);
+    const [isRestrictedToOpenRouter, setIsRestrictedToOpenRouter] =
+      useState<boolean>(false);
     const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -150,7 +207,7 @@ export const ChatInput = memo(
     ) => {
       e.preventDefault();
 
-      if (!input?.trim() && selectedFiles.length === 0) {
+      if ((!input?.trim() && selectedFiles.length === 0) || disabled) {
         return;
       }
 
@@ -162,9 +219,10 @@ export const ChatInput = memo(
       onSubmit({
         input,
         selectedModel,
-        effort,
-        searchMode,
+        reasoningEffort,
+        searchStrategy,
         attachments,
+        forceOpenRouter: isRestrictedToOpenRouter,
       });
 
       setSelectedFiles([]);
@@ -186,7 +244,7 @@ export const ChatInput = memo(
     return (
       <div className="sticky inset-x-0 bottom-0 z-10 mx-auto flex w-full gap-2 bg-background px-4 pb-4 md:max-w-3xl md:pb-6">
         <div className="relative flex w-full flex-col">
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2">
+          <div className="-top-12 -translate-x-1/2 absolute left-1/2">
             <AnimatePresence>
               {!isAtBottom && (
                 <motion.div
@@ -212,15 +270,15 @@ export const ChatInput = memo(
           </div>
           {/* Error Display */}
           {status === "error" && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            <div className="rounded-lg border border-b-0 border-rose-200 bg-rose-50 rounded-b-none w-[95%] mx-auto p-2">
               <div className="flex items-center justify-between">
-                <p className="text-red-800 text-sm">Something went wrong</p>
+                <p className="text-rose-900  text-sm">Something went wrong</p>
                 {reload && (
                   <Button
                     onClick={async () => await reload()}
                     size="sm"
                     variant="outline"
-                    className="border-red-300 text-red-600"
+                    className="border-rose-300 text-rose-900 bg-rose-50 border-rose-300 h-6 rounded-sm hover:bg-rose-100"
                   >
                     Retry
                   </Button>
@@ -237,14 +295,14 @@ export const ChatInput = memo(
             <textarea
               ref={textareaRef}
               value={input}
+              disabled={disabled}
               onChange={onInputChange}
-              disabled={isProcessing}
               style={{
                 minHeight: "42px",
                 maxHeight: "384px",
               }}
               spellCheck={false}
-              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 text-sm outline-none ring-0 placeholder:text-neutral-500 disabled:opacity-50"
+              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 outline-none ring-0 placeholder:text-neutral-500 disabled:opacity-50"
               placeholder={
                 isProcessing
                   ? "AI is responding..."
@@ -284,16 +342,24 @@ export const ChatInput = memo(
                 <SelectModelButton
                   selectedModel={selectedModel}
                   onSelect={setSelectedModel}
+                  isRestrictedToOpenRouter={isRestrictedToOpenRouter}
+                  onIsRestrictedToOpenRouterChange={setIsRestrictedToOpenRouter}
+                  disabled={disabled}
                 />
                 {modelCapabilities.supportsEffort && (
-                  <EffortButton effort={effort} onEffortChange={setEffort} />
+                  <EffortButton
+                    effort={reasoningEffort}
+                    onEffortChange={setReasoningEffort}
+                    disabled={disabled}
+                  />
                 )}
                 {(modelCapabilities.supportsTools ||
                   modelCapabilities.supportsSearch) && (
                   <SearchButton
-                    searchMode={searchMode}
-                    onSearchModeChange={setSearchMode}
+                    searchMode={searchStrategy}
+                    onSearchModeChange={setSearchStrategy}
                     supportsNativeSearch={modelCapabilities.supportsSearch}
+                    disabled={disabled}
                   />
                 )}
                 {modelCapabilities.supportsFiles && (
@@ -301,19 +367,23 @@ export const ChatInput = memo(
                     selectedModel={selectedModel}
                     onFileChange={handleFileChange}
                     onUploadStateChange={handleUploadStateChange}
-                    disabled={isProcessing}
+                    disabled={isProcessing || disabled}
                   />
                 )}
               </div>
               <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
-                {status === "submitted" ? (
-                  <StopButton onStop={onStop} setMessages={setMessages} />
+                {status === "submitted" || status === "streaming" ? (
+                  <StopButton
+                    threadId={threadId}
+                    onStop={onStop}
+                    setMessages={setMessages}
+                  />
                 ) : (
                   <Button
                     type="submit"
                     size="icon"
                     className="rounded-lg transition-all duration-300 ease-in-out"
-                    disabled={cannotSubmit}
+                    disabled={cannotSubmit || disabled}
                     title={
                       isUploading
                         ? "Files are uploading..."

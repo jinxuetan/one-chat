@@ -1,8 +1,8 @@
 import {
   branchOutFromMessageAlt as branchOutFromMessage,
   deleteChat,
-  deleteTrailingMessages,
   deleteMessageAndTrailing,
+  deleteTrailingMessages,
   generateAndUpdateThreadTitle,
   getUserThreadsCached,
 } from "@/lib/actions/thread";
@@ -114,12 +114,21 @@ export const threadRouter = router({
     }),
 
   generateAndUpdateThreadTitle: protectedProcedure
-    .input(z.object({ id: z.string(), userQuery: z.string() }))
+    .input(
+      z.object({
+        id: z.string(),
+        userQuery: z.string(),
+        apiKeys: z
+          .object({
+            openai: z.string().optional(),
+            openrouter: z.string().optional(),
+          })
+          .optional()
+          .default({}),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
-      const threadPromise = generateAndUpdateThreadTitle({
-        id: input.id,
-        userQuery: input.userQuery,
-      });
+      const threadPromise = generateAndUpdateThreadTitle(input);
       const threadCachePromise = redis.del(getUserThreadsCacheKey(ctx.user.id));
       await Promise.all([threadPromise, threadCachePromise]);
     }),

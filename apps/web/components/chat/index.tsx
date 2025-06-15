@@ -1,21 +1,22 @@
 "use client";
 
+import { useApiKeys } from "@/hooks/use-api-keys";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import type { Model } from "@/lib/ai";
-import type { Effort } from "@/lib/ai/config";
 import { useSession } from "@/lib/auth/client";
+import { OneChatSDKError } from "@/lib/errors";
 import type { ChatRequest } from "@/lib/schema";
 import { trpc } from "@/lib/trpc/client";
 import { generateUUID } from "@/lib/utils";
+import type { ChatSubmitData } from "@/types";
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@workspace/ui/components/sonner";
-import type { Attachment, UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
-import { SearchMode } from "@/types";
 
 interface ChatProps {
   threadId: string;
@@ -25,14 +26,6 @@ interface ChatProps {
   isReadonly: boolean;
   autoResume: boolean;
   initialIsNewThread?: boolean;
-}
-
-interface ChatSubmitData {
-  input: string;
-  selectedModel: Model;
-  effort: Effort;
-  searchMode: SearchMode;
-  attachments?: Attachment[];
 }
 
 export const Chat = ({
@@ -46,8 +39,14 @@ export const Chat = ({
 }: ChatProps) => {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
+  const { keys: userApiKeys, hasKeys } = useApiKeys();
   const trpcUtils = trpc.useUtils();
+  const searchParams = useSearchParams();
+  const query = searchParams.get("query");
   const [isNewThread, setIsNewThread] = useState(initialIsNewThread);
+  const [hasAppendedQuery, setHasAppendedQuery] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const scrollToBottomRef = useRef<(() => void) | null>(null);
 
   const { mutate: generateAndUpdateThreadTitle } =
     trpc.thread.generateAndUpdateThreadTitle.useMutation({
@@ -111,26 +110,50 @@ export const Chat = ({
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
-    experimental_prepareRequestBody: ({ id, messages, requestBody }) => {
-      const lastMessage = messages.at(-1);
-      return {
-        id,
-        message: lastMessage,
-        selectedVisibilityType: initialVisibilityType,
-        ...requestBody,
-      };
-    },
+    experimental_prepareRequestBody: ({ id, messages, requestBody }) => ({
+      id,
+      message: messages.at(-1),
+      userApiKeys,
+      ...requestBody,
+    }),
     onError: (error) => {
-      toast.error(error.message);
+      console.error("Chat error:", error);
+
+      if (error instanceof OneChatSDKError) {
+        toast.error(error.message);
+        return;
+      }
+
+      // Handle structured error responses from API
+      if (error?.message) {
+        try {
+          const parsedError = JSON.parse(error.message);
+
+          if (parsedError.error && parsedError.code) {
+            toast.error(parsedError.error);
+            return;
+          }
+
+          if (parsedError.error) {
+            toast.error(parsedError.error);
+            return;
+          }
+
+          if (parsedError.message) {
+            toast.error(parsedError.message);
+            return;
+          }
+        } catch {
+          // If JSON parsing fails, use the raw error message
+          toast.error(error.message);
+          return;
+        }
+      }
+
+      // Fallback for any other error types
+      toast.error("An error occurred while processing your request.");
     },
   });
-
-  const searchParams = useSearchParams();
-  const query = searchParams.get("query");
-
-  const [hasAppendedQuery, setHasAppendedQuery] = useState(false);
-  const [isAtBottom, setIsAtBottom] = useState(true);
-  const scrollToBottomRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (query && !hasAppendedQuery) {
@@ -144,15 +167,25 @@ export const Chat = ({
     }
   }, [query, append, hasAppendedQuery, threadId]);
 
-  const onSubmit = useCallback(
+  useAutoResume({
+    autoResume,
+    initialMessages,
+    experimental_resume,
+    data,
+    setMessages,
+  });
+
+  const handleSubmitMessage = useCallback(
     (data: ChatSubmitData) => {
       if (isNewThread)
         window.history.replaceState({}, "", `/thread/${threadId}`);
 
       const request: ChatRequest = {
-        effort: data.effort,
+        id: threadId,
+        reasoningEffort: data.reasoningEffort,
         selectedModel: data.selectedModel,
-        searchStrategy: data.searchMode,
+        searchStrategy: data.searchStrategy,
+        forceOpenRouter: data.forceOpenRouter,
       };
 
       handleSubmit(undefined, {
@@ -166,10 +199,11 @@ export const Chat = ({
         generateAndUpdateThreadTitle({
           id: threadId,
           userQuery: data.input,
+          apiKeys: userApiKeys,
         });
       }
     },
-    [threadId, append, isNewThread]
+    [threadId, handleSubmit, isNewThread, generateAndUpdateThreadTitle]
   );
 
   const handleScrollStateChange = useCallback(
@@ -184,14 +218,6 @@ export const Chat = ({
     scrollToBottomRef.current?.();
   }, []);
 
-  useAutoResume({
-    autoResume,
-    initialMessages,
-    experimental_resume,
-    data,
-    setMessages,
-  });
-
   return (
     <div className="flex h-dvh min-w-0 flex-col bg-background">
       <Messages
@@ -202,7 +228,9 @@ export const Chat = ({
         reload={reload}
         isReadonly={isReadonly}
         onScrollStateChange={handleScrollStateChange}
+        hasKeys={hasKeys}
       />
+      {/* <section className="absolute bottom-0 w-full left-0 h-64 bg-gradient-to-t from-[#fefefe] from-10% via-50% via-[#fefefe]/50 to-transparent pointer-events-none isolate" /> */}
       {!isReadonly && (
         <ChatInput
           threadId={threadId}
@@ -210,13 +238,14 @@ export const Chat = ({
           input={input}
           setInput={setInput}
           onInputChange={handleInputChange}
-          onSubmit={onSubmit}
+          onSubmit={handleSubmitMessage}
           status={status}
           onStop={stop}
           setMessages={setMessages}
           reload={reload}
           isAtBottom={isAtBottom}
           scrollToBottom={scrollToBottom}
+          disabled={!hasKeys}
         />
       )}
     </div>

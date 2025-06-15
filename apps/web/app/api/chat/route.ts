@@ -1,277 +1,364 @@
 import { env } from "@/env";
-import { createImageGenerationTool } from "@/lib/actions/image";
 import { appendStreamId, loadStreams } from "@/lib/actions/stream";
 import {
+  getLastPendingMessage,
+  getMostRecentModel,
   getOrCreateThread,
   loadChat,
+  markMessageAsErrored,
   upsertMessage,
 } from "@/lib/actions/thread";
-import { webSearch } from "@/lib/actions/web-search";
-import { type Model, getLanguageModel } from "@/lib/ai";
-import { getModelByKey, ModelOptions } from "@/lib/ai/models";
+import { getLanguageModel } from "@/lib/ai";
+import type { ModelOptions } from "@/lib/ai/models";
+import { getSystemPrompt } from "@/lib/ai/prompt";
 import { auth } from "@/lib/auth/server";
-import { EFFORT_MAP_FOR_ANTHROPIC } from "@/lib/constants";
+import {
+  DEFAULT_CHAT_MODEL,
+  FALLBACK_MODEL,
+  IMAGE_GENERATION_MODEL,
+  MAX_STEPS,
+} from "@/lib/constants";
+import { OneChatSDKError } from "@/lib/errors";
 import { chatRequestSchema } from "@/lib/schema";
-import { AnthropicProviderOptions } from "@ai-sdk/anthropic";
-import { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
+import {
+  createProviderOptions,
+  createStreamAbortController,
+  createToolsConfig,
+  getStreamingModel,
+  stopChatStream,
+} from "@/lib/utils/chat";
 import {
   type UIMessage,
   appendClientMessage,
   appendResponseMessages,
   createDataStream,
   generateId,
+  smoothStream,
   streamText,
 } from "ai";
 import { Redis } from "ioredis";
 import { type NextRequest, after } from "next/server";
 import { createResumableStreamContext } from "resumable-stream/ioredis";
+import { ZodError } from "zod";
 
-const publisher = new Redis(env.UPSTASH_REDIS_URL);
-const subscriber = new Redis(env.UPSTASH_REDIS_URL);
+const redisPublisher = new Redis(env.UPSTASH_REDIS_URL);
+const redisSubscriber = new Redis(env.UPSTASH_REDIS_URL);
 
-const streamContext = createResumableStreamContext({
+const resumableStreamContext = createResumableStreamContext({
   waitUntil: after,
-  publisher,
-  subscriber,
+  publisher: redisPublisher,
+  subscriber: redisSubscriber,
 });
 
 export const maxDuration = 150;
 
-export const POST = async (req: NextRequest) => {
+const createEmptyDataStream = () =>
+  createDataStream({
+    execute: () => {},
+  });
+
+export const POST = async (request: NextRequest) => {
   try {
-    const body = await req.json();
-    const { message, id, isRestrictedToOpenRouter } = body as {
-      message: UIMessage;
-      id: string;
-      experimental_attachments: any[];
-      isRestrictedToOpenRouter: boolean;
-    };
+    const requestBody = await request.json();
 
-    // modelIdentifier, reasoningEffort
-    const { selectedModel, effort, searchStrategy } =
-      chatRequestSchema.parse(body);
+    const {
+      message: userMessage,
+      id: threadId,
+      forceOpenRouter,
+      selectedModel,
+      reasoningEffort,
+      searchStrategy,
+      userApiKeys,
+    } = chatRequestSchema.parse(requestBody);
 
-    const session = await auth.api.getSession({ headers: req.headers });
-    if (!session) return new Response("Unauthorized", { status: 401 });
-
-    if (!selectedModel)
-      return new Response("Model not specified", { status: 400 });
+    const userSession = await auth.api.getSession({ headers: request.headers });
+    if (!userSession) {
+      throw new OneChatSDKError("unauthorized:chat");
+    }
 
     const streamId = generateId();
 
     await getOrCreateThread({
-      id,
-      userId: session.user.id,
+      id: threadId,
+      userId: userSession.user.id,
     });
+
+    const model =
+      selectedModel ||
+      (await getMostRecentModel(threadId)) ||
+      DEFAULT_CHAT_MODEL;
 
     await Promise.all([
       upsertMessage({
-        threadId: id,
-        id: message.id,
-        message,
-        attachments: message.experimental_attachments,
-        model: selectedModel,
+        threadId,
+        id: userMessage.id,
+        message: userMessage,
+        attachments: userMessage.experimental_attachments,
+        model,
       }),
-      appendStreamId({ chatId: id, streamId }),
+      appendStreamId({ chatId: threadId, streamId }),
     ]);
 
-    const previousMessages = await loadChat(id);
-    const allMessages = appendClientMessage({
+    const previousMessages = await loadChat(threadId);
+    const conversationMessages = appendClientMessage({
       messages: previousMessages.map(
-        (m) =>
+        (messageItem) =>
           ({
-            ...m,
+            ...messageItem,
             content: "",
           } as UIMessage)
       ),
-      message,
+      message: userMessage,
     });
-
-    const modelOptions: ModelOptions = {
-      enableSearch: searchStrategy === "native",
-      onlyOpenRouter: isRestrictedToOpenRouter,
+    const options: ModelOptions = {
+      search: searchStrategy === "native",
+      effort: reasoningEffort,
+      forceOpenRouter,
+      apiKeys: {
+        openai: userApiKeys?.openai,
+        anthropic: userApiKeys?.anthropic,
+        google: userApiKeys?.google,
+        openrouter: userApiKeys?.openrouter,
+      },
     };
 
-    const model = getLanguageModel(selectedModel as Model, modelOptions);
-    const modelConfig = getModelByKey(selectedModel as Model);
+    const { model: primaryModel, config: modelConfig } = getLanguageModel(
+      model,
+      options
+    );
 
-    const stream = createDataStream({
-      execute: (dataStream) => {
-        dataStream.writeMessageAnnotation({
+    const { model: fallbackModel } = getLanguageModel(FALLBACK_MODEL, {
+      apiKeys: { openai: userApiKeys?.openai },
+    });
+
+    let hasFirstChunk = false;
+
+    const dataStream = createDataStream({
+      execute: (dataStreamWriter) => {
+        const { abortController, cleanup } =
+          createStreamAbortController(streamId);
+
+        dataStreamWriter.writeMessageAnnotation({
           type: "model",
-          model: selectedModel,
+          model: model,
         });
 
+        const streamingModel = getStreamingModel(
+          model,
+          primaryModel,
+          fallbackModel
+        );
+
+        const toolsConfig = createToolsConfig(
+          model,
+          searchStrategy,
+          userSession.user.id,
+          { openai: userApiKeys?.openai }
+        );
+
+        const providerOptions = createProviderOptions(
+          modelConfig,
+          reasoningEffort
+        );
+
         const result = streamText({
-          model:
-            selectedModel === "openai:gpt-imagegen"
-              ? getLanguageModel("openai:gpt-4.1-nano")
-              : model,
-          system:
-            selectedModel === "openai:gpt-imagegen"
-              ? "You are a helpful assistant that can generate images. You will be given a prompt and you will need to generate an image based on the prompt."
-              : searchStrategy === "tool"
-              ? "You are a helpful assistant that can answer questions and help with tasks. You can use the webSearch tool to search the web for up-to-date information. Answer based on the sources provided."
-              : "You are a helpful assistant that can answer questions and help with tasks.",
-          maxSteps: 10,
-          messages: allMessages,
-          ...(selectedModel === "openai:gpt-imagegen"
-            ? {
-                tools: {
-                  generateImage: createImageGenerationTool(
-                    session.user.id,
-                    env.OPENAI_API_KEY
-                  ),
-                },
-              }
-            : {}),
-          ...(searchStrategy === "tool" && {
-            tools: {
-              webSearch: webSearch,
-            },
+          model: streamingModel,
+          system: getSystemPrompt({
+            selectedModel: modelConfig?.name || model,
+            searchStrategy,
+            isImageGeneration: selectedModel === IMAGE_GENERATION_MODEL,
           }),
-          // temperature: 0.6,
-          // topP: 0.9,
-          providerOptions: {
-            ...(modelConfig?.provider === "openai" &&
-              !modelConfig.apiProvider &&
-              modelConfig.capabilities.reasoning && {
-                openai: {
-                  reasoningEffort: effort,
-                  reasoningSummary: "auto",
-                },
-              }),
-            ...(modelConfig?.provider === "google" &&
-              !modelConfig.apiProvider && {
-                google: {
-                  thinkingConfig: {
-                    includeThoughts: true,
-                  },
-                } satisfies GoogleGenerativeAIProviderOptions,
-              }),
-            ...(modelConfig?.provider === "anthropic" &&
-              !modelConfig.apiProvider &&
-              modelConfig.capabilities.reasoning && {
-                anthropic: {
-                  thinking: {
-                    type: "enabled",
-                    budgetTokens: EFFORT_MAP_FOR_ANTHROPIC[effort],
-                  },
-                } satisfies AnthropicProviderOptions,
-              }),
+          maxSteps: MAX_STEPS,
+          messages: conversationMessages,
+          ...toolsConfig,
+          providerOptions,
+          temperature: 0.6,
+          topP: 0.9,
+          abortSignal: abortController.signal,
+          experimental_transform: smoothStream(),
+          onChunk: () => {
+            if (!hasFirstChunk) {
+              dataStreamWriter.writeData({
+                type: "first-chunk",
+              });
+              hasFirstChunk = true;
+            }
           },
-          onFinish: async ({ response, sources, files }) => {
-            let newMessage = appendResponseMessages({
-              messages: allMessages,
+          onFinish: async ({ response, sources }) => {
+            let assistantMessage = appendResponseMessages({
+              messages: conversationMessages,
               responseMessages: response.messages,
             }).at(-1)!;
 
             if (searchStrategy === "native") {
-              newMessage = {
-                ...newMessage,
+              assistantMessage = {
+                ...assistantMessage,
                 parts: [
-                  ...(newMessage.parts ?? []),
-                  ...sources.map((source) => ({
+                  ...(assistantMessage.parts ?? []),
+                  ...sources.map((sourceItem) => ({
                     type: "source" as const,
-                    source,
+                    source: sourceItem,
                   })),
                 ],
               } satisfies UIMessage;
-              console.log("newMessage", newMessage);
             }
 
+            console.log("YES");
+
             await upsertMessage({
-              id: newMessage.id,
-              threadId: id,
-              message: newMessage as UIMessage,
-              model: selectedModel,
+              id: assistantMessage.id,
+              threadId,
+              message: assistantMessage as UIMessage,
+              model,
               status: "done",
             });
+            cleanup();
           },
-          onError: (error) => {
-            console.error("Error in streamText", error);
+          onError: async (err) => {
+            const error = err.error as Error;
+            const isAborted = error.name === "AbortError";
+
+            console.log("YES IN ERROR", error);
+
+            if (!isAborted) {
+              console.error("Error in streamText:", error);
+
+              // Find the current streaming message and mark it as errored
+              const currentMessage = await getLastPendingMessage(threadId);
+              if (currentMessage) {
+                await markMessageAsErrored({
+                  messageId: currentMessage.id,
+                  threadId,
+                  errorMessage: error.message || "An unknown error occurred",
+                });
+              }
+            }
+            cleanup();
           },
         });
 
-        result.mergeIntoDataStream(dataStream, {
+        result.mergeIntoDataStream(dataStreamWriter, {
           sendReasoning: true,
           sendSources: true,
         });
       },
     });
 
-    return new Response(
-      await streamContext.resumableStream(streamId, () => stream)
-    );
+    if (dataStream)
+      return new Response(
+        await resumableStreamContext.resumableStream(streamId, () => dataStream)
+      );
   } catch (error) {
-    console.error("Error in /api/chat", error);
-    return new Response("Internal server error", { status: 500 });
+    console.error("Error in /api/chat:", error);
+
+    if (error instanceof OneChatSDKError) {
+      return error.toResponse();
+    }
+
+    const unknownError = new OneChatSDKError("internal_server_error:api");
+    return unknownError.toResponse();
   }
 };
 
 export const GET = async (request: NextRequest) => {
-  const { searchParams } = new URL(request.url);
-  const chatId = searchParams.get("chatId");
+  try {
+    const { searchParams } = new URL(request.url);
+    const chatId = searchParams.get("chatId");
 
-  if (!chatId) {
-    return new Response("id is required", { status: 400 });
-  }
+    if (!chatId) {
+      throw new OneChatSDKError("bad_request:api", "Chat ID is required");
+    }
 
-  const streamIds = await loadStreams(chatId);
+    const activeStreamIds = await loadStreams(chatId);
 
-  if (!streamIds.length) {
-    const emptyDataStream = createDataStream({
-      execute: () => {},
+    if (!activeStreamIds.length) {
+      return new Response(createEmptyDataStream(), { status: 200 });
+    }
+
+    const latestStreamId = activeStreamIds[0];
+    if (!latestStreamId) {
+      return new Response(createEmptyDataStream(), { status: 200 });
+    }
+
+    const fallbackStream = createEmptyDataStream();
+    const resumedStream = await resumableStreamContext.resumableStream(
+      latestStreamId,
+      () => fallbackStream
+    );
+
+    if (resumedStream) {
+      return new Response(resumedStream, { status: 200 });
+    }
+
+    const chatHistory = await loadChat(chatId);
+    const lastMessage = chatHistory.at(-1);
+
+    if (!lastMessage || lastMessage.role !== "assistant") {
+      return new Response(createEmptyDataStream(), { status: 200 });
+    }
+
+    const completedStream = createDataStream({
+      execute: (dataStreamWriter) => {
+        dataStreamWriter.writeData({
+          type: "append-message",
+          message: JSON.stringify(lastMessage),
+        });
+
+        dataStreamWriter.writeMessageAnnotation({
+          model: lastMessage.model || "unknown",
+          status: "completed",
+        });
+      },
     });
-    return new Response(emptyDataStream, { status: 200 });
+
+    return new Response(completedStream, { status: 200 });
+  } catch (error) {
+    console.error("Error in GET /api/chat:", error);
+
+    if (error instanceof OneChatSDKError) {
+      return error.toResponse();
+    }
+
+    if (error instanceof ZodError) {
+      const validationError = new OneChatSDKError(
+        "bad_request:api",
+        `Invalid request parameters: ${error.issues
+          .map((issue) => `${issue.path.join(".")} ${issue.message}`)
+          .join(", ")}`
+      );
+      return validationError.toResponse();
+    }
+
+    const unknownError = new OneChatSDKError("internal_server_error:api");
+    return unknownError.toResponse();
   }
+};
 
-  const recentStreamId = streamIds[0];
+export const DELETE = async (request: NextRequest) => {
+  try {
+    const { searchParams } = new URL(request.url);
+    const chatId = searchParams.get("chatId");
 
-  if (!recentStreamId) {
-    const emptyDataStream = createDataStream({
-      execute: () => {},
-    });
-    return new Response(emptyDataStream, { status: 200 });
+    if (!chatId) {
+      throw new OneChatSDKError("bad_request:api", "Chat ID is required");
+    }
+
+    const userSession = await auth.api.getSession({ headers: request.headers });
+    if (!userSession) {
+      throw new OneChatSDKError("unauthorized:chat");
+    }
+
+    await stopChatStream(chatId);
+
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    console.error("Error in DELETE /api/chat:", error);
+
+    if (error instanceof OneChatSDKError) {
+      return error.toResponse();
+    }
+
+    const unknownError = new OneChatSDKError("internal_server_error:api");
+    return unknownError.toResponse();
   }
-
-  const emptyDataStream = createDataStream({
-    execute: () => {
-      // do nothing
-    },
-  });
-
-  const stream = await streamContext.resumableStream(
-    recentStreamId,
-    () => emptyDataStream
-  );
-
-  if (stream) {
-    return new Response(stream, { status: 200 });
-  }
-
-  // If no active stream, check for completed messages
-  const messages = await loadChat(chatId);
-  const mostRecentMessage = messages.at(-1);
-
-  if (!mostRecentMessage || mostRecentMessage.role !== "assistant") {
-    return new Response(emptyDataStream, { status: 200 });
-  }
-
-  const streamWithMessage = createDataStream({
-    execute: (buffer) => {
-      buffer.writeData({
-        type: "append-message",
-        message: JSON.stringify(mostRecentMessage),
-      });
-
-      // Also send model annotation for the completed message
-      buffer.writeMessageAnnotation({
-        model: mostRecentMessage.model || "unknown",
-        status: "completed",
-      });
-    },
-  });
-
-  return new Response(streamWithMessage, { status: 200 });
 };

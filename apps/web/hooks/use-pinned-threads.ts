@@ -1,8 +1,8 @@
 "use client";
 
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import type { StateCreator } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface PinnedThreadsState {
   pinnedThreadIds: string[];

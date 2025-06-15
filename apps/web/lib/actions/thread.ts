@@ -7,9 +7,9 @@ import {
   prePopulateBranchedThreadCache,
 } from "@/lib/cache/thread-cache";
 import {
+  type ThreadListItem,
   createCachedThreadsFunction,
   invalidateUserThreadsCache,
-  type ThreadListItem,
 } from "@/lib/cache/thread-list-cache";
 import { db } from "@/lib/db";
 import {
@@ -18,21 +18,11 @@ import {
   message as messageTable,
   thread,
 } from "@/lib/db/schema/thread";
-import type { Attachment, JSONValue, UIMessage } from "ai";
-import {
-  and,
-  desc,
-  eq,
-  gt,
-  lt,
-  lte,
-  max,
-  sql,
-  inArray,
-  gte,
-} from "drizzle-orm";
+import type { Attachment, UIMessage } from "ai";
+import { and, desc, eq, gt, gte, lt, lte, max, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import { cache } from "react";
+import type { Model } from "../ai";
 import { generateThreadTitle } from "../ai/action";
 
 export const getThreadById = cache(async (id: string) => {
@@ -128,7 +118,7 @@ export const createChat = async ({
     .values({
       id,
       userId,
-      title: "",
+      title: "New Thread",
     })
     .returning();
 
@@ -142,15 +132,20 @@ export const upsertMessage = async ({
   model,
   status,
   attachments = [],
+  isErrored = false,
+  isStopped = false,
+  errorMessage,
 }: {
   id: string;
   threadId: string;
   message: UIMessage;
-  model?: string;
-  status?: "pending" | "streaming" | "done" | "error";
+  model?: Model;
+  status?: "pending" | "streaming" | "done" | "error" | "stopped";
   attachments?: Attachment[];
+  isErrored?: boolean;
+  isStopped?: boolean;
+  errorMessage?: string;
 }): Promise<typeof messageTable.$inferSelect | undefined> => {
-  console.log("attachments", attachments);
   const [result] = await db
     .insert(messageTable)
     .values({
@@ -163,6 +158,9 @@ export const upsertMessage = async ({
       model,
       status,
       attachments,
+      isErrored,
+      isStopped,
+      errorMessage,
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -176,6 +174,9 @@ export const upsertMessage = async ({
         model,
         status,
         attachments,
+        isErrored,
+        isStopped,
+        errorMessage,
         updatedAt: new Date(),
       },
     })
@@ -203,6 +204,7 @@ export const getOrCreateThread = async ({
   id: string;
   userId: string;
 }) => {
+  // TODO: Maybe use upsert here?
   const [existingThread] = await getThreadById(id);
   if (existingThread) return existingThread;
 
@@ -215,13 +217,18 @@ export const getOrCreateThread = async ({
 type GenerateAndUpdateThreadTitlePayload = {
   id: string;
   userQuery: string;
+  apiKeys: {
+    openai?: string;
+    openrouter?: string;
+  };
 };
 
 export const generateAndUpdateThreadTitle = async ({
   id,
   userQuery,
+  apiKeys,
 }: GenerateAndUpdateThreadTitlePayload) => {
-  const title = await generateThreadTitle({ userQuery: userQuery });
+  const title = await generateThreadTitle({ userQuery, apiKeys });
   await db.update(thread).set({ title }).where(eq(thread.id, id));
 };
 
@@ -369,6 +376,24 @@ export const getLastAssistantModel = async (
     .limit(1);
 
   return message?.model || null;
+};
+
+export const getMostRecentModel = async (
+  threadId: string
+): Promise<Model | null> => {
+  const [message] = await db
+    .select({ model: messageTable.model })
+    .from(messageTable)
+    .where(
+      and(
+        eq(messageTable.threadId, threadId),
+        sql`${messageTable.model} IS NOT NULL`
+      )
+    )
+    .orderBy(desc(messageTable.createdAt))
+    .limit(1);
+
+  return (message?.model as Model) || null;
 };
 
 export const retryMessageWithOriginalModel = async (
@@ -634,3 +659,120 @@ export const getThreadWithMessagesCached = createCachedThreadFunction(
 export const getUserThreadsCached = createCachedThreadsFunction(
   getUserThreadsUncached
 );
+
+export const markMessageAsStopped = async ({
+  messageId,
+  threadId,
+}: {
+  messageId: string;
+  threadId: string;
+}): Promise<typeof messageTable.$inferSelect | undefined> => {
+  const [result] = await db
+    .update(messageTable)
+    .set({
+      status: "stopped",
+      isStopped: true,
+      updatedAt: new Date(),
+    })
+    .where(eq(messageTable.id, messageId))
+    .returning();
+
+  if (result) {
+    invalidateThreadCache(threadId);
+  }
+
+  return result;
+};
+
+export const markMessageAsErrored = async ({
+  messageId,
+  threadId,
+  errorMessage,
+}: {
+  messageId: string;
+  threadId: string;
+  errorMessage?: string;
+}): Promise<typeof messageTable.$inferSelect | undefined> => {
+  const [result] = await db
+    .update(messageTable)
+    .set({
+      status: "error",
+      isErrored: true,
+      errorMessage,
+      updatedAt: new Date(),
+    })
+    .where(eq(messageTable.id, messageId))
+    .returning();
+
+  if (result) {
+    invalidateThreadCache(threadId);
+  }
+
+  return result;
+};
+
+export const getLastPendingMessage = async (
+  threadId: string
+): Promise<typeof messageTable.$inferSelect | null> => {
+  const [message] = await db
+    .select()
+    .from(messageTable)
+    .where(
+      and(
+        eq(messageTable.threadId, threadId),
+        eq(messageTable.status, "streaming")
+      )
+    )
+    .orderBy(desc(messageTable.createdAt))
+    .limit(1);
+
+  return message || null;
+};
+
+export const getLastMessage = async (
+  threadId: string
+): Promise<typeof messageTable.$inferSelect | null> => {
+  const [message] = await db
+    .select()
+    .from(messageTable)
+    .where(eq(messageTable.threadId, threadId))
+    .orderBy(desc(messageTable.createdAt))
+    .limit(1);
+
+  return message || null;
+};
+
+export const getStopStreamMessageData = async (
+  threadId: string
+): Promise<{
+  lastMessage: typeof messageTable.$inferSelect | null;
+  pendingMessage: typeof messageTable.$inferSelect | null;
+}> => {
+  const [lastMessageResult, pendingMessageResult] = await Promise.all([
+    // Get the last message
+    db
+      .select()
+      .from(messageTable)
+      .where(eq(messageTable.threadId, threadId))
+      .orderBy(desc(messageTable.createdAt))
+      .limit(1),
+    // Get pending assistant message if any
+    db
+      .select()
+      .from(messageTable)
+      .where(
+        and(
+          eq(messageTable.threadId, threadId),
+          eq(messageTable.role, "assistant"),
+          eq(messageTable.status, "streaming")
+        )
+      )
+      .orderBy(desc(messageTable.createdAt))
+      .limit(1),
+  ]);
+
+  return {
+    lastMessage: lastMessageResult[0] || null,
+    pendingMessage: pendingMessageResult[0] || null,
+  };
+};

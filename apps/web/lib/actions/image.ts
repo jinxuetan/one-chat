@@ -41,6 +41,7 @@ export const createImageGenerationTool = (userId: string, apiKey?: string) =>
         model: openaiClient.image("gpt-image-1"),
         prompt: imagePrompt,
         size: "1024x1024",
+        aspectRatio: "1:1",
       });
 
       const imageFilePath = `${userId}/generated-images/generated-image.png`;

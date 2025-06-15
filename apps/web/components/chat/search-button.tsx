@@ -1,5 +1,5 @@
 import { Toggle } from "@workspace/ui/components/toggle";
-import { Globe2, ChevronRight } from "lucide-react";
+import { ChevronRight, Globe2 } from "lucide-react";
 
 export type SearchMode = "off" | "native" | "tool";
 
@@ -7,14 +7,17 @@ interface SearchButtonProps {
   searchMode: SearchMode;
   onSearchModeChange: (mode: SearchMode) => void;
   supportsNativeSearch?: boolean;
+  disabled?: boolean;
 }
 
 export const SearchButton = ({
   searchMode,
   onSearchModeChange,
   supportsNativeSearch = false,
+  disabled = false,
 }: SearchButtonProps) => {
   const handleClick = () => {
+    if (disabled) return;
     if (supportsNativeSearch) {
       // Cycle through: off -> native -> tool -> off
       switch (searchMode) {
@@ -60,9 +63,10 @@ export const SearchButton = ({
       variant="outline"
       size="sm"
       type="button"
-      className="w-fit bg-white dark:bg-neutral-900 gap-2"
+      className="w-fit gap-2 bg-white dark:bg-neutral-900"
       pressed={searchMode !== "off"}
       onClick={handleClick}
+      disabled={disabled}
     >
       <Globe2 className="size-4" />
       <span>{getDisplayText()}</span>

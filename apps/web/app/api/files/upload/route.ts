@@ -69,6 +69,10 @@ export async function POST(request: Request): Promise<NextResponse> {
             attachmentUrl: blob.url,
           });
         } catch (error) {
+          console.error(
+            "/api/files/upload/route.ts: Error in onUploadCompleted:",
+            error
+          );
           throw new Error("Failed to store file metadata in database");
         }
       },
@@ -76,6 +80,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
+    console.error("/api/files/upload/route.ts: Error in POST:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Upload failed" },
       { status: 400 }

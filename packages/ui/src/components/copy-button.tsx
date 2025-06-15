@@ -2,12 +2,14 @@
 
 import { Button } from "@workspace/ui/components/button";
 import { Copy } from "lucide-react";
-import { type Variants, motion, cubicBezier } from "motion/react";
+import { type Variants, cubicBezier, motion } from "motion/react";
 import type React from "react";
 import { useRef, useState } from "react";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface CopyButtonProps {
   onCopy: () => Promise<void> | void;
+  className?: string;
 }
 
 const easeOut = cubicBezier(0.4, 0, 0.2, 1);
@@ -68,7 +70,10 @@ const checkPathVariants: Variants = {
 
 const MotionButton = motion.create(Button);
 
-export const CopyButton: React.FC<CopyButtonProps> = ({ onCopy }) => {
+export const CopyButton: React.FC<CopyButtonProps> = ({
+  onCopy,
+  className,
+}) => {
   const [status, setStatus] = useState<"idle" | "copying" | "copied">("idle");
   const [backgroundState, setBackgroundState] = useState<
     "hidden" | "entering" | "centered" | "leaving"
@@ -77,7 +82,10 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ onCopy }) => {
   const [leaveDirection, setLeaveDirection] = useState({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (status !== "idle") return;
 
     setStatus("copying");
@@ -183,7 +191,10 @@ export const CopyButton: React.FC<CopyButtonProps> = ({ onCopy }) => {
     <div className="relative">
       {/* animated Background */}
       <motion.div
-        className="absolute inset-0 rounded-md bg-border/50 dark:bg-border"
+        className={cn(
+          "absolute inset-0 rounded-md bg-border/50 dark:bg-border",
+          className
+        )}
         style={{
           opacity: 0,
           x: 0,

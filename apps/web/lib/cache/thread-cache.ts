@@ -1,5 +1,5 @@
 import { redis } from "@/lib/redis";
-import { Attachment } from "ai";
+import type { Attachment } from "ai";
 import { after } from "next/server";
 import { cache } from "react";
 
@@ -17,9 +17,12 @@ type ThreadWithMessages = {
     parts: unknown;
     role: "user" | "assistant" | "system" | "data";
     model: string | null;
-    status: "pending" | "streaming" | "done" | "error" | null;
+    status: "pending" | "streaming" | "done" | "error" | "stopped" | null;
     createdAt: Date;
     attachments: Attachment[] | null;
+    isErrored?: boolean;
+    isStopped?: boolean;
+    errorMessage?: string | null;
   }>;
 } | null;
 
@@ -76,7 +79,7 @@ export const invalidateThreadCache = (threadId: string) => {
 
 // Create cached version of any function that returns ThreadWithMessages
 export const createCachedThreadFunction = <
-  T extends (chatId: string) => Promise<ThreadWithMessages>
+  T extends (chatId: string) => Promise<ThreadWithMessages>,
 >(
   getThreadWithMessages: T
 ) => {
@@ -102,10 +105,13 @@ export const prePopulateBranchedThreadCache = async (
     parts: unknown;
     role: "user" | "assistant" | "system" | "data";
     model: string | null;
-    status: "pending" | "streaming" | "done" | "error" | null;
+    status: "pending" | "streaming" | "done" | "error" | "stopped" | null;
     createdAt: Date;
     updatedAt: Date;
     attachments: Attachment[] | null;
+    isErrored?: boolean;
+    isStopped?: boolean;
+    errorMessage?: string | null;
   }>,
   threadInfo: {
     title: string | null;

@@ -6,6 +6,9 @@ import { memo } from "react";
 import type { HTMLAttributes } from "react";
 import ReactMarkdown, { type Options } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { CodeComponent } from "./code-component";
 
 export type AIResponseProps = HTMLAttributes<HTMLDivElement> & {
@@ -79,26 +82,30 @@ const components: Options["components"] = {
   ),
 };
 
-const remarkPlugins = [remarkGfm];
+const remarkPlugins = [remarkGfm, remarkMath];
+const rehypePlugins = [rehypeKatex];
 
 export const AIResponse = memo(
-  ({
-    className,
-    options,
-    children,
-    ...props
-  }: AIResponseProps) => (
-    <div
-      className={cn(
-        "prose prose-neutral dark:prose-invert prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0",
-        className
-      )}
-      {...props}
-    >
-      <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
-        {children}
-      </ReactMarkdown>
-    </div>
-  ),
+  ({ className, options, children, ...props }: AIResponseProps) => {
+    return (
+      <div
+        className={cn(
+          "prose prose-neutral dark:prose-invert prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0",
+          className
+        )}
+        {...props}
+      >
+        <ReactMarkdown
+          remarkPlugins={remarkPlugins}
+          rehypePlugins={rehypePlugins}
+          components={components}
+        >
+          {children}
+        </ReactMarkdown>
+      </div>
+    );
+  },
   (prevProps, nextProps) => prevProps.children === nextProps.children
 );
+
+AIResponse.displayName = "AIResponse";

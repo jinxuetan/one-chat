@@ -36,7 +36,9 @@ export const FilePreview = ({
     <div className="min-w-0 flex-1">
       <div className="truncate font-medium text-neutral-900">{fileName}</div>
       {fileSize && (
-        <div className="text-neutral-500 text-xs">{formatFileSize(fileSize)}</div>
+        <div className="text-neutral-500 text-xs">
+          {formatFileSize(fileSize)}
+        </div>
       )}
     </div>
 

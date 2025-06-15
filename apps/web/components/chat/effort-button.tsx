@@ -12,6 +12,7 @@ import { useState } from "react";
 interface EffortButtonProps {
   effort: Effort;
   onEffortChange: (effort: Effort) => void;
+  disabled?: boolean;
 }
 
 const BrainLow = ({ className }: { className?: string }) => (
@@ -52,7 +53,11 @@ const EFFORT_CONFIG = {
   },
 } as const;
 
-export const EffortButton = ({ effort, onEffortChange }: EffortButtonProps) => {
+export const EffortButton = ({
+  effort,
+  onEffortChange,
+  disabled = false,
+}: EffortButtonProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleEffortSelect = (newEffort: Effort) => {
@@ -68,7 +73,7 @@ export const EffortButton = ({ effort, onEffortChange }: EffortButtonProps) => {
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 gap-1.5 px-2.5">
           <CurrentIcon className="size-3.5 text-foreground" />
-          <span className="font-medium text-foreground text-xs">
+          <span className="font-medium text-foreground">
             {currentConfig.label}
           </span>
           <ChevronDown className="size-3 text-muted-foreground" />
@@ -95,6 +100,7 @@ export const EffortButton = ({ effort, onEffortChange }: EffortButtonProps) => {
                     : "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
                 )}
                 onClick={() => handleEffortSelect(effortLevel)}
+                disabled={disabled}
               >
                 <IconComponent className="size-3.5 shrink-0 text-current" />
                 <div className="min-w-0 flex-1">

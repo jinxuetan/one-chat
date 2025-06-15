@@ -1,4 +1,6 @@
+import type { Attachment, JSONValue } from "ai";
 import {
+  boolean,
   foreignKey,
   integer,
   jsonb,
@@ -9,7 +11,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { nanoid, timestamps } from "./index";
-import { Attachment, JSONValue } from "ai";
 
 export const roleEnum = pgEnum("role", ["user", "assistant", "system", "data"]);
 export const statusEnum = pgEnum("status", [
@@ -17,6 +18,7 @@ export const statusEnum = pgEnum("status", [
   "streaming",
   "done",
   "error",
+  "stopped",
 ]);
 export const visibilityEnum = pgEnum("visibility", ["private", "public"]);
 
@@ -75,6 +77,9 @@ export const message = pgTable("message", {
   status: statusEnum("status").notNull().default("done"),
   attachmentIds: jsonb("attachment_ids").$type<string[]>().default([]),
   attachments: jsonb("attachments").$type<Attachment[]>().default([]),
+  isErrored: boolean("is_errored").notNull().default(false),
+  isStopped: boolean("is_stopped").notNull().default(false),
+  errorMessage: text("error_message"),
   ...timestamps,
 });
 

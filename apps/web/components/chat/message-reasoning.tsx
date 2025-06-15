@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  Loader,
-  Loader2,
-  LoaderIcon,
-} from "lucide-react";
 import { TextShimmer } from "@workspace/ui/components/text-shimmer";
+import { ChevronDownIcon, ChevronRightIcon, Loader } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { AIResponse } from "./ai-response";
@@ -29,7 +22,6 @@ const variants = {
     height: "auto",
     opacity: 1,
     marginTop: "1rem",
-    marginBottom: "0.5rem",
   },
 };
 
@@ -39,12 +31,19 @@ export const MessageReasoning = ({
 }: MessageReasoningProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  if (!reasoning)
+    return (
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        Model did not provide reasoning.
+      </p>
+    );
+
   return (
     <div className="flex flex-col">
       <button
         data-testid="message-reasoning-toggle"
         type="button"
-        className="cursor-pointer flex flex-row items-center gap-2"
+        className="flex cursor-pointer flex-row items-center gap-2"
         onClick={() => {
           setIsExpanded(!isExpanded);
         }}
@@ -77,9 +76,9 @@ export const MessageReasoning = ({
             variants={variants}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
-            className="flex flex-col gap-4 border-l pl-4 text-zinc-600 dark:text-zinc-400 bg-zinc-50 p-2 rounded-r-xl rounded-l-md"
+            className="flex flex-col gap-4 rounded-r-xl rounded-l-md border shadow-xs bg-neutral-50 p-2 pl-4 text-neutral-600 dark:text-neutral-400"
           >
-            <AIResponse>{reasoning}</AIResponse>
+            <AIResponse className="text-sm">{reasoning}</AIResponse>
           </motion.div>
         )}
       </AnimatePresence>

@@ -10,7 +10,7 @@ export type Model =
   | "openrouter:meta-llama/llama-4-scout:free"
   | "openrouter:meta-llama/llama-4-maverick:free"
   | "openrouter:deepseek/deepseek-r1-0528:free"
-  | "openrouter:qwen/qwen3-30b-a3b:free"
+  | "openrouter:qwen/qwen3-32b:free"
   | "openai:o4-mini"
   | "openai:gpt-4o"
   | "openai:gpt-4o-mini"
@@ -26,8 +26,32 @@ export type Model =
   | "anthropic:claude-3-7-sonnet-latest-reasoning"
   | "google:gemini-2.5-pro-preview-06-05"
   | "google:gemini-2.5-flash-preview-05-20"
+  | "google:gemini-2.5-flash-preview-05-20-thinking"
   | "google:gemini-2.0-flash"
   | "google:gemini-2.0-flash-lite";
+
+export const OPENROUTER_MODEL_MAP = {
+  "o4-mini": "openai/o4-mini",
+  "gpt-4o": "openai/gpt-4o",
+  "gpt-4o-mini": "openai/gpt-4o-mini",
+  "gpt-4.1": "openai/gpt-4.1",
+  "gpt-4.1-mini": "openai/gpt-4.1-mini",
+  "gpt-4.1-nano": "openai/gpt-4.1-nano",
+  o3: "openai/o3",
+  "o3-mini": "openai/o3-mini",
+
+  "claude-sonnet-4-0": "anthropic/claude-sonnet-4",
+  "claude-sonnet-4-0-reasoning": "anthropic/claude-sonnet-4",
+  "claude-3-7-sonnet-latest": "anthropic/claude-3.7-sonnet",
+  "claude-3-7-sonnet-latest-reasoning": "anthropic/claude-3.7-sonnet:thinking",
+
+  "gemini-2.5-pro-preview-06-05": "google/gemini-2.5-pro-preview",
+  "gemini-2.5-flash-preview-05-20": "google/gemini-2.5-flash-preview-05-20",
+  "gemini-2.5-flash-preview-05-20-thinking":
+    "google/gemini-2.5-flash-preview-05-20:thinking",
+  "gemini-2.0-flash": "google/gemini-2.0-flash-001",
+  "gemini-2.0-flash-lite": "google/gemini-2.0-flash-lite-001",
+} as const;
 
 export type Effort = "low" | "medium" | "high";
 
@@ -175,25 +199,25 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     performance: { speed: "slow", quality: "high" },
     tier: "standard",
   },
-  "openrouter:qwen/qwen3-30b-a3b:free": {
-    id: "qwen/qwen3-30b-a3b:free",
-    name: "Qwen 3 30B",
+  "openrouter:qwen/qwen3-32b:free": {
+    id: "qwen/qwen3-32b:free",
+    name: "Qwen 3 32B",
     provider: "openrouter",
     apiProvider: "openrouter",
-    description: "Qwen 3.3 model with 30B parameters",
-    maxTokens: 100000,
-    contextWindow: 128000,
+    description: "Qwen 3 model with 32B parameters",
+    maxTokens: 40_960,
+    contextWindow: 40_960,
     enabled: true,
     capabilities: {
       tools: false,
-      vision: true,
+      vision: false,
       nativeSearch: false,
-      pdf: true,
+      pdf: false,
       reasoning: true,
       effort: false,
       image: false,
     },
-    supportedFileTypes: [...SUPPORTS_TEXT_TYPES, ...SUPPORTS_IMAGE_TYPES],
+    supportedFileTypes: [...SUPPORTS_TEXT_TYPES],
     pricing: { input: 0.4, output: 0.8 },
     performance: { speed: "medium", quality: "high" },
     tier: "standard",
@@ -409,6 +433,32 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
       vision: true,
       nativeSearch: true,
       pdf: true,
+      reasoning: false,
+      effort: false,
+      image: false,
+    },
+    supportedFileTypes: [
+      ...SUPPORTS_TEXT_TYPES,
+      ...SUPPORTS_IMAGE_TYPES,
+      ...SUPPORTS_PDF_TYPES,
+    ],
+    pricing: { input: 0.15, output: 0.6 },
+    performance: { speed: "fast", quality: "high" },
+    tier: "budget",
+  },
+  "google:gemini-2.5-flash-preview-05-20-thinking": {
+    id: "gemini-2.5-flash-preview-05-20-thinking",
+    name: "Gemini 2.5 Flash (Thinking)",
+    provider: "google",
+    description: "Fast, efficient Gemini model with multimodal capabilities",
+    maxTokens: 100000,
+    contextWindow: 1000000,
+    enabled: true,
+    capabilities: {
+      tools: true,
+      vision: true,
+      nativeSearch: true,
+      pdf: true,
       reasoning: true,
       effort: true,
       image: false,
@@ -505,8 +555,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     name: "Claude 4 Sonnet",
     provider: "anthropic",
     description: "Latest Claude model with enhanced capabilities",
-    maxTokens: 100000,
-    contextWindow: 200000,
+    maxTokens: 64_000,
+    contextWindow: 200_000,
     enabled: true,
     capabilities: {
       tools: true,
@@ -531,8 +581,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     name: "Claude 4 Sonnet (Reasoning)",
     provider: "anthropic",
     description: "Claude 4 Sonnet optimized for reasoning tasks",
-    maxTokens: 100000,
-    contextWindow: 200000,
+    maxTokens: 64_000,
+    contextWindow: 200_000,
     enabled: true,
     capabilities: {
       tools: true,
@@ -557,8 +607,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     name: "Claude 3.7 Sonnet",
     provider: "anthropic",
     description: "Enhanced Claude 3.5 with improved capabilities",
-    maxTokens: 100000,
-    contextWindow: 200000,
+    maxTokens: 64_000,
+    contextWindow: 200_000,
     enabled: true,
     capabilities: {
       tools: true,
@@ -583,8 +633,8 @@ export const AVAILABLE_MODELS: Record<Model, ModelConfig> = {
     name: "Claude 3.7 Sonnet (Reasoning)",
     provider: "anthropic",
     description: "Claude 3.7 Sonnet optimized for reasoning tasks",
-    maxTokens: 100000,
-    contextWindow: 200000,
+    maxTokens: 64_000,
+    contextWindow: 200_000,
     enabled: true,
     capabilities: {
       tools: true,

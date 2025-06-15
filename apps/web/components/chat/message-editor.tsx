@@ -39,9 +39,7 @@ export const MessageEditor = ({
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${
-        textareaRef.current.scrollHeight + 2
-      }px`;
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
 
@@ -89,16 +87,18 @@ export const MessageEditor = ({
   };
 
   return (
-    <div className="ml-auto inline-block w-full max-w-[80%] break-words rounded-xl border px-4 py-3 text-left">
-      <div className="w-full overflow-y-scroll" style={{ maxHeight: 256 }}>
-        <textarea
-          ref={textareaRef}
-          className="!text-base mb-px w-full resize-none overflow-hidden border-none bg-transparent px-0 pt-[3px] text-secondary-foreground leading-6 shadow-none outline-none [vertical-align:unset] focus-visible:ring-0"
-          value={draftContent}
-          onChange={handleInput}
-          onKeyDown={handleKeyDown}
-        />
-      </div>
+    <div className="ml-auto inline-block w-full max-w-[80%] break-words rounded-xl border py-2 px-2 text-left shadow-xs">
+      <textarea
+        ref={textareaRef}
+        className="text-base size-full resize-none overflow-hidden border-none bg-transparent text-secondary-foreground leading-6 shadow-none outline-none [vertical-align:unset] focus-visible:ring-0"
+        value={draftContent}
+        onChange={handleInput}
+        style={{
+          minHeight: "42px",
+          maxHeight: "384px",
+        }}
+        onKeyDown={handleKeyDown}
+      />
     </div>
   );
 };

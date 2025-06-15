@@ -2,7 +2,7 @@
 
 import { Loader, Pin, PinOff, Split, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { usePinnedThreads } from "@/hooks/use-pinned-threads";
@@ -88,40 +88,40 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
             variant: "ghost",
             size: "sm",
             className:
-              "group-hover/item:bg-accent group-hover/item:text-accent-foreground dark:group-hover/item:bg-accent/50 rounded-lg",
+              "rounded-lg group-hover/item:bg-accent group-hover/item:text-accent-foreground dark:group-hover/item:bg-accent/50",
           }),
-          "border border-transparent w-full justify-start gap-2 px-2 py-1.5 h-auto min-h-8",
-          isActive && "bg-secondary text-secondary-foreground border-secondary",
-          isDeleting && "opacity-50 pointer-events-none"
+          "h-auto min-h-8 w-full justify-start gap-2 border border-transparent px-2 py-1.5",
+          isActive && "border-secondary bg-secondary text-secondary-foreground",
+          isDeleting && "pointer-events-none opacity-50"
         )}
       >
-        {pinned && <Pin className="size-3 text-muted-foreground shrink-0" />}
+        {pinned && <Pin className="size-3 shrink-0 text-muted-foreground" />}
         {thread.originThreadId && (
-          <Split className="size-3 text-muted-foreground shrink-0" />
+          <Split className="size-3 shrink-0 text-muted-foreground" />
         )}
-        <span className="truncate text-left flex-1 text-ellipsis">
+        <span className="flex-1 truncate text-ellipsis text-left">
           {thread.title}
         </span>
         {isCloningOrGenerating && (
           <div className="ml-auto flex items-center justify-center">
-            <Loader className="size-3 text-muted-foreground shrink-0 animate-spin" />
+            <Loader className="size-3 shrink-0 animate-spin text-muted-foreground" />
           </div>
         )}
       </Link>
 
       {!isCloningOrGenerating && (
-        <div className="absolute right-1 bg-neutral-100 top-1/2  -translate-y-1/2 opacity-0 group-hover/item:opacity-100 transition-opacity flex gap-1">
+        <div className="-translate-y-1/2 absolute top-1/2 right-1 flex gap-1 bg-neutral-100 opacity-0 transition-opacity group-hover/item:opacity-100">
           <Button
             size="icon"
             variant="ghost"
-            className="size-6 flex items-center justify-center rounded-md shrink-0 group/pin hover:bg-accent"
+            className="group/pin flex size-6 shrink-0 items-center justify-center rounded-md hover:bg-accent"
             onClick={handleTogglePin}
             title={pinned ? "Unpin thread" : "Pin thread"}
           >
             {pinned ? (
-              <PinOff className="size-3 group-hover/pin:scale-110 transition-transform" />
+              <PinOff className="size-3 transition-transform group-hover/pin:scale-110" />
             ) : (
-              <Pin className="size-3 group-hover/pin:scale-110 transition-transform" />
+              <Pin className="size-3 transition-transform group-hover/pin:scale-110" />
             )}
             <span className="sr-only">
               {pinned ? "Unpin thread" : "Pin thread"}
@@ -131,12 +131,12 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
           <Button
             size="icon"
             variant="ghost"
-            className="size-6 flex items-center justify-center rounded-md shrink-0 text-destructive hover:text-destructive group/delete hover:bg-destructive/10"
+            className="group/delete flex size-6 shrink-0 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={handleDelete}
             disabled={isDeleting}
             title="Delete thread"
           >
-            <Trash2 className="size-3 group-hover/delete:scale-110 transition-transform" />
+            <Trash2 className="size-3 transition-transform group-hover/delete:scale-110" />
             <span className="sr-only">Delete thread</span>
           </Button>
         </div>
