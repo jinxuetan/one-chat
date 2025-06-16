@@ -5,6 +5,7 @@ import {
   deleteTrailingMessages,
   generateAndUpdateThreadTitle,
   getUserThreadsCached,
+  toggleThreadVisibility,
 } from "@/lib/actions/thread";
 import { getUserThreadsCacheKey } from "@/lib/cache/thread-list-cache";
 import { redis } from "@/lib/redis";
@@ -169,6 +170,31 @@ export const threadRouter = router({
             error instanceof Error
               ? error.message
               : "Failed to branch out from message",
+        });
+      }
+    }),
+
+  /**
+   * Toggle thread visibility between private and public
+   * Used for sharing/unsharing threads
+   */
+  toggleVisibility: protectedProcedure
+    .input(z.object({ threadId: z.string() }))
+    .mutation(async ({ input }) => {
+      try {
+        const result = await toggleThreadVisibility(input.threadId);
+        return result;
+      } catch (error) {
+        console.error("Error in toggleVisibility:", error);
+
+        if (error instanceof TRPCError) throw error;
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to toggle thread visibility",
         });
       }
     }),

@@ -129,7 +129,7 @@ export const POST = async (request: NextRequest) => {
 
     const { model: fallbackModel } = getLanguageModel(FALLBACK_MODEL, {
       // TODO: Remove this once we have a better way to handle this
-      apiKeys: { openai: userApiKeys?.openai || "" },
+      apiKeys: { openai: userApiKeys?.openai || "sk-proj-1234567890" },
     });
 
     let hasFirstChunk = false;

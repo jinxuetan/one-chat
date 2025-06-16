@@ -232,6 +232,49 @@ export const generateAndUpdateThreadTitle = async ({
   await db.update(thread).set({ title }).where(eq(thread.id, id));
 };
 
+export const toggleThreadVisibility = async (
+  threadId: string
+): Promise<{ visibility: "private" | "public"; threadId: string }> => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const [existingThread] = await getThreadById(threadId);
+  if (!existingThread) {
+    throw new Error("Thread not found");
+  }
+
+  if (existingThread.userId !== session.user.id) {
+    throw new Error("Unauthorized: You can only share your own threads");
+  }
+
+  const newVisibility =
+    existingThread.visibility === "private" ? "public" : "private";
+
+  const [updatedThread] = await db
+    .update(thread)
+    .set({
+      visibility: newVisibility,
+      updatedAt: new Date(),
+    })
+    .where(eq(thread.id, threadId))
+    .returning();
+
+  if (updatedThread) {
+    invalidateThreadCache(threadId);
+    invalidateUserThreadsCache(session.user.id);
+  }
+
+  return {
+    visibility: newVisibility,
+    threadId: updatedThread?.id ?? threadId,
+  };
+};
+
 export const deleteChat = async (chatId: string): Promise<void> => {
   const session = await auth.api.getSession({
     headers: await headers(),

@@ -10,9 +10,6 @@ export const env = createEnv({
     UPSTASH_REDIS_URL: z.string().url(),
 
     OPENAI_API_KEY: z.string().startsWith("sk-").optional(),
-    ANTHROPIC_API_KEY: z.string().startsWith("sk-").optional(),
-    GOOGLE_AI_API_KEY: z.string().startsWith("AIza").optional(),
-    OPENROUTER_API_KEY: z.string().startsWith("sk-").optional(),
 
     FIRECRAWL_API_KEY: z.string().startsWith("fc-").optional(),
 

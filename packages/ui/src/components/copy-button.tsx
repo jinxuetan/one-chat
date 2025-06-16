@@ -10,6 +10,7 @@ import { useRef, useState } from "react";
 interface CopyButtonProps {
   onCopy: () => Promise<void> | void;
   className?: string;
+  disabled?: boolean;
 }
 
 const easeOut = cubicBezier(0.4, 0, 0.2, 1);
@@ -73,6 +74,7 @@ const MotionButton = motion.create(Button);
 export const CopyButton: React.FC<CopyButtonProps> = ({
   onCopy,
   className,
+  disabled,
 }) => {
   const [status, setStatus] = useState<"idle" | "copying" | "copied">("idle");
   const [backgroundState, setBackgroundState] = useState<
@@ -193,6 +195,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       <motion.div
         className={cn(
           "absolute inset-0 rounded-md bg-border/50 dark:bg-border",
+          "disabled:opacity-50 disabled:cursor-not-allowed",
           className
         )}
         style={{
@@ -215,7 +218,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
         aria-label="Copy code"
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        // disabled={status !== "idle"}
+        disabled={disabled}
       >
         <div className="relative h-4 w-4">
           {/* Copy Icon */}

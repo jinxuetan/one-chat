@@ -46,14 +46,16 @@ const SharePage = async ({ params }: SharePageProps) => {
   );
 
   return (
-    <Chat
-      threadId={id}
-      initialMessages={messagesWithMetadata}
-      initialChatModel={resolvedInitialModel}
-      initialVisibilityType={chat.thread?.visibility}
-      isReadonly={!isOwner}
-      autoResume={true}
-    />
+    <div className="flex flex-col h-dvh w-full items-center justify-center">
+      <Chat
+        threadId={id}
+        initialMessages={messagesWithMetadata}
+        initialChatModel={resolvedInitialModel}
+        initialVisibilityType={chat.thread?.visibility}
+        isReadonly={!isOwner}
+        autoResume={true}
+      />
+    </div>
   );
 };
 
