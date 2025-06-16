@@ -1,5 +1,5 @@
-import { type Model } from "@/lib/ai/config";
 import { useFileHandler } from "@/hooks/use-file-handler";
+import type { Model } from "@/lib/ai/config";
 import { Button } from "@workspace/ui/components/button";
 import {
   Tooltip,
@@ -29,7 +29,7 @@ export const FileButton = ({
   disabled = false,
 }: FileButtonProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const {
     isUploading,
     handleFiles,
@@ -63,7 +63,7 @@ export const FileButton = ({
     if (!files || files.length === 0) return;
 
     await handleFiles(files);
-    
+
     // Clear the input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";

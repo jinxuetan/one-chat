@@ -1,4 +1,8 @@
-import { AVAILABLE_MODELS, type Model, getModelAcceptTypes } from "@/lib/ai/config";
+import {
+  AVAILABLE_MODELS,
+  type Model,
+  getModelAcceptTypes,
+} from "@/lib/ai/config";
 import { useSession } from "@/lib/auth/client";
 import { upload } from "@vercel/blob/client";
 import { toast } from "@workspace/ui/components/sonner";
@@ -148,13 +152,7 @@ export const useFileHandler = ({
         onUploadStateChange?.(false);
       }
     },
-    [
-      maxFiles,
-      validateFile,
-      uploadFile,
-      onFileChange,
-      onUploadStateChange,
-    ]
+    [maxFiles, validateFile, uploadFile, onFileChange, onUploadStateChange]
   );
 
   return {
@@ -164,4 +162,4 @@ export const useFileHandler = ({
     getSupportedFileExtensions,
     validateFile,
   };
-}; 
+};

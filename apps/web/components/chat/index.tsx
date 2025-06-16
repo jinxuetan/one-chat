@@ -15,13 +15,13 @@ import type { ChatSubmitData } from "@/types";
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@workspace/ui/components/sonner";
+import { cn } from "@workspace/ui/lib/utils";
 import type { UIMessage } from "ai";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { DragDropOverlay } from "./drag-drop-overlay";
 import { Messages } from "./messages";
-import { cn } from "@workspace/ui/lib/utils";
 
 interface ChatProps {
   threadId: string;
@@ -56,12 +56,14 @@ export const Chat = ({
   const [isAtBottom, setIsAtBottom] = useState(true);
   const scrollToBottomRef = useRef<(() => void) | null>(null);
   const [hasKeys, setHasKeys] = useState(hasKeysFromProps);
-  
+
   // Drag and drop state
   const [isDragOverlay, setIsDragOverlay] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [dragCounter, setDragCounter] = useState(0);
-  const fileHandlerRef = useRef<((files: FileList) => Promise<void>) | null>(null);
+  const [_, setDragCounter] = useState(0);
+  const fileHandlerRef = useRef<((files: FileList) => Promise<void>) | null>(
+    null
+  );
 
   const { mutate: generateAndUpdateThreadTitle } =
     trpc.thread.generateAndUpdateThreadTitle.useMutation({
@@ -252,9 +254,9 @@ export const Chat = ({
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setDragCounter((prev) => prev + 1);
-    
+
     if (e.dataTransfer?.items) {
       const hasFiles = Array.from(e.dataTransfer.items).some(
         (item) => item.kind === "file"
@@ -274,7 +276,7 @@ export const Chat = ({
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setDragCounter((prev) => {
       const newCount = prev - 1;
       if (newCount <= 0) {
@@ -289,25 +291,28 @@ export const Chat = ({
   const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setIsDragOverlay(false);
     setIsDragOver(false);
     setDragCounter(0);
 
     if (!fileHandlerRef.current) return;
-    
+
     const files = e.dataTransfer?.files;
     if (files && files.length > 0) {
       await fileHandlerRef.current(files);
     }
   }, []);
 
-  const handleFileHandlerSet = useCallback((handler: (files: FileList) => Promise<void>) => {
-    fileHandlerRef.current = handler;
-  }, []);
+  const handleFileHandlerSet = useCallback(
+    (handler: (files: FileList) => Promise<void>) => {
+      fileHandlerRef.current = handler;
+    },
+    []
+  );
 
   return (
-    <div
+    <section
       className={cn(
         "relative flex h-dvh min-w-0 flex-col bg-background",
         isReadonly && "w-full"
@@ -316,6 +321,7 @@ export const Chat = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      aria-label="Chat interface with file drag and drop support"
     >
       {!isReadonly && (
         <div className="pointer-events-auto fixed top-2 right-2 z-50 flex flex-row gap-0.5 rounded-md border border-border/50 bg-neutral-50 p-1 shadow-xs backdrop-blur-sm transition-all duration-200 dark:border-border/30 dark:bg-neutral-800/90">
@@ -358,6 +364,6 @@ export const Chat = ({
         />
       )}
       <DragDropOverlay isVisible={isDragOverlay} isDragOver={isDragOver} />
-    </div>
+    </section>
   );
 };

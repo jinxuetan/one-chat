@@ -17,10 +17,11 @@ const ChatPage = async () => {
   const modelIdFromCookie = cookieStore.get("chat-model")?.value as
     | Model
     | undefined;
-  
+
   // Use user-specific cookie name
   const userId = session.user.id;
-  const hasKeysFromCookie = cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
+  const hasKeysFromCookie =
+    cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
 
   const resolvedInitialModel = resolveInitialModel(
     [],

@@ -13,7 +13,7 @@ import { toast } from "@workspace/ui/components/sonner";
 import { Switch } from "@workspace/ui/components/switch";
 import { cn } from "@workspace/ui/lib/utils";
 import { Globe, Lock, Share, X } from "lucide-react";
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface ShareButtonProps {
   threadId: string;
@@ -183,7 +183,7 @@ export const ShareButton = ({
       >
         <div className="space-y-6 p-6">
           <div className="space-y-3 border-border/20">
-            <h3 className="flex items-center gap-2.5 text-foreground text-lg font-semibold">
+            <h3 className="flex items-center gap-2.5 font-semibold text-foreground text-lg">
               <Share className="size-4.5" />
               Share conversation
             </h3>
@@ -200,7 +200,7 @@ export const ShareButton = ({
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-foreground/70 text-xs tracking-wide uppercase dark:text-foreground/60">
+              <span className="font-semibold text-foreground/70 text-xs uppercase tracking-wide dark:text-foreground/60">
                 Share Link
               </span>
               {isPublic && (
@@ -213,7 +213,7 @@ export const ShareButton = ({
               )}
             </div>
 
-            <div className="flex items-center gap-3 w-full">
+            <div className="flex w-full items-center gap-3">
               <Input
                 value={shareUrl}
                 readOnly
@@ -229,7 +229,7 @@ export const ShareButton = ({
               <CopyButton
                 onCopy={handleCopyShareLink}
                 className={cn(
-                  "flex-shrink-0 size-11 border border-border/80 bg-background/80 transition-all duration-200 hover:border-border hover:bg-background hover:shadow-sm dark:border-border/60 dark:bg-card/40 dark:hover:border-border/80 dark:hover:bg-card/60",
+                  "size-11 flex-shrink-0 border border-border/80 bg-background/80 transition-all duration-200 hover:border-border hover:bg-background hover:shadow-sm dark:border-border/60 dark:bg-card/40 dark:hover:border-border/80 dark:hover:bg-card/60",
                   !isPublic &&
                     "pointer-events-none border-border/50 bg-background/40 opacity-50 dark:border-border/40 dark:bg-card/20"
                 )}
@@ -247,7 +247,7 @@ export const ShareButton = ({
           {partialShares.length > 0 && (
             <div className="space-y-4 border-border/40 border-t pt-6 dark:border-border/30">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-foreground/70 text-xs tracking-wide uppercase dark:text-foreground/60">
+                <span className="font-semibold text-foreground/70 text-xs uppercase tracking-wide dark:text-foreground/60">
                   Partial Shares
                 </span>
                 <span className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5 font-medium text-foreground/70 text-xs dark:border-border/50 dark:bg-card/30 dark:text-foreground/60">
@@ -255,17 +255,17 @@ export const ShareButton = ({
                 </span>
               </div>
 
-              <div className="space-y-3 max-h-40 overflow-y-auto">
+              <div className="max-h-40 space-y-3 overflow-y-auto">
                 {partialShares.map((share) => (
                   <div
                     key={share.token}
                     className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/70 p-3.5 shadow-sm transition-all duration-200 hover:border-border/90 hover:bg-background/90 hover:shadow dark:border-border/50 dark:bg-card/30 dark:hover:border-border/70 dark:hover:bg-card/50"
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-mono text-foreground/70 text-xs truncate dark:text-foreground/60">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-mono text-foreground/70 text-xs dark:text-foreground/60">
                         {share.token}
                       </div>
-                      <div className="text-foreground/50 text-xs mt-1.5 dark:text-foreground/40">
+                      <div className="mt-1.5 text-foreground/50 text-xs dark:text-foreground/40">
                         Created {new Date(share.createdAt).toLocaleDateString()}
                       </div>
                     </div>

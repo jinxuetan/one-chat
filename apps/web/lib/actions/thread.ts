@@ -12,13 +12,8 @@ import {
   invalidateUserThreadsCache,
 } from "@/lib/cache/thread-list-cache";
 import { db } from "@/lib/db";
-import {
-  attachment,
-  messageAttachment,
-  message as messageTable,
-  thread,
-} from "@/lib/db/schema/thread";
-import type { Attachment, UIMessage } from "ai";
+import { message as messageTable, thread } from "@/lib/db/schema/thread";
+import type { UIMessage } from "ai";
 import { and, desc, eq, gt, gte, lt, lte, max, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import { cache } from "react";
@@ -82,7 +77,7 @@ const getUserThreadsUncached = async (
 };
 
 const getThreadWithMessages = async (chatId: string) => {
-  const [threadResult, messagesWithAttachments] = await Promise.all([
+  const [threadResult, messages] = await Promise.all([
     db
       .select({
         id: thread.id,
@@ -93,7 +88,7 @@ const getThreadWithMessages = async (chatId: string) => {
       .from(thread)
       .where(eq(thread.id, chatId))
       .limit(1),
-    getMessagesWithAttachments(chatId),
+    getMessages(chatId),
   ]);
 
   if (threadResult.length === 0) {
@@ -102,7 +97,7 @@ const getThreadWithMessages = async (chatId: string) => {
 
   return {
     thread: threadResult[0],
-    messages: messagesWithAttachments,
+    messages: messages,
   };
 };
 
@@ -131,7 +126,6 @@ export const upsertMessage = async ({
   id,
   model,
   status,
-  attachments = [],
   isErrored = false,
   isStopped = false,
   errorMessage,
@@ -141,7 +135,6 @@ export const upsertMessage = async ({
   message: UIMessage;
   model?: Model;
   status?: "pending" | "streaming" | "done" | "error" | "stopped";
-  attachments?: Attachment[];
   isErrored?: boolean;
   isStopped?: boolean;
   errorMessage?: string;
@@ -157,7 +150,6 @@ export const upsertMessage = async ({
       role: message.role,
       model,
       status,
-      attachments,
       isErrored,
       isStopped,
       errorMessage,
@@ -173,7 +165,6 @@ export const upsertMessage = async ({
         threadId,
         model,
         status,
-        attachments,
         isErrored,
         isStopped,
         errorMessage,
@@ -190,7 +181,7 @@ export const upsertMessage = async ({
 };
 
 export const loadChat = async (chatId: string) => {
-  return await getMessagesWithAttachments(chatId);
+  return await getMessages(chatId);
 };
 
 export const getThread = async (): Promise<(typeof thread.$inferSelect)[]> => {
@@ -468,130 +459,7 @@ export const retryMessageWithOriginalModel = async (
   };
 };
 
-export const createAttachment = async ({
-  fileKey,
-  fileName,
-  fileSize,
-  mimeType,
-  attachmentType = "file",
-  attachmentUrl,
-}: {
-  fileKey: string;
-  fileName: string;
-  fileSize: number;
-  mimeType: string;
-  attachmentType?: string;
-  attachmentUrl: string;
-}): Promise<typeof attachment.$inferSelect | undefined> => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const [result] = await db
-    .insert(attachment)
-    .values({
-      userId: session.user.id,
-      fileKey,
-      fileName,
-      fileSize,
-      mimeType,
-      attachmentType,
-      attachmentUrl,
-    })
-    .returning();
-  return result;
-};
-
-export const createAttachmentAndLinkToMessage = async ({
-  attachmentId,
-  userId,
-  messageId,
-  fileKey,
-  fileName,
-  fileSize,
-  mimeType,
-  attachmentType = "file",
-  attachmentUrl,
-}: {
-  attachmentId: string;
-  userId: string;
-  messageId: string;
-  fileKey: string;
-  fileName: string;
-  fileSize: number;
-  mimeType: string;
-  attachmentType?: string;
-  attachmentUrl: string;
-}): Promise<typeof attachment.$inferSelect | null> => {
-  const [newAttachment] = await db
-    .insert(attachment)
-    .values({
-      id: attachmentId,
-      userId,
-      fileKey,
-      fileName,
-      fileSize,
-      mimeType,
-      attachmentType,
-      attachmentUrl,
-    })
-    .returning();
-
-  if (!newAttachment) {
-    throw new Error("Failed to create attachment");
-  }
-
-  await db.insert(messageAttachment).values({
-    messageId,
-    attachmentId: newAttachment.id,
-  });
-
-  return newAttachment;
-};
-
-export const linkMessageAttachment = async (
-  messageId: string,
-  attachmentId: string
-): Promise<typeof messageAttachment.$inferSelect | undefined> => {
-  const [result] = await db
-    .insert(messageAttachment)
-    .values({
-      messageId,
-      attachmentId,
-    })
-    .returning();
-  return result;
-};
-
-export const getMessageAttachments = async (
-  messageId: string
-): Promise<(typeof attachment.$inferSelect)[]> => {
-  return await db
-    .select({
-      id: attachment.id,
-      userId: attachment.userId,
-      fileKey: attachment.fileKey,
-      fileName: attachment.fileName,
-      fileSize: attachment.fileSize,
-      mimeType: attachment.mimeType,
-      attachmentType: attachment.attachmentType,
-      attachmentUrl: attachment.attachmentUrl,
-      createdAt: attachment.createdAt,
-      updatedAt: attachment.updatedAt,
-    })
-    .from(attachment)
-    .innerJoin(
-      messageAttachment,
-      eq(attachment.id, messageAttachment.attachmentId)
-    )
-    .where(eq(messageAttachment.messageId, messageId));
-};
-
-const getMessagesWithAttachments = async (threadId: string) => {
+const getMessages = async (threadId: string) => {
   const rows = await db
     .select({
       id: messageTable.id,
@@ -602,7 +470,6 @@ const getMessagesWithAttachments = async (threadId: string) => {
       model: messageTable.model,
       status: messageTable.status,
       annotations: messageTable.annotations,
-      attachments: messageTable.attachments,
       createdAt: messageTable.createdAt,
       updatedAt: messageTable.updatedAt,
     })
@@ -672,7 +539,6 @@ export const branchOutFromMessage = async ({
     role: msg.role,
     model: msg.model,
     status: msg.status,
-    attachments: msg.attachments,
     createdAt: new Date(Date.now() + index),
     updatedAt: new Date(Date.now() + index),
   }));

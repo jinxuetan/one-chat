@@ -1,11 +1,10 @@
 import { Chat } from "@/components/chat";
 import { getPartialThreadData } from "@/lib/actions/partial-share";
 import type { Model } from "@/lib/ai";
-import { auth } from "@/lib/auth/server";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { resolveInitialModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 interface PartialSharePageProps {
@@ -35,7 +34,7 @@ const PartialSharePage = async ({ params }: PartialSharePageProps) => {
   );
 
   return (
-    <div className="flex h-dvh flex-col items-center justify-center min-w-3xl mx-auto">
+    <div className="mx-auto flex h-dvh min-w-3xl flex-col items-center justify-center">
       <Chat
         threadId={partialThreadData.thread.id}
         initialMessages={messagesWithMetadata}

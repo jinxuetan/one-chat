@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc/client";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useApiKeys } from "./use-api-keys";
 
 interface TranscriptionCallbacks {
@@ -116,7 +116,9 @@ export const useVoiceTranscription = ({
       const testStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
-      testStream.getTracks().forEach((track) => track.stop());
+      for (const track of testStream.getTracks()) {
+        track.stop();
+      }
       return true;
     } catch {
       return false;
@@ -293,9 +295,13 @@ export const useVoiceTranscription = ({
     // Stop audio processing
     processorNodeRef.current?.disconnect();
     audioContextRef.current?.close();
-
     // Release media resources
-    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+    const tracks = mediaStreamRef.current?.getTracks();
+    if (tracks) {
+      for (const track of tracks) {
+        track.stop();
+      }
+    }
 
     // Close WebSocket connection
     const websocket = websocketRef.current;

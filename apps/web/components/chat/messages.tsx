@@ -5,13 +5,13 @@ import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { getModelFromCookie, resolveModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
+import { cn } from "@workspace/ui/lib/utils";
 import type { UIMessage } from "ai";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef } from "react";
 import { BYOK } from "../byok";
 import { EmptyMessage } from "./empty-message";
 import { Message, ThinkingMessage } from "./message";
-import { cn } from "@workspace/ui/lib/utils";
 
 interface MessagesProps {
   threadId: string;

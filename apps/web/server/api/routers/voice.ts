@@ -1,6 +1,6 @@
 import { env } from "@/env";
-import { protectedProcedure, router } from "@/lib/trpc/server";
 import { voiceRateLimit } from "@/lib/redis/rate-limits";
+import { protectedProcedure, router } from "@/lib/trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -102,9 +102,8 @@ export const voiceRouter = router({
       // Rate limit free users (no API key provided)
       if (!hasUserApiKey) {
         const rateLimitKey = `voice_${user.id}`;
-        const { success, limit, remaining, reset } = await voiceRateLimit.limit(
-          rateLimitKey
-        );
+        const { success, limit, reset } =
+          await voiceRateLimit.limit(rateLimitKey);
 
         if (!success) {
           const waitMinutes = Math.ceil((reset - Date.now()) / 60000);
@@ -113,10 +112,6 @@ export const voiceRouter = router({
             message: `Voice limit reached (${limit}/hour). Try again in ${waitMinutes}m or add your API key.`,
           });
         }
-
-        console.log(
-          `Voice requests remaining: ${remaining}/${limit} for user ${user.id}`
-        );
       }
 
       // Create transcription session
@@ -192,9 +187,8 @@ export const voiceRouter = router({
         provider: z.enum(["openai", "google"]).default("openai"),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const { text, voice, model, speed, apiKey, provider } = input;
-      const { user } = ctx;
       const hasUserApiKey = Boolean(apiKey);
 
       // Validate API key availability
@@ -247,7 +241,9 @@ export const voiceRouter = router({
             voice,
             text_length: text.length,
           };
-        } else {
+        }
+
+        if (provider === "google") {
           // Google Gemini TTS API
           const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,

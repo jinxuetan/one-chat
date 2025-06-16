@@ -48,16 +48,17 @@ export const MessageActions = memo<MessageActionsProps>(
     const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
     const [isTTSDropdownOpen, setIsTTSDropdownOpen] = useState(false);
 
-    const createPartialShareMutation = trpc.thread.createPartialShare.useMutation({
-      onSuccess: (data) => {
-        const shareUrl = `${window.location.origin}/share/partial/${data.token}`;
-        navigator.clipboard.writeText(shareUrl);
-        toast.success("Partial share link copied to clipboard!");
-      },
-      onError: (error) => {
-        toast.error(error.message || "Failed to create partial share");
-      },
-    });
+    const createPartialShareMutation =
+      trpc.thread.createPartialShare.useMutation({
+        onSuccess: (data) => {
+          const shareUrl = `${window.location.origin}/share/partial/${data.token}`;
+          navigator.clipboard.writeText(shareUrl);
+          toast.success("Partial share link copied to clipboard!");
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to create partial share");
+        },
+      });
 
     const handlePartialShare = () => {
       createPartialShareMutation.mutate({
@@ -69,8 +70,10 @@ export const MessageActions = memo<MessageActionsProps>(
     if (isReadonly) return null;
 
     const modelConfig = model && getModelByKey(model);
-    const isAnyDropdownOpen = isReloadDropdownOpen || isBranchDropdownOpen || isTTSDropdownOpen;
-    const isPartialShareLoading = createPartialShareMutation.status === "pending";
+    const isAnyDropdownOpen =
+      isReloadDropdownOpen || isBranchDropdownOpen || isTTSDropdownOpen;
+    const isPartialShareLoading =
+      createPartialShareMutation.status === "pending";
 
     return (
       <div

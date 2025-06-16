@@ -36,41 +36,6 @@ type TTSModel =
 
 type TTSProvider = "openai" | "google";
 
-const OPENAI_VOICES = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"];
-
-const GEMINI_VOICES = [
-  "Zephyr",
-  "Puck",
-  "Charon",
-  "Kore",
-  "Fenrir",
-  "Leda",
-  "Orus",
-  "Aoede",
-  "Callirrhoe",
-  "Autonoe",
-  "Enceladus",
-  "Iapetus",
-  "Umbriel",
-  "Algieba",
-  "Despina",
-  "Erinome",
-  "Algenib",
-  "Rasalgethi",
-  "Laomedeia",
-  "Achernar",
-  "Alnilam",
-  "Schedar",
-  "Gacrux",
-  "Pulcherrima",
-  "Achird",
-  "Zubenelgenubi",
-  "Vindemiatrix",
-  "Sadachbia",
-  "Sadaltager",
-  "Sulafat",
-];
-
 const TTS_MODELS: {
   id: TTSModel;
   name: string;
@@ -136,9 +101,14 @@ export const TTSButton = memo<TTSButtonProps>(
           // Stop any currently playing audio
           stopAudio();
 
+          if (!data?.audio) {
+            toast.error("Failed to generate speech");
+            return;
+          }
+
           // Create audio element and play
           const audio = new Audio(
-            `data:audio/${data.format};base64,${data.audio}`
+            `data:audio/${data?.format};base64,${data?.audio}`
           );
 
           currentAudioRef.current = audio;
@@ -260,10 +230,10 @@ export const TTSButton = memo<TTSButtonProps>(
             {isPlaying
               ? "Stop audio"
               : isLoading
-              ? "Generating speech..."
-              : isTextTooLong
-              ? `Speech - Text too long (${text.length}/4000 characters)`
-              : "Text to Speech"}
+                ? "Generating speech..."
+                : isTextTooLong
+                  ? `Speech - Text too long (${text.length}/4000 characters)`
+                  : "Text to Speech"}
           </TooltipContent>
         </Tooltip>
 
@@ -275,7 +245,7 @@ export const TTSButton = memo<TTSButtonProps>(
         >
           {!hasOpenAIKey && !hasGoogleKey && (
             <div className="px-3 pt-2 text-start">
-              <span className="font-medium text-sm text-muted-foreground">
+              <span className="font-medium text-muted-foreground text-sm">
                 Add OpenAI or Gemini API key to use TTS
               </span>
             </div>

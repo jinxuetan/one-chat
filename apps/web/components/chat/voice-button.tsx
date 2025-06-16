@@ -1,17 +1,17 @@
 "use client";
 
-import { Loader, Mic, MicOff } from "lucide-react";
-import { motion } from "motion/react";
 import { useVoiceTranscription } from "@/hooks/use-voice-transcription";
-import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
+import { toast } from "@workspace/ui/components/sonner";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import { toast } from "@workspace/ui/components/sonner";
-import React, { forwardRef, useImperativeHandle } from "react";
+import { cn } from "@workspace/ui/lib/utils";
+import { Loader, Mic, MicOff } from "lucide-react";
+import { motion } from "motion/react";
+import { forwardRef, useImperativeHandle } from "react";
 
 interface VoiceButtonProps {
   onTranscript: (transcript: string) => void;
@@ -73,9 +73,9 @@ export const VoiceButton = forwardRef<VoiceButtonRef, VoiceButtonProps>(
             {/* Recording pulse indicator */}
             {isRecording && (
               <motion.div
-                className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"
+                className="-top-1 -right-1 absolute h-3 w-3 rounded-full bg-red-500"
                 animate={{ opacity: [1, 0.4, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
+                transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
               />
             )}
           </Button>

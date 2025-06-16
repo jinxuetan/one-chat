@@ -1,8 +1,7 @@
-import type { Attachment, JSONValue } from "ai";
+import type { JSONValue } from "ai";
 import {
   boolean,
   foreignKey,
-  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -45,23 +44,6 @@ export const thread = pgTable(
   ]
 );
 
-// Attachment table for file uploads
-export const attachment = pgTable("attachment", {
-  id: varchar("id")
-    .primaryKey()
-    .$defaultFn(() => nanoid()),
-  userId: varchar("user_id")
-    .references(() => user.id, { onDelete: "cascade" })
-    .notNull(),
-  fileKey: varchar("file_key").notNull(),
-  fileName: varchar("file_name").notNull(),
-  fileSize: integer("file_size").notNull(),
-  mimeType: varchar("mime_type").notNull(),
-  attachmentType: varchar("attachment_type").notNull().default("file"),
-  attachmentUrl: text("attachment_url").notNull(),
-  ...timestamps,
-});
-
 export const message = pgTable("message", {
   id: varchar("id")
     .primaryKey()
@@ -75,24 +57,8 @@ export const message = pgTable("message", {
   annotations: jsonb("annotations").$type<JSONValue[]>().default([]),
   model: varchar("model"),
   status: statusEnum("status").notNull().default("done"),
-  attachmentIds: jsonb("attachment_ids").$type<string[]>().default([]),
-  attachments: jsonb("attachments").$type<Attachment[]>().default([]),
   isErrored: boolean("is_errored").notNull().default(false),
   isStopped: boolean("is_stopped").notNull().default(false),
   errorMessage: text("error_message"),
-  ...timestamps,
-});
-
-// Junction table for message-attachment relationships
-export const messageAttachment = pgTable("message_attachment", {
-  id: varchar("id")
-    .primaryKey()
-    .$defaultFn(() => nanoid()),
-  messageId: varchar("message_id")
-    .references(() => message.id, { onDelete: "cascade" })
-    .notNull(),
-  attachmentId: varchar("attachment_id")
-    .references(() => attachment.id, { onDelete: "cascade" })
-    .notNull(),
   ...timestamps,
 });

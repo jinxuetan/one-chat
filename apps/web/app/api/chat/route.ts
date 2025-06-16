@@ -96,7 +96,6 @@ export const POST = async (request: NextRequest) => {
         threadId,
         id: userMessage.id,
         message: userMessage,
-        attachments: userMessage.experimental_attachments,
         model,
       }),
       appendStreamId({ chatId: threadId, streamId }),

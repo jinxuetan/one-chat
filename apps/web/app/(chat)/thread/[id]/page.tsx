@@ -44,10 +44,11 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
       chatModelFromCookie ?? null,
       DEFAULT_CHAT_MODEL
     );
-    
+
     // Use user-specific cookie name
     const userId = session.user.id;
-    const hasKeysFromCookie = cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
+    const hasKeysFromCookie =
+      cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
 
     // Return empty chat for optimistic branch creation
     return (
@@ -68,25 +69,21 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
     | Model
     | undefined;
 
-  const messagesWithMetadata = chat.messages.map((message) => ({
-    ...message,
-    experimental_attachments: message.attachments,
-  })) as MessageWithMetadata[];
-
   const resolvedInitialModel = resolveInitialModel(
-    messagesWithMetadata,
+    chat.messages as MessageWithMetadata[],
     chatModelFromCookie ?? null,
     DEFAULT_CHAT_MODEL
   );
 
-  // Use user-specific cookie name  
+  // Use user-specific cookie name
   const userId = session.user.id;
-  const hasKeysFromCookie = cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
+  const hasKeysFromCookie =
+    cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
 
   return (
     <Chat
       threadId={id}
-      initialMessages={messagesWithMetadata}
+      initialMessages={chat.messages as MessageWithMetadata[]}
       initialChatModel={resolvedInitialModel}
       initialVisibilityType={chat.thread?.visibility}
       isReadonly={session.user?.id !== chat.thread?.userId}

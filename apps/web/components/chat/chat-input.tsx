@@ -121,7 +121,9 @@ interface ChatInputProps {
   scrollToBottom: () => void;
   isStreamInterrupted: boolean;
   disabled?: boolean;
-  onExternalFileDrop?: (handleFiles: (files: FileList) => Promise<void>) => void;
+  onExternalFileDrop?: (
+    handleFiles: (files: FileList) => Promise<void>
+  ) => void;
 }
 
 const convertToAttachment = (file: SelectedFile): Attachment => ({
@@ -145,9 +147,9 @@ export const ChatInput = memo(
     isAtBottom,
     scrollToBottom,
     isStreamInterrupted,
-          disabled = false,
-      onExternalFileDrop,
-    }: ChatInputProps) => {
+    disabled = false,
+    onExternalFileDrop,
+  }: ChatInputProps) => {
     const [reasoningEffort, setReasoningEffort] = useState<Effort>("medium");
     const [searchStrategy, setSearchStrategy] = useState<SearchMode>("off");
     const [selectedModel, setSelectedModel] = useState<Model>(initialChatModel);
@@ -342,7 +344,7 @@ export const ChatInput = memo(
 
           {/* Interrupted Stream Display */}
           {status !== "error" && isStreamInterrupted && (
-            <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-amber-300/30 border-b-0 bg-amber-50/80 p-2 dark:border-amber-400/20 dark:bg-amber-900/20 pl-3">
+            <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-amber-300/30 border-b-0 bg-amber-50/80 p-2 pl-3 dark:border-amber-400/20 dark:bg-amber-900/20">
               <div className="flex items-center justify-between">
                 <p className="text-amber-700 text-sm sm:text-base dark:text-amber-300">
                   Stream was interrupted or stopped
@@ -387,8 +389,8 @@ export const ChatInput = memo(
                 isProcessing
                   ? "AI is responding..."
                   : isUploading
-                  ? "Uploading files..."
-                  : "Ask me anything..."
+                    ? "Uploading files..."
+                    : "Ask me anything..."
               }
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -474,10 +476,10 @@ export const ChatInput = memo(
                       isUploading
                         ? "Files are uploading..."
                         : isProcessing
-                        ? "AI is responding..."
-                        : canSubmit
-                        ? "Send message"
-                        : "Enter a message"
+                          ? "AI is responding..."
+                          : canSubmit
+                            ? "Send message"
+                            : "Enter a message"
                     }
                   >
                     <ArrowUp className="size-4" />

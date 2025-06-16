@@ -2,9 +2,9 @@
 
 import { auth } from "@/lib/auth/server";
 import { redis } from "@/lib/redis";
-import { headers } from "next/headers";
 import { nanoid } from "nanoid";
-import { getThreadWithMessagesCached, getMessageById } from "./thread";
+import { headers } from "next/headers";
+import { getMessageById, getThreadWithMessagesCached } from "./thread";
 
 export interface PartialShare {
   token: string;
@@ -80,15 +80,18 @@ export const createPartialShare = async ({
 /**
  * Get a partial share by token
  */
-export const getPartialShare = async (token: string): Promise<PartialShare | null> => {
+export const getPartialShare = async (
+  token: string
+): Promise<PartialShare | null> => {
   try {
     const data = await redis.get(`${PARTIAL_SHARE_KEY_PREFIX}${token}`);
     if (!data) return null;
 
     // Redis might return an object or string depending on the client
-    const partialShare = typeof data === 'string' 
-      ? JSON.parse(data) as PartialShare 
-      : data as PartialShare;
+    const partialShare =
+      typeof data === "string"
+        ? (JSON.parse(data) as PartialShare)
+        : (data as PartialShare);
 
     // Check if expired
     if (new Date(partialShare.expiresAt) < new Date()) {
@@ -126,7 +129,7 @@ export const deletePartialShare = async (token: string): Promise<boolean> => {
   const pipeline = redis.pipeline();
   pipeline.del(`${PARTIAL_SHARE_KEY_PREFIX}${token}`);
   pipeline.srem(`${USER_PARTIAL_SHARES_KEY_PREFIX}${session.user.id}`, token);
-  
+
   const results = await pipeline.exec();
   return results !== null && Array.isArray(results[0]) && results[0][1] === 1;
 };
@@ -143,7 +146,9 @@ export const getUserPartialShares = async (): Promise<PartialShare[]> => {
     throw new Error("Unauthorized");
   }
 
-  const tokens = await redis.smembers(`${USER_PARTIAL_SHARES_KEY_PREFIX}${session.user.id}`);
+  const tokens = await redis.smembers(
+    `${USER_PARTIAL_SHARES_KEY_PREFIX}${session.user.id}`
+  );
   const partialShares: PartialShare[] = [];
 
   for (const token of tokens) {
@@ -154,8 +159,8 @@ export const getUserPartialShares = async (): Promise<PartialShare[]> => {
   }
 
   // Sort by creation date (newest first)
-  return partialShares.sort((a, b) => 
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  return partialShares.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 };
 
@@ -196,4 +201,4 @@ export const getPartialThreadData = async (token: string) => {
     originalThreadId: partialShare.threadId,
     cutoffMessageId: partialShare.messageId,
   };
-}; 
+};
