@@ -5,10 +5,12 @@ import { trpc } from "@/lib/trpc/client";
 import { generateUUID, resolveModel, setModelCookie } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
+import type { SourceUIPart } from "@ai-sdk/ui-utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@workspace/ui/components/sonner";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 interface UseMessageLogicProps {
   threadId: string;
@@ -26,9 +28,9 @@ export const useMessageLogic = ({
   messageModel,
 }: UseMessageLogicProps): {
   displayMode: "view" | "edit";
-  setDisplayMode: (mode: "view" | "edit") => void;
+  setDisplayMode: Dispatch<SetStateAction<"view" | "edit">>;
   messageModelConfig: ModelConfig | false | null;
-  sources: unknown[];
+  sources: SourceUIPart["source"][];
   isBranchingThread: boolean;
   isReloading: boolean;
   handleMessageReload: (model?: Model) => Promise<void>;
@@ -87,8 +89,8 @@ export const useMessageLogic = ({
       const errorMessage = error.message.includes("Unauthorized")
         ? "You don't have permission to branch this thread"
         : error.message.includes("not found")
-          ? "Message or thread not found"
-          : "Failed to branch out. Please try again.";
+        ? "Message or thread not found"
+        : "Failed to branch out. Please try again.";
       toast.error(errorMessage);
     },
     onSettled: () => {
@@ -109,11 +111,12 @@ export const useMessageLogic = ({
     [message.role, resolvedModel]
   );
 
-  const sources = useMemo(() => {
+  const sources = useMemo((): SourceUIPart["source"][] => {
     return (
       message.parts
         ?.filter((part) => part.type === "source")
-        ?.map((part) => part.source) || []
+        ?.map((part) => (part as { source: SourceUIPart["source"] }).source) ||
+      []
     );
   }, [message.parts]);
 
