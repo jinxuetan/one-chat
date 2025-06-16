@@ -21,6 +21,7 @@ import { ProviderIcon } from "./model-selection-popover";
 interface ModelSelectionDropdownProps {
   trigger: React.ReactNode;
   onSelect: (model?: Model) => void;
+  onOpenChange?: (open: boolean) => void;
   disabled?: boolean;
   side?: "top" | "bottom" | "left" | "right";
   align?: "start" | "center" | "end";
@@ -35,6 +36,7 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
   ({
     trigger,
     onSelect,
+    onOpenChange,
     disabled = false,
     side = "bottom",
     align = "start",
@@ -114,7 +116,7 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
     }, []);
 
     return (
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={onOpenChange}>
         <DropdownMenuTrigger asChild disabled={disabled}>
           <div className={className}>{trigger}</div>
         </DropdownMenuTrigger>

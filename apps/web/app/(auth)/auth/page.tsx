@@ -16,7 +16,7 @@ const AuthPage = async () => {
           <h1 className="flex items-center font-semibold text-3xl">
             Welcome to{" "}
             <span className="relative ml-2">
-              <span className="absolute inset-y-1/2 h-0.5 w-full bg-black" />
+              <span className="absolute inset-y-1/2 h-0.5 w-full bg-black dark:bg-white" />
               <Image
                 src="/assets/t3chat.svg"
                 alt="T3.Chat"
@@ -30,12 +30,13 @@ const AuthPage = async () => {
                 alt="OneChat"
                 width={126}
                 height={25}
+                className="dark:invert transition-all duration-200"
               />
             </span>
           </h1>
           <p className="text-lg text-muted-foreground">
-            Totally not a clone (we promise it&apos;s 100% original and
-            definitely faster than the real one 🤓)
+            Access multiple premium AI models including GPT-4.1, Claude, and more.
+            Experience the best AI models in a clean, simple chat interface.
           </p>
         </div>
         <OAuthButton />

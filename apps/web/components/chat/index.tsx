@@ -253,7 +253,6 @@ export const Chat = ({
         onScrollStateChange={handleScrollStateChange}
         hasKeys={hasKeys}
       />
-      {/* <section className="absolute bottom-0 w-full left-0 h-64 bg-gradient-to-t from-[#fefefe] from-10% via-50% via-[#fefefe]/50 to-transparent pointer-events-none isolate" /> */}
       {!isReadonly && (
         <ChatInput
           threadId={threadId}

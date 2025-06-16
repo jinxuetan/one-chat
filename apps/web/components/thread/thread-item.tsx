@@ -110,7 +110,7 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
       </Link>
 
       {!isCloningOrGenerating && (
-        <div className="-translate-y-1/2 absolute top-1/2 right-1 flex gap-1 opacity-0 transition-opacity group-hover/item:opacity-100">
+        <div className="-translate-y-1/2 absolute top-1/2 right-1 flex gap-1 opacity-0 transition-opacity group-hover/item:opacity-100 bg-accent rounded-md">
           <Button
             size="icon"
             variant="ghost"

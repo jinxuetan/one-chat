@@ -250,7 +250,7 @@ export const ChatInput = memo(
     const cannotSubmit = !canSubmit || isProcessing || isUploading;
 
     return (
-      <div className="sticky inset-x-0 bottom-0 z-10 mx-auto flex w-full gap-2 bg-background px-4 pb-4 md:max-w-3xl md:pb-6">
+      <div className="sticky inset-x-0 bottom-0 z-10 mx-auto flex w-full gap-2 bg-background/60 backdrop-blur-sm border-border/20 px-4 pb-4 md:max-w-3xl md:pb-6">
         <div className="relative flex w-full flex-col">
           <div className="-top-12 -translate-x-1/2 absolute left-1/2">
             <AnimatePresence>
@@ -298,7 +298,7 @@ export const ChatInput = memo(
           {/* Input Form */}
           <form
             onSubmit={handleSubmit}
-            className="relative w-full rounded-xl border border-border dark:border-border/60 bg-muted/30 dark:bg-card/50 shadow-sm dark:shadow-none backdrop-blur-sm transition-all duration-200 focus-within:border-border/80 dark:focus-within:border-border/80 focus-within:shadow-md dark:focus-within:shadow-lg"
+            className="relative w-full rounded-xl border border-border dark:border-border/60 bg-muted/30 dark:bg-card/50 shadow-xs dark:shadow-none backdrop-blur-sm transition-all duration-200 focus-within:border-border/80 dark:focus-within:border-border/80 focus-within:shadow-md dark:focus-within:shadow-lg"
           >
             <textarea
               ref={textareaRef}

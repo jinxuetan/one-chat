@@ -6,6 +6,7 @@
     "clean": "turbo clean",
     "build": "turbo build",
     "dev": "turbo dev",
+    "start": "turbo start",
     "lint": "ultracite lint",
     "format": "ultracite format"
   },

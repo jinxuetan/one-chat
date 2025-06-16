@@ -1,7 +1,17 @@
-import { type Model, getModelAcceptTypes } from "@/lib/ai/config";
+import {
+  type Model,
+  getModelAcceptTypes,
+  AVAILABLE_MODELS,
+} from "@/lib/ai/config";
 import { useSession } from "@/lib/auth/client";
 import { upload } from "@vercel/blob/client";
 import { Button } from "@workspace/ui/components/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
 import { toast } from "@workspace/ui/components/sonner";
 import { Loader2, Paperclip } from "lucide-react";
 import { useRef, useState } from "react";
@@ -34,6 +44,27 @@ export const FileButton = ({
 
   const getAllowedFileTypes = () => {
     return selectedModel ? getModelAcceptTypes(selectedModel) : ["text/plain"];
+  };
+
+  const getSupportedFileExtensions = () => {
+    if (!selectedModel) return ["txt"];
+    const model = AVAILABLE_MODELS[selectedModel];
+    return model?.supportedFileTypes || ["txt"];
+  };
+
+  const getTooltipContent = () => {
+    const extensions = getSupportedFileExtensions();
+    const modelName = selectedModel?.split(":")[1] || "this model";
+
+    if (extensions.length === 0) {
+      return `No file types supported by ${modelName}`;
+    }
+
+    const formattedExtensions = extensions
+      .map((ext) => ext.toUpperCase())
+      .join(", ");
+
+    return formattedExtensions;
   };
 
   const validateFile = (file: File): string | null => {
@@ -138,30 +169,37 @@ export const FileButton = ({
   };
 
   return (
-    <>
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        className="hidden"
-        onChange={handleFileChange}
-        accept={getAllowedFileTypes().join(",")}
-        disabled={disabled || isUploading}
-      />
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        disabled={disabled || isUploading}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        {isUploading ? (
-          <Loader2 className="size-3.5 animate-spin" />
-        ) : (
-          <Paperclip className="size-3.5" />
-        )}
-        <span>{isUploading ? "Uploading..." : "Attach"}</span>
-      </Button>
-    </>
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger asChild>
+        <div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={handleFileChange}
+            accept={getAllowedFileTypes().join(",")}
+            disabled={disabled || isUploading}
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={disabled || isUploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {isUploading ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Paperclip className="size-3.5" />
+            )}
+            <span>{isUploading ? "Uploading..." : "Attach"}</span>
+          </Button>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p className="text-xs">{getTooltipContent()}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };

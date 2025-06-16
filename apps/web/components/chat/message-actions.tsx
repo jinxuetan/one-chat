@@ -9,7 +9,7 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { PencilIcon, RotateCcwIcon, Split } from "lucide-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { ModelSelectionDropdown } from "./model-selection-dropdown";
 import { ProviderIcon } from "./model-selection-popover";
 
@@ -39,9 +39,13 @@ export const MessageActions = memo<MessageActionsProps>(
     isBranching,
     textContent,
   }) => {
+    const [isReloadDropdownOpen, setIsReloadDropdownOpen] = useState(false);
+    const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
+
     if (isReadonly) return null;
 
     const modelConfig = model && getModelByKey(model);
+    const isAnyDropdownOpen = isReloadDropdownOpen || isBranchDropdownOpen;
 
     return (
       <div
@@ -50,6 +54,7 @@ export const MessageActions = memo<MessageActionsProps>(
           {
             "right-0": message.role === "user",
             "left-0": message.role === "assistant",
+            "opacity-100": isAnyDropdownOpen,
           }
         )}
       >
@@ -82,6 +87,7 @@ export const MessageActions = memo<MessageActionsProps>(
             </Tooltip>
           }
           onSelect={(model) => onReload(model)}
+          onOpenChange={setIsReloadDropdownOpen}
           disabled={isReloading}
           side="bottom"
           align="end"
@@ -134,6 +140,7 @@ export const MessageActions = memo<MessageActionsProps>(
               </Tooltip>
             }
             onSelect={(model) => onBranchOut(model)}
+            onOpenChange={setIsBranchDropdownOpen}
             disabled={isBranching}
             side="bottom"
             align="end"

@@ -1,6 +1,20 @@
-import { Toggle } from "@workspace/ui/components/toggle";
-import { ChevronRight, Globe2 } from "lucide-react";
+import { useApiKeys } from "@/hooks/use-api-keys";
+import { getRoutingFromCookie } from "@/lib/utils/cookie";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
+import { ChevronDown, Globe2, OctagonAlert, Search } from "lucide-react";
+import { useState } from "react";
 
 export type SearchMode = "off" | "native" | "tool";
 
@@ -11,98 +25,149 @@ interface SearchButtonProps {
   disabled?: boolean;
 }
 
+const SEARCH_CONFIG = {
+  off: {
+    label: "Search Off",
+    description: "No search enabled",
+    icon: Search,
+  },
+  native: {
+    label: "Native Search",
+    description: "Model's built-in search",
+    icon: Globe2,
+  },
+  tool: {
+    label: "Web Search",
+    description: "External web search",
+    icon: Globe2,
+  },
+} as const;
+
 export const SearchButton = ({
   searchMode,
   onSearchModeChange,
   supportsNativeSearch = false,
   disabled = false,
 }: SearchButtonProps) => {
-  const handleClick = () => {
-    if (disabled) return;
-    if (supportsNativeSearch) {
-      // Cycle through: off -> native -> tool -> off
-      switch (searchMode) {
-        case "off":
-          onSearchModeChange("native");
-          break;
-        case "native":
-          onSearchModeChange("tool");
-          break;
-        case "tool":
-          onSearchModeChange("off");
-          break;
-      }
-    } else {
-      // Cycle through: off -> tool -> off
-      switch (searchMode) {
-        case "off":
-          onSearchModeChange("tool");
-          break;
-        case "tool":
-          onSearchModeChange("off");
-          break;
-        default:
-          onSearchModeChange("off");
-          break;
-      }
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const { keys } = useApiKeys();
+  
+  // Check if native search requirements are met
+  const hasGoogleKey = Boolean(keys.google);
+  const isAutoRouting = getRoutingFromCookie() !== true; // true means OpenRouter only, false/null means Auto
+  const canUseNativeSearch = hasGoogleKey && isAutoRouting;
+
+  const handleSearchModeSelect = (newMode: SearchMode) => {
+    // Prevent selecting native search if requirements aren't met
+    if (newMode === "native" && !canUseNativeSearch) {
+      return;
     }
+    
+    // If currently on native search and requirements are no longer met, switch to off
+    if (searchMode === "native" && !canUseNativeSearch) {
+      onSearchModeChange("off");
+      setIsPopoverOpen(false);
+      return;
+    }
+    
+    onSearchModeChange(newMode);
+    setIsPopoverOpen(false);
   };
 
-  const getDisplayText = () => {
-    switch (searchMode) {
-      case "native":
-        return "Native Search";
-      case "tool":
-        return "Search";
-      default:
-        return "Search";
-    }
-  };
+  const availableModes = supportsNativeSearch 
+    ? (["off", "native", "tool"] as const)
+    : (["off", "tool"] as const);
 
-  const getSearchModeInfo = () => {
-    switch (searchMode) {
-      case "native":
-        return {
-          variant: "default" as const,
-          className: "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900"
-        };
-      case "tool":
-        return {
-          variant: "default" as const,
-          className: "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-900"
-        };
-      default:
-        return {
-          variant: "outline" as const,
-          className: "bg-background dark:bg-card hover:bg-accent dark:hover:bg-accent/80 border-border dark:border-border/60"
-        };
-    }
-  };
+  const currentConfig = SEARCH_CONFIG[searchMode];
+  const CurrentIcon = currentConfig.icon;
 
-  const modeInfo = getSearchModeInfo();
+  const getNativeSearchTooltip = () => {
+    if (!hasGoogleKey && !isAutoRouting) {
+      return "Native search requires Google API Key configured and routing set to Auto Mode";
+    }
+    if (!hasGoogleKey) {
+      return "Native search requires Google API Key configured";
+    }
+    if (!isAutoRouting) {
+      return "Native search requires routing set to Auto Mode";
+    }
+    return null;
+  };
 
   return (
-    <Toggle
-      variant={modeInfo.variant}
-      size="sm"
-      type="button"
-      className={cn(
-        "w-fit gap-2 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
-        modeInfo.className
-      )}
-      pressed={searchMode !== "off"}
-      onClick={handleClick}
-      disabled={disabled}
-      aria-label={`Toggle ${getDisplayText()}`}
-    >
-      <Globe2 className="size-4" />
-      <span>{getDisplayText()}</span>
-      {supportsNativeSearch && (
-        <ChevronRight className={cn(
-          "size-3 transition-transform duration-200",
-          searchMode !== "off" && "rotate-90"
-        )} />
-      )}
-    </Toggle>
+    <TooltipProvider>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-8 gap-1.5 px-2.5"
+            disabled={disabled}
+          >
+            <CurrentIcon className="size-3.5 text-foreground" />
+            <span className="font-medium text-foreground">
+              {searchMode === "off" ? "Search" : currentConfig.label}
+            </span>
+            <ChevronDown className="size-3 text-muted-foreground" />
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-56 p-1" align="start" sideOffset={6}>
+          <div className="space-y-px">
+            {availableModes.map((mode) => {
+              const config = SEARCH_CONFIG[mode];
+              const IconComponent = config.icon;
+              const isNativeMode = mode === "native";
+              const isDisabled = isNativeMode && !canUseNativeSearch;
+              const tooltipContent = isNativeMode ? getNativeSearchTooltip() : null;
+
+              const buttonContent = (
+                <button
+                  key={mode}
+                  type="button"
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
+                    isDisabled && "opacity-50 cursor-not-allowed",
+                    !isDisabled && searchMode === mode
+                      ? "bg-accent text-accent-foreground"
+                      : !isDisabled && "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
+                  )}
+                  onClick={() => handleSearchModeSelect(mode)}
+                  disabled={disabled || isDisabled}
+                >
+                  <div className="flex items-center gap-2.5 flex-1">
+                    <IconComponent className="size-3.5 shrink-0 text-current" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium">{config.label}</div>
+                      <div className="text-muted-foreground">
+                        {config.description}
+                      </div>
+                    </div>
+                  </div>
+                  {isDisabled && (
+                    <OctagonAlert className="size-3.5 shrink-0 text-yellow-500" />
+                  )}
+                </button>
+              );
+
+              if (tooltipContent) {
+                return (
+                  <Tooltip key={mode}>
+                    <TooltipTrigger asChild>
+                      {buttonContent}
+                    </TooltipTrigger>
+                    <TooltipContent side="left" className="max-w-xs">
+                      {tooltipContent}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              }
+
+              return buttonContent;
+            })}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </TooltipProvider>
   );
 };

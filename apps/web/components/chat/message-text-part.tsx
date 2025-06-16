@@ -49,7 +49,6 @@ export const MessageTextPart = memo<MessageTextPartProps>(
       <div
         className={cn("group relative mb-12 gap-2", {
           "ml-auto": message.role === "user",
-          "mr-auto": message.role === "assistant",
           "w-full": message.role === "user" && displayMode === "edit",
         })}
       >

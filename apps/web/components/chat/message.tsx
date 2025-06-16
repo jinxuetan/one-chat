@@ -54,19 +54,18 @@ export const Message = ({
   return (
     <AnimatePresence>
       <motion.div
-        className="mx-auto w-full max-w-3xl px-3"
+        className="mx-auto w-full max-w-3xl px-4"
         initial={{ y: 4, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
       >
         <div
           className={cn(
-            "group/message flex w-fit gap-3 group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-3xl",
+            "group/message w-full flex gap-3 group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-3xl",
             {
               "w-full": displayMode === "edit",
               "group-data-[role=user]/message:w-fit": displayMode !== "edit",
-              "ml-auto w-full": message.role === "user",
-              "mr-auto": message.role === "assistant",
+              "ml-auto": message.role === "user",
             }
           )}
         >

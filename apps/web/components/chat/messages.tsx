@@ -51,7 +51,6 @@ export const Messages = ({
 
   const defaultModel = useDefaultModel();
 
-
   const onScrollStateChangeRef = useRef(onScrollStateChange);
   onScrollStateChangeRef.current = onScrollStateChange;
 
@@ -96,7 +95,7 @@ export const Messages = ({
   return (
     <div
       ref={containerRef}
-      className="relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10"
+      className="relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10 pb-24"
     >
       {messages.length === 0 && (!hasKeys ? <BYOK /> : <EmptyMessage />)}
 
