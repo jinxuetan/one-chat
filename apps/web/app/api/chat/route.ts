@@ -52,10 +52,13 @@ const resumableStreamContext = createResumableStreamContext({
 
 export const maxDuration = 150;
 
-const createEmptyDataStream = () =>
-  createDataStream({
-    execute: () => {},
+const createEmptyDataStream = () => {
+  return createDataStream({
+    execute: () => {
+      // Do nothing
+    },
   });
+};
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -186,6 +189,7 @@ export const POST = async (request: NextRequest) => {
             }
           },
           onFinish: async ({ response, sources }) => {
+            // biome-ignore lint/style/noNonNullAssertion: <explanation>
             let assistantMessage = appendResponseMessages({
               messages: conversationMessages,
               responseMessages: response.messages,
@@ -203,9 +207,6 @@ export const POST = async (request: NextRequest) => {
                 ],
               } satisfies UIMessage;
             }
-
-            // Idk, i'll just leave this here for now. Maybe we'll need it later.
-            console.log("YES");
 
             await upsertMessage({
               id: assistantMessage.id,

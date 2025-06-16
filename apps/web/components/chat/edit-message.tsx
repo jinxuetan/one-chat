@@ -80,8 +80,6 @@ export const EditMessage = ({
           messageId: message.id,
         });
 
-        console.log("selected model", model);
-
         reload({
           body: {
             selectedModel: model,

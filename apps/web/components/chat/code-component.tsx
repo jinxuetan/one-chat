@@ -23,7 +23,9 @@ import {
   CodeBlockWrapButton,
 } from "./code-block";
 
-// Language to extension mapping for filename generation
+const LANGUAGE_CLASS_REGEX = /language-(\w+)/;
+const TRAILING_NEWLINE_REGEX = /\n$/;
+
 const languageExtensions: Record<string, string> = {
   javascript: "js",
   typescript: "ts",
@@ -243,9 +245,9 @@ export const CodeComponent = ({
   className,
   children,
 }: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => {
-  const match = /language-(\w+)/.exec(className || "");
-  const language = (match && match[1]) || "plaintext";
-  const code = String(children).replace(/\n$/, "");
+  const match = LANGUAGE_CLASS_REGEX.exec(className || "");
+  const language = match?.[1] || "plaintext";
+  const code = String(children).replace(TRAILING_NEWLINE_REGEX, "");
 
   const data: CodeBlockProps["data"] = [
     {

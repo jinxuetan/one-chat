@@ -7,7 +7,7 @@ import { EFFORT_PERCENTAGE_MAP, IMAGE_GENERATION_MODEL } from "@/lib/constants";
 import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
 import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import type { OpenRouterLanguageModel } from "@openrouter/ai-sdk-provider";
-import type { LanguageModelV1 } from "ai";
+import type { LanguageModelV1, Tool } from "ai";
 import { Redis } from "ioredis";
 
 /**
@@ -16,6 +16,7 @@ import { Redis } from "ioredis";
 export const createProviderOptions = (
   modelConfig: ModelConfig | null,
   reasoningEffort: "low" | "medium" | "high"
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 ): Record<string, any> => ({
   ...(modelConfig?.provider === "openai" &&
     !modelConfig.apiProvider &&
@@ -69,8 +70,8 @@ export const createToolsConfig = (
   searchStrategy: "off" | "native" | "tool",
   userId: string,
   apiKeys?: { openai?: string }
-): { tools?: Record<string, any> } => {
-  const tools: Record<string, any> = {};
+): { tools?: Record<string, Tool> } => {
+  const tools: Record<string, Tool> = {};
 
   if (selectedModel === IMAGE_GENERATION_MODEL) {
     tools.generateImage = createImageGenerationTool(userId, apiKeys?.openai);

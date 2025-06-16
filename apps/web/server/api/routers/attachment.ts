@@ -72,7 +72,7 @@ export const attachmentRouter = router({
           .where(eq(attachment.id, existingAttachment.id));
 
         return { success: true };
-      } catch (error) {
+      } catch (_error) {
         // If blob deletion fails, still clean up database
         await ctx.db
           .delete(attachment)

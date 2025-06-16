@@ -300,6 +300,7 @@ export const deleteMessage = async (
     .limit(1);
 
   if (message.length > 0) {
+    // biome-ignore lint/style/noNonNullAssertion: The array has elements
     const targetMessage = message.at(0)!;
 
     const removed = await db
@@ -696,7 +697,7 @@ export const branchOutFromMessage = async ({
 export { branchOutFromMessage as branchOutFromMessageAlt };
 
 export const getThreadWithMessagesCached = createCachedThreadFunction(
-  getThreadWithMessages as any
+  getThreadWithMessages
 );
 
 export const getUserThreadsCached = createCachedThreadsFunction(

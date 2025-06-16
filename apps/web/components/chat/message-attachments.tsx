@@ -33,9 +33,7 @@ export const MessageAttachments = memo<MessageAttachmentsProps>(
                 ? FileTextIcon
                 : FileIcon;
 
-          const fileName =
-            (attachment.name?.split(".").at(0) ?? "File").substring(0, 20) +
-            "...";
+          const fileName = `${(attachment.name?.split(".").at(0) ?? "File").substring(0, 20)}...`;
           const fileExtension = attachment.name?.split(".").at(1) ?? "txt";
 
           return (

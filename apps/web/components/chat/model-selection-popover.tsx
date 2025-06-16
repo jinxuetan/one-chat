@@ -128,7 +128,7 @@ const CAPABILITY_ICONS = {
   nativeSearch: <Globe2 className="size-4" />,
 } as const;
 
-const PROVIDER_ICONS: Record<Provider, React.ComponentType<any>> = {
+const PROVIDER_ICONS = {
   openai: OpenAI,
   anthropic: Anthropic,
   google: Google,
@@ -136,7 +136,7 @@ const PROVIDER_ICONS: Record<Provider, React.ComponentType<any>> = {
   meta: Meta,
   openrouter: OpenRouter,
   qwen: Qwen,
-};
+} as const;
 
 const TIER_CONFIG = {
   premium: {
@@ -213,7 +213,10 @@ const useModelFiltering = (
     if (selectedCapabilities.length > 0) {
       filtered = filtered.filter((model) =>
         selectedCapabilities.some(
-          (capability) => (model.capabilities as any)[capability] === true
+          (capability) =>
+            model.capabilities[
+              capability as keyof typeof model.capabilities
+            ] === true
         )
       );
     }
@@ -227,8 +230,8 @@ const useModelFiltering = (
           model.provider.toLowerCase().includes(searchTerm) ||
           Object.keys(model.capabilities).some(
             (cap) =>
-              (model.capabilities as any)[cap] === true &&
-              cap.toLowerCase().includes(searchTerm)
+              model.capabilities[cap as keyof typeof model.capabilities] ===
+                true && cap.toLowerCase().includes(searchTerm)
           )
       );
     }
@@ -250,6 +253,7 @@ const useModelFiltering = (
   return { recommendedModels, additionalModels };
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const useScrollDetection = (dependencies: any[]) => {
   const [isAtBottom, setIsAtBottom] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -279,13 +283,13 @@ const useScrollDetection = (dependencies: any[]) => {
 const useAvailableCapabilities = () => {
   return useMemo(() => {
     const capabilities = new Set<CapabilityFilter>();
-    ALL_MODELS.forEach((model) => {
-      Object.entries(model.capabilities).forEach(([key, value]) => {
+    for (const model of ALL_MODELS) {
+      for (const [key, value] of Object.entries(model.capabilities)) {
         if (value === true && key !== "tools" && key in CAPABILITY_ICONS) {
           capabilities.add(key as CapabilityFilter);
         }
-      });
-    });
+      }
+    }
     return Array.from(capabilities);
   }, []);
 };

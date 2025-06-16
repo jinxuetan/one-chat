@@ -126,7 +126,9 @@ export const FileButton = ({
 
     // Show validation errors
     if (errors.length > 0) {
-      errors.forEach((error) => toast.error(error));
+      for (const error of errors) {
+        toast.error(error);
+      }
       if (validFiles.length === 0) return;
     }
 
@@ -137,17 +139,15 @@ export const FileButton = ({
       // Upload all valid files
       const results = await Promise.allSettled(validFiles.map(uploadFile));
 
-      let successCount = 0;
       let errorCount = 0;
 
-      results.forEach((result) => {
+      for (const result of results) {
         if (result.status === "fulfilled") {
           onFileChange(result.value);
-          successCount++;
         } else {
           errorCount++;
         }
-      });
+      }
 
       if (errorCount > 0) {
         toast.error(
@@ -156,7 +156,7 @@ export const FileButton = ({
             : `${errorCount} files failed to upload`
         );
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Upload failed. Please try again.");
     } finally {
       setIsUploading(false);

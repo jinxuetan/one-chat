@@ -183,6 +183,7 @@ export const Chat = ({
     setMessages,
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const handleSubmitMessage = useCallback(
     (data: ChatSubmitData) => {
       if (isNewThread)

@@ -102,7 +102,7 @@ export const ShareButton = ({
 
     try {
       await navigator.clipboard.writeText(shareUrl);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to copy link");
     }
   }, [shareUrl, isPublic]);
@@ -150,12 +150,12 @@ export const ShareButton = ({
           {/* Share Link */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="font-medium text-muted-foreground text-xs tracking-wide">
+              <span className="font-medium text-muted-foreground text-xs tracking-wide">
                 SHARE LINK
-              </label>
+              </span>
               {isPublic && (
                 <div className="flex items-center gap-1">
-                  <div className="size-1.5 rounded-full bg-green-500"></div>
+                  <div className="size-1.5 rounded-full bg-green-500" />
                   <span className="font-medium text-green-600 text-xs dark:text-green-400">
                     Active
                   </span>

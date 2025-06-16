@@ -151,7 +151,7 @@ export const setCookie = (
   }
 
   if (secure) {
-    cookieString += `;secure`;
+    cookieString += ";secure";
   }
 
   if (sameSite) {
@@ -159,9 +159,10 @@ export const setCookie = (
   }
 
   if (httpOnly) {
-    cookieString += `;httponly`;
+    cookieString += ";httponly";
   }
 
+  // biome-ignore lint/nursery/noDocumentCookie: <explanation>
   document.cookie = cookieString;
 };
 

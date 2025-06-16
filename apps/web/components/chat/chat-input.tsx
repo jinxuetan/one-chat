@@ -58,7 +58,8 @@ const StopButton = ({ threadId, onStop, setMessages }: StopButtonProps) => {
               isStopped: true,
             },
           ];
-        } else if (lastMessage.role === "user") {
+        }
+        if (lastMessage.role === "user") {
           // If the last message is user, add a new empty assistant message with `isStopped: true`
           return [
             ...messages,

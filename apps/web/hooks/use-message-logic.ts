@@ -1,5 +1,5 @@
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { type Model, getModelByKey } from "@/lib/ai";
+import { type Model, type ModelConfig, getModelByKey } from "@/lib/ai";
 import { useSession } from "@/lib/auth/client";
 import { trpc } from "@/lib/trpc/client";
 import { generateUUID, resolveModel, setModelCookie } from "@/lib/utils";
@@ -24,7 +24,17 @@ export const useMessageLogic = ({
   setMessages,
   reload,
   messageModel,
-}: UseMessageLogicProps) => {
+}: UseMessageLogicProps): {
+  displayMode: "view" | "edit";
+  setDisplayMode: (mode: "view" | "edit") => void;
+  messageModelConfig: ModelConfig | false | null;
+  sources: unknown[];
+  isBranchingThread: boolean;
+  isReloading: boolean;
+  handleMessageReload: (model?: Model) => Promise<void>;
+  handleThreadBranchOut: (model?: Model) => void;
+  handleTextCopy: (textContent: string) => Promise<void>;
+} => {
   const router = useRouter();
   const [_, copyToClipboard] = useCopyToClipboard();
   const [displayMode, setDisplayMode] = useState<"view" | "edit">("view");
@@ -103,11 +113,11 @@ export const useMessageLogic = ({
     return (
       message.parts
         ?.filter((part) => part.type === "source")
-        ?.map((part: any) => part.source) || []
+        ?.map((part) => part.source) || []
     );
   }, [message.parts]);
 
-  // Event handlers
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Event handlers
   const handleMessageReload = useCallback(
     async (model?: Model) => {
       try {
@@ -149,7 +159,7 @@ export const useMessageLogic = ({
   );
 
   const handleThreadBranchOut = useCallback(
-    async (model?: Model) => {
+    (model?: Model) => {
       const newThreadId = generateUUID();
       if (model) setModelCookie(model);
       branchOutMutation.mutate({

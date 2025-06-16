@@ -37,11 +37,10 @@ export const visibilityBySurface: Record<Surface, ErrorVisibility> = {
   thread: "response",
   attachment: "response",
 };
-
 export class OneChatSDKError extends Error {
-  public type: ErrorType;
-  public surface: Surface;
-  public statusCode: number;
+  type: ErrorType;
+  surface: Surface;
+  statusCode: number;
 
   constructor(errorCode: ErrorCode, cause?: string) {
     super();
@@ -55,7 +54,7 @@ export class OneChatSDKError extends Error {
     this.statusCode = getStatusCodeByType(this.type);
   }
 
-  public toResponse() {
+  toResponse() {
     const code: ErrorCode = `${this.type}:${this.surface}`;
     const visibility = visibilityBySurface[this.surface];
     const { message, cause, statusCode } = this;
@@ -73,7 +72,7 @@ export class OneChatSDKError extends Error {
       );
     }
 
-    const errorResponse: Record<string, any> = {
+    const errorResponse: Record<string, unknown> = {
       message,
       code,
     };
@@ -173,6 +172,7 @@ function getStatusCodeByType(type: ErrorType): number {
     case "api_key_missing":
       return 503;
     case "internal_server_error":
+      return 500;
     default:
       return 500;
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { getCookie, removeCookie, setCookie } from "@/lib/utils";
 import { create } from "zustand";
 import type { StateCreator } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -84,31 +85,17 @@ export const usePinnedThreads = create<PinnedThreadsState>()(
       // Custom storage implementation using cookies
       return {
         getItem: (name: string) => {
-          if (typeof document === "undefined") return null;
-
-          const nameEQ = `${name}=`;
-          const ca = document.cookie.split(";");
-
-          for (let c of ca) {
-            while (c.charAt(0) === " ") c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) {
-              return c.substring(nameEQ.length, c.length);
-            }
-          }
-
-          return null;
+          return getCookie(name);
         },
         setItem: (name: string, value: string) => {
-          if (typeof document === "undefined") return;
-
-          const expires = new Date();
-          expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
-          document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+          setCookie(name, value, {
+            maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
+            path: "/",
+            sameSite: "lax",
+          });
         },
         removeItem: (name: string) => {
-          if (typeof document === "undefined") return;
-
-          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+          removeCookie(name, { path: "/" });
         },
       };
     }),

@@ -37,7 +37,7 @@ export const threadRouter = router({
    */
   deleteThread: protectedProcedure
     .input(z.object({ threadId: z.string() }))
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       try {
         await deleteChat(input.threadId);
         return { success: true };

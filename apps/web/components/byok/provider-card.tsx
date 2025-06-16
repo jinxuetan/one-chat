@@ -37,12 +37,12 @@ interface ProviderCardProps {
   onClearValidation: (provider: ApiProvider) => void;
 }
 
-const PROVIDER_ICONS: Record<ApiProvider, React.ComponentType<any>> = {
+const PROVIDER_ICONS = {
   openai: OpenAI,
   anthropic: Anthropic,
   google: Google,
   openrouter: OpenRouter,
-};
+} as const;
 
 const ProviderIcon = ({
   provider,
@@ -80,8 +80,6 @@ export const ProviderCard = ({
       await onSaveKey(provider, key.trim());
       setKey("");
       setShowKey(false);
-    } catch (error) {
-      // Error handling is done in the hook
     } finally {
       setIsSaving(false);
     }
@@ -112,7 +110,8 @@ export const ProviderCard = ({
     setShowKey(false);
   };
 
-  const displayKey = hasExistingKey ? obfuscateKey(existingKey!) : key;
+  const displayKey =
+    hasExistingKey && existingKey ? obfuscateKey(existingKey) : key;
 
   // Only show validating state if this specific provider is being validated
   const isCurrentProviderValidating =

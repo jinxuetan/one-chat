@@ -1,7 +1,10 @@
 import type { SourceUIPart } from "@ai-sdk/ui-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { ExternalLink } from "lucide-react";
+import Image from "next/image";
 import { useCallback } from "react";
+
+const WWW_PREFIX_REGEX = /^www\./;
 
 interface MessageSourcesProps {
   sources: SourceUIPart["source"][];
@@ -12,7 +15,7 @@ export const MessageSources = ({ sources, className }: MessageSourcesProps) => {
   const getDomainFromUrl = useCallback((url: string) => {
     try {
       const urlObj = new URL(url);
-      return urlObj.hostname.replace(/^www\./, "");
+      return urlObj.hostname.replace(WWW_PREFIX_REGEX, "");
     } catch {
       return "Unknown";
     }
@@ -43,11 +46,12 @@ export const MessageSources = ({ sources, className }: MessageSourcesProps) => {
       <div className="flex flex-wrap gap-2">
         {sources.map((source) => (
           <button
+            type="button"
             key={source.id}
             onClick={() => handleSourceClick(source.url)}
             className="flex items-center gap-1.5 rounded-full border bg-muted/50 px-2 py-1.5 text-xs transition-colors hover:bg-muted"
           >
-            <img
+            <Image
               src={getFaviconUrl(source.url)}
               alt=""
               className="size-4 shrink-0"

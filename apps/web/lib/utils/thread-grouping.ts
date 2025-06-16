@@ -72,7 +72,8 @@ const isWithinDays = (date: Date | string, days: number): boolean => {
 
   if (days === 7) {
     return dateObj >= boundaries.sevenDaysAgo;
-  } else if (days === 30) {
+  }
+  if (days === 30) {
     return dateObj >= boundaries.thirtyDaysAgo;
   }
 

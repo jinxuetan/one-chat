@@ -67,18 +67,22 @@ const validateKeyWithProvider = async (
 
     switch (provider) {
       case "openai":
-        headers["Authorization"] = `Bearer ${key}`;
+        headers.Authorization = `Bearer ${key}`;
         break;
-      case "anthropic":
+      case "anthropic": {
         headers["x-api-key"] = key;
         headers["anthropic-version"] = "2023-06-01";
         break;
+      }
       case "google":
         break;
-      case "openrouter":
-        headers["Authorization"] = `Bearer ${key}`;
+      case "openrouter": {
+        headers.Authorization = `Bearer ${key}`;
         headers["HTTP-Referer"] = window.location.origin;
         headers["X-Title"] = "OneChat";
+        break;
+      }
+      default:
         break;
     }
 
@@ -219,6 +223,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
         `${PROVIDER_CONFIGS[provider].name} key added successfully. Switched to ${modelName}.`
       );
     },
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     [validateKey, setStoredKeys, userId, keys]
   );
 
@@ -261,6 +266,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
 
   const canUseModelWithKeys = useCallback(
     (modelKey: string) => canUseModel(modelKey, keys),
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     [keys]
   );
 

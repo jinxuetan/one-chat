@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useDeferredValue, useMemo } from "react";
 
 import { usePinnedThreads } from "@/hooks/use-pinned-threads";
+import type { ThreadListItem } from "@/lib/cache/thread-list-cache";
 import { trpc } from "@/lib/trpc/client";
 import {
   filterThreads,
@@ -23,7 +24,7 @@ const ThreadGroupComponent = ({
   pinnedThreadIds,
 }: {
   label: string;
-  threads: any[];
+  threads: ThreadListItem[];
   currentThreadId?: string;
   pinnedThreadIds: string[];
 }) => (
@@ -78,11 +79,11 @@ const EmptyState = ({ hasSearch }: { hasSearch: boolean }) => (
   </div>
 );
 
-const ErrorState = ({ error }: { error: any }) => (
+const ErrorState = ({ error }: { error: string }) => (
   <div className="flex flex-col items-center justify-center py-8 text-center">
     <div className="text-destructive text-sm">Failed to load threads</div>
     <div className="mt-1 text-muted-foreground text-xs">
-      {error?.message || "Please try again"}
+      {error || "Please try again"}
     </div>
   </div>
 );
@@ -121,7 +122,7 @@ export const ThreadList = ({ search }: ThreadListProps) => {
   const renderKey = `${pinnedThreadIds.join(",")}-${currentThreadId}`;
 
   if (isLoading || !isPinningLoaded) return <LoadingSkeleton />;
-  if (isError) return <ErrorState error={error} />;
+  if (isError) return <ErrorState error={error?.message} />;
   if (!filteredAndGroupedThreads || filteredAndGroupedThreads.length === 0)
     return <EmptyState hasSearch={deferredSearch.trim().length > 0} />;
 

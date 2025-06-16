@@ -302,7 +302,9 @@ const CodeBlockContext = createContext<CodeBlockContextType>({
   onValueChange: undefined,
   data: [],
   isWrapped: false,
-  onWrappedChange: () => {},
+  onWrappedChange: () => {
+    // do nothing
+  },
 });
 
 export type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {

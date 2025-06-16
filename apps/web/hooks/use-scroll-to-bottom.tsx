@@ -9,6 +9,7 @@ export const useScrollToBottom = () => {
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [scrollBehavior, setScrollBehavior] = useState<ScrollFlag>(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (scrollBehavior) {
       endRef.current?.scrollIntoView({ behavior: scrollBehavior });
@@ -16,6 +17,7 @@ export const useScrollToBottom = () => {
     }
   }, [setScrollBehavior, scrollBehavior]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const scrollToBottom = useCallback(
     (scrollBehavior: ScrollBehavior = "smooth") => {
       setScrollBehavior(scrollBehavior);

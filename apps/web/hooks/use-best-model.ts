@@ -3,7 +3,7 @@
 import type { Model } from "@/lib/ai/config";
 import { getBestAvailableDefaultModel } from "@/lib/ai/models";
 import { setModelCookie } from "@/lib/utils";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { useApiKeys } from "./use-api-keys";
 
 interface UseBestModelOptions {
@@ -24,26 +24,12 @@ interface UseBestModelOptions {
  * to it when API keys are added or removed
  */
 export const useBestModel = (options: UseBestModelOptions = {}) => {
-  const { onModelChange, autoSwitch = true } = options;
+  const { onModelChange } = options;
   const { keys } = useApiKeys();
-  const previousKeysRef = useRef(keys);
 
   const getBestModel = useCallback(() => {
     return getBestAvailableDefaultModel(keys);
   }, [keys]);
-
-  // Check if keys have changed in a meaningful way
-  const haveKeysChanged = useCallback(
-    (prevKeys: typeof keys, currentKeys: typeof keys) => {
-      return (
-        Boolean(prevKeys.openai) !== Boolean(currentKeys.openai) ||
-        Boolean(prevKeys.anthropic) !== Boolean(currentKeys.anthropic) ||
-        Boolean(prevKeys.google) !== Boolean(currentKeys.google) ||
-        Boolean(prevKeys.openrouter) !== Boolean(currentKeys.openrouter)
-      );
-    },
-    []
-  );
 
   return {
     /**
