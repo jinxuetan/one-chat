@@ -17,7 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@workspace/ui/components/sonner";
 import type { UIMessage } from "ai";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
 
@@ -231,6 +231,15 @@ export const Chat = ({
     scrollToBottomRef.current?.();
   }, []);
 
+  const isStreamInterrupted = useMemo(() => {
+    return (
+      messages.length >= 1 &&
+      messages.at(-1)?.role !== "assistant" &&
+      status !== "streaming" &&
+      status !== "submitted"
+    );
+  }, [messages, status]);
+
   return (
     <div className="relative flex h-dvh min-w-0 flex-col bg-background">
       {!isReadonly && (
@@ -268,6 +277,7 @@ export const Chat = ({
           reload={reload}
           isAtBottom={isAtBottom}
           scrollToBottom={scrollToBottom}
+          isStreamInterrupted={isStreamInterrupted}
           disabled={!hasKeys}
         />
       )}

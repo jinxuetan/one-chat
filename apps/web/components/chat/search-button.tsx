@@ -96,79 +96,89 @@ export const SearchButton = ({
 
   return (
     <TooltipProvider>
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-1.5 px-2.5"
-            disabled={disabled}
-          >
-            <CurrentIcon className="size-3.5 text-foreground" />
-            <span className="font-medium text-foreground">
-              {searchMode === "off" ? "Search" : currentConfig.label}
-            </span>
-            <ChevronDown className="size-3 text-muted-foreground" />
-          </Button>
-        </PopoverTrigger>
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 px-2.5 sm:px-2.5"
+                disabled={disabled}
+              >
+                <CurrentIcon className="size-3.5 text-foreground" />
+                <span className="hidden font-medium text-foreground sm:inline">
+                  {searchMode === "off" ? "Search" : currentConfig.label}
+                </span>
+                <ChevronDown className="hidden size-3 text-muted-foreground sm:inline" />
+              </Button>
+            </PopoverTrigger>
 
-        <PopoverContent className="w-56 p-1" align="start" sideOffset={6}>
-          <div className="space-y-px">
-            {availableModes.map((mode) => {
-              const config = SEARCH_CONFIG[mode];
-              const IconComponent = config.icon;
-              const isNativeMode = mode === "native";
-              const isDisabled = isNativeMode && !canUseNativeSearch;
-              const tooltipContent = isNativeMode
-                ? getNativeSearchTooltip()
-                : null;
+            <PopoverContent className="w-56 p-1" align="start" sideOffset={6}>
+              <div className="space-y-px">
+                {availableModes.map((mode) => {
+                  const config = SEARCH_CONFIG[mode];
+                  const IconComponent = config.icon;
+                  const isNativeMode = mode === "native";
+                  const isDisabled = isNativeMode && !canUseNativeSearch;
+                  const tooltipContent = isNativeMode
+                    ? getNativeSearchTooltip()
+                    : null;
 
-              const buttonContent = (
-                <button
-                  key={mode}
-                  type="button"
-                  className={cn(
-                    "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
-                    isDisabled && "cursor-not-allowed opacity-50",
-                    !isDisabled && searchMode === mode
-                      ? "bg-accent text-accent-foreground"
-                      : !isDisabled &&
-                          "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
-                  )}
-                  onClick={() => handleSearchModeSelect(mode)}
-                  disabled={disabled || isDisabled}
-                >
-                  <div className="flex flex-1 items-center gap-2.5">
-                    <IconComponent className="size-3.5 shrink-0 text-current" />
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium">{config.label}</div>
-                      <div className="text-muted-foreground">
-                        {config.description}
+                  const buttonContent = (
+                    <button
+                      key={mode}
+                      type="button"
+                      className={cn(
+                        "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
+                        isDisabled && "cursor-not-allowed opacity-50",
+                        !isDisabled && searchMode === mode
+                          ? "bg-accent text-accent-foreground"
+                          : !isDisabled &&
+                              "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
+                      )}
+                      onClick={() => handleSearchModeSelect(mode)}
+                      disabled={disabled || isDisabled}
+                    >
+                      <div className="flex flex-1 items-center gap-2.5">
+                        <IconComponent className="size-3.5 shrink-0 text-current" />
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium">{config.label}</div>
+                          <div className="text-muted-foreground">
+                            {config.description}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  {isDisabled && (
-                    <OctagonAlert className="size-3.5 shrink-0 text-yellow-500" />
-                  )}
-                </button>
-              );
+                      {isDisabled && (
+                        <OctagonAlert className="size-3.5 shrink-0 text-yellow-500" />
+                      )}
+                    </button>
+                  );
 
-              if (tooltipContent) {
-                return (
-                  <Tooltip key={mode}>
-                    <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
-                    <TooltipContent side="left" className="max-w-xs">
-                      {tooltipContent}
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              }
+                  if (tooltipContent) {
+                    return (
+                      <Tooltip key={mode}>
+                        <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
+                        <TooltipContent side="left" className="max-w-xs">
+                          {tooltipContent}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
 
-              return buttonContent;
-            })}
-          </div>
-        </PopoverContent>
-      </Popover>
+                  return buttonContent;
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </TooltipTrigger>
+        <TooltipContent className="sm:hidden">
+          <p className="text-xs">
+            {searchMode === "off" ? "Search" : currentConfig.label} -{" "}
+            {currentConfig.description}
+          </p>
+        </TooltipContent>
+      </Tooltip>
     </TooltipProvider>
   );
 };

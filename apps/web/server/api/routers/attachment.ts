@@ -40,44 +40,14 @@ export const attachmentRouter = router({
   delete: protectedProcedure
     .input(z.object({ url: z.string().url() }))
     .mutation(async ({ ctx, input }) => {
-      const [existingAttachment] = await ctx.db
-        .select()
-        .from(attachment)
-        .where(eq(attachment.attachmentUrl, input.url))
-        .limit(1);
-
-      if (!existingAttachment) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Attachment not found",
-        });
-      }
-
-      if (existingAttachment.userId !== ctx.user.id) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You can only delete your own attachments",
-        });
-      }
-
       try {
         // Delete from Vercel Blob
-        await del(existingAttachment.attachmentUrl, {
+        await del(input.url, {
           token: env.VERCEL_BLOB_READ_WRITE_TOKEN,
         });
 
-        // Delete from database
-        await ctx.db
-          .delete(attachment)
-          .where(eq(attachment.id, existingAttachment.id));
-
         return { success: true };
       } catch (_error) {
-        // If blob deletion fails, still clean up database
-        await ctx.db
-          .delete(attachment)
-          .where(eq(attachment.id, existingAttachment.id));
-
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete attachment",

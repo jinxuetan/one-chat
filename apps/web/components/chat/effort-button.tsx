@@ -5,6 +5,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { Brain, ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -69,51 +74,64 @@ export const EffortButton = ({
   const CurrentIcon = currentConfig.icon;
 
   return (
-    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1.5 px-2.5">
-          <CurrentIcon className="size-3.5 text-foreground" />
-          <span className="font-medium text-foreground">
-            {currentConfig.label}
-          </span>
-          <ChevronDown className="size-3 text-muted-foreground" />
-        </Button>
-      </PopoverTrigger>
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger asChild>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5 px-2.5 sm:px-2.5"
+            >
+              <CurrentIcon className="size-3.5 text-foreground" />
+              <span className="hidden font-medium text-foreground sm:inline">
+                {currentConfig.label}
+              </span>
+              <ChevronDown className="hidden size-3 text-muted-foreground sm:inline" />
+            </Button>
+          </PopoverTrigger>
 
-      <PopoverContent className="w-48 p-1" align="start" sideOffset={6}>
-        <div className="space-y-px">
-          {(
-            Object.entries(EFFORT_CONFIG) as [
-              Effort,
-              (typeof EFFORT_CONFIG)[Effort],
-            ][]
-          ).map(([effortLevel, config]) => {
-            const IconComponent = config.icon;
-            return (
-              <button
-                key={effortLevel}
-                type="button"
-                className={cn(
-                  "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
-                  effort === effortLevel
-                    ? "bg-accent text-accent-foreground"
-                    : "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
-                )}
-                onClick={() => handleEffortSelect(effortLevel)}
-                disabled={disabled}
-              >
-                <IconComponent className="size-3.5 shrink-0 text-current" />
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium">{config.label}</div>
-                  <div className="text-muted-foreground">
-                    {config.description}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </PopoverContent>
-    </Popover>
+          <PopoverContent className="w-48 p-1" align="start" sideOffset={6}>
+            <div className="space-y-px">
+              {(
+                Object.entries(EFFORT_CONFIG) as [
+                  Effort,
+                  (typeof EFFORT_CONFIG)[Effort],
+                ][]
+              ).map(([effortLevel, config]) => {
+                const IconComponent = config.icon;
+                return (
+                  <button
+                    key={effortLevel}
+                    type="button"
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
+                      effort === effortLevel
+                        ? "bg-accent text-accent-foreground"
+                        : "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
+                    )}
+                    onClick={() => handleEffortSelect(effortLevel)}
+                    disabled={disabled}
+                  >
+                    <IconComponent className="size-3.5 shrink-0 text-current" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium">{config.label}</div>
+                      <div className="text-muted-foreground">
+                        {config.description}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </TooltipTrigger>
+      <TooltipContent className="sm:hidden">
+        <p className="text-xs">
+          {currentConfig.label} - {currentConfig.description}
+        </p>
+      </TooltipContent>
+    </Tooltip>
   );
 };

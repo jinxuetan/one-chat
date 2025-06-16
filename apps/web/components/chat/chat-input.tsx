@@ -17,6 +17,7 @@ import { FileButton } from "./file-button";
 import { FilePreview } from "./file-preview";
 import { ModelSelectionPopover } from "./model-selection-popover";
 import { SearchButton } from "./search-button";
+import { VoiceButton, type VoiceButtonRef } from "./voice-button";
 
 interface SelectedFile {
   fileKey: string;
@@ -117,6 +118,7 @@ interface ChatInputProps {
   reload: UseChatHelpers["reload"];
   isAtBottom: boolean;
   scrollToBottom: () => void;
+  isStreamInterrupted: boolean;
   disabled?: boolean;
 }
 
@@ -130,6 +132,7 @@ export const ChatInput = memo(
   ({
     threadId,
     input,
+    setInput,
     initialChatModel,
     onInputChange,
     onSubmit,
@@ -139,6 +142,7 @@ export const ChatInput = memo(
     reload,
     isAtBottom,
     scrollToBottom,
+    isStreamInterrupted,
     disabled = false,
   }: ChatInputProps) => {
     const [reasoningEffort, setReasoningEffort] = useState<Effort>("medium");
@@ -150,6 +154,7 @@ export const ChatInput = memo(
     const [isUploading, setIsUploading] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const voiceButtonRef = useRef<VoiceButtonRef>(null);
     const deleteAttachment = trpc.attachment.delete.useMutation();
 
     // Auto-switch to best model when API keys change
@@ -186,6 +191,19 @@ export const ChatInput = memo(
       setIsUploading(uploading);
     }, []);
 
+    const handleVoiceTranscript = useCallback(
+      (transcript: string) => {
+        // Append the transcript to the current input
+        setInput((prevInput: string) => {
+          const newInput = prevInput
+            ? `${prevInput} ${transcript}`
+            : transcript;
+          return newInput.trim();
+        });
+      },
+      [setInput]
+    );
+
     useEffect(() => {
       // Set cookie when model changes
       setModelCookie(selectedModel);
@@ -218,6 +236,9 @@ export const ChatInput = memo(
         return;
       }
 
+      // Stop voice transcription when submitting
+      voiceButtonRef.current?.stop();
+
       const attachments: Attachment[] | undefined =
         selectedFiles.length > 0
           ? selectedFiles.map(convertToAttachment)
@@ -249,7 +270,7 @@ export const ChatInput = memo(
     const cannotSubmit = !canSubmit || isProcessing || isUploading;
 
     return (
-      <div className="sticky inset-x-0 bottom-0 z-10 mx-auto flex w-full gap-2 border-border/20 bg-background/60 px-4 pb-4 backdrop-blur-sm md:max-w-3xl md:pb-6">
+      <div className="sticky inset-x-0 bottom-0 z-10 mx-auto flex w-full gap-2 border-border/20 bg-background/60 px-2 pb-2 backdrop-blur-sm sm:px-4 sm:pb-4 md:max-w-3xl md:pb-6">
         <div className="relative flex w-full flex-col">
           <div className="-top-12 -translate-x-1/2 absolute left-1/2">
             <AnimatePresence>
@@ -279,15 +300,48 @@ export const ChatInput = memo(
           {status === "error" && (
             <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-destructive/30 border-b-0 bg-destructive/10 p-2 dark:border-destructive/20 dark:bg-destructive/5">
               <div className="flex items-center justify-between">
-                <p className="text-destructive text-sm dark:text-destructive/90">
+                <p className="text-destructive text-sm sm:text-base dark:text-destructive/90">
                   Something went wrong
                 </p>
                 {reload && (
                   <Button
-                    onClick={async () => await reload()}
+                    onClick={async () =>
+                      await reload({
+                        body: {
+                          selectedModel,
+                        },
+                      })
+                    }
                     size="sm"
                     variant="outline"
                     className="h-6 rounded-sm border-destructive/30 bg-destructive/10 text-destructive transition-colors duration-200 hover:bg-destructive/20 dark:border-destructive/20 dark:bg-destructive/5 dark:text-destructive/90 dark:hover:bg-destructive/10"
+                  >
+                    Retry
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Interrupted Stream Display */}
+          {status !== "error" && isStreamInterrupted && (
+            <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-amber-300/30 border-b-0 bg-amber-50/80 p-2 dark:border-amber-400/20 dark:bg-amber-900/20 pl-3">
+              <div className="flex items-center justify-between">
+                <p className="text-amber-700 text-sm sm:text-base dark:text-amber-300">
+                  Stream was interrupted or stopped
+                </p>
+                {reload && (
+                  <Button
+                    onClick={async () =>
+                      await reload({
+                        body: {
+                          selectedModel,
+                        },
+                      })
+                    }
+                    size="sm"
+                    variant="outline"
+                    className="h-6 rounded-sm border-amber-300/30 bg-amber-50/80 text-amber-700 transition-colors duration-200 hover:bg-amber-100/80 dark:border-amber-400/20 dark:bg-amber-900/20 dark:text-amber-300 dark:hover:bg-amber-800/30"
                   >
                     Retry
                   </Button>
@@ -311,13 +365,13 @@ export const ChatInput = memo(
                 maxHeight: "384px",
               }}
               spellCheck={false}
-              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 text-foreground outline-none ring-0 transition-colors duration-200 placeholder:text-muted-foreground disabled:opacity-50"
+              className="w-full flex-1 resize-none overflow-auto bg-transparent p-2 pb-1.5 text-foreground outline-none ring-0 transition-colors duration-200 placeholder:text-muted-foreground disabled:opacity-50 sm:p-3"
               placeholder={
                 isProcessing
                   ? "AI is responding..."
                   : isUploading
-                    ? "Uploading files..."
-                    : "Ask me anything..."
+                  ? "Uploading files..."
+                  : "Ask me anything..."
               }
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -331,8 +385,8 @@ export const ChatInput = memo(
 
             {/* File previews */}
             {selectedFiles.length > 0 && (
-              <div className="border-border/30 border-t px-3 py-2 dark:border-border/20">
-                <div className="flex flex-wrap gap-2">
+              <div className="border-border/30 border-t px-2 pt-2 sm:px-3 dark:border-border/20">
+                <div className="flex flex-wrap gap-2 overflow-x-auto">
                   {selectedFiles.map((file) => (
                     <FilePreview
                       key={file.fileKey}
@@ -340,13 +394,14 @@ export const ChatInput = memo(
                       fileType={file.fileType}
                       fileSize={file.fileSize}
                       onRemove={async () => await handleRemoveFile(file)}
+                      fileUrl={file.fileUrl}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="flex items-center gap-1 p-3">
+            <div className="flex items-center gap-1 p-2 sm:gap-2 sm:p-3">
               <div className="flex items-end gap-0.5 sm:gap-1">
                 <ModelSelectionPopover
                   selectedModel={selectedModel}
@@ -379,6 +434,11 @@ export const ChatInput = memo(
                     disabled={isProcessing || disabled}
                   />
                 )}
+                <VoiceButton
+                  ref={voiceButtonRef}
+                  onTranscript={handleVoiceTranscript}
+                  disabled={isProcessing || disabled}
+                />
               </div>
               <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
                 {status === "submitted" || status === "streaming" ? (
@@ -397,10 +457,10 @@ export const ChatInput = memo(
                       isUploading
                         ? "Files are uploading..."
                         : isProcessing
-                          ? "AI is responding..."
-                          : canSubmit
-                            ? "Send message"
-                            : "Enter a message"
+                        ? "AI is responding..."
+                        : canSubmit
+                        ? "Send message"
+                        : "Enter a message"
                     }
                   >
                     <ArrowUp className="size-4" />

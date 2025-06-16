@@ -12,6 +12,7 @@ import { PencilIcon, RotateCcwIcon, Split } from "lucide-react";
 import { memo, useState } from "react";
 import { ModelSelectionDropdown } from "./model-selection-dropdown";
 import { ProviderIcon } from "./model-selection-popover";
+import { TTSButton } from "./tts-button";
 
 interface MessageActionsProps {
   message: MessageWithMetadata;
@@ -41,11 +42,12 @@ export const MessageActions = memo<MessageActionsProps>(
   }) => {
     const [isReloadDropdownOpen, setIsReloadDropdownOpen] = useState(false);
     const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
+    const [isTTSDropdownOpen, setIsTTSDropdownOpen] = useState(false);
 
     if (isReadonly) return null;
 
     const modelConfig = model && getModelByKey(model);
-    const isAnyDropdownOpen = isReloadDropdownOpen || isBranchDropdownOpen;
+    const isAnyDropdownOpen = isReloadDropdownOpen || isBranchDropdownOpen || isTTSDropdownOpen;
 
     return (
       <div
@@ -144,6 +146,14 @@ export const MessageActions = memo<MessageActionsProps>(
             disabled={isBranching}
             side="bottom"
             align="end"
+          />
+        )}
+
+        {message.role === "assistant" && (
+          <TTSButton
+            text={textContent}
+            onOpenChange={setIsTTSDropdownOpen}
+            isOpen={isTTSDropdownOpen}
           />
         )}
 

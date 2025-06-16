@@ -186,13 +186,16 @@ export const FileButton = ({
             variant="outline"
             disabled={disabled || isUploading}
             onClick={() => fileInputRef.current?.click()}
+            className="h-8 gap-1.5 px-2.5 sm:px-2.5"
           >
             {isUploading ? (
               <Loader2 className="size-3.5 animate-spin" />
             ) : (
               <Paperclip className="size-3.5" />
             )}
-            <span>{isUploading ? "Uploading..." : "Attach"}</span>
+            <span className="hidden sm:inline">
+              {isUploading ? "Uploading..." : "Attach"}
+            </span>
           </Button>
         </div>
       </TooltipTrigger>

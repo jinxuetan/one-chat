@@ -44,7 +44,10 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
       chatModelFromCookie ?? null,
       DEFAULT_CHAT_MODEL
     );
-    const hasKeysFromCookie = cookieStore.get("has-api-keys")?.value === "true";
+    
+    // Use user-specific cookie name
+    const userId = session.user.id;
+    const hasKeysFromCookie = cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
 
     // Return empty chat for optimistic branch creation
     return (
@@ -76,7 +79,9 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
     DEFAULT_CHAT_MODEL
   );
 
-  const hasKeysFromCookie = cookieStore.get("has-api-keys")?.value === "true";
+  // Use user-specific cookie name  
+  const userId = session.user.id;
+  const hasKeysFromCookie = cookieStore.get(`has-api-keys-${userId}`)?.value === "true";
 
   return (
     <Chat

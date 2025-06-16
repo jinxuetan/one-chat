@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { BYOK } from "../byok";
 import { EmptyMessage } from "./empty-message";
 import { Message, ThinkingMessage } from "./message";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface MessagesProps {
   threadId: string;
@@ -95,7 +96,12 @@ export const Messages = ({
   return (
     <div
       ref={containerRef}
-      className="relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10 pb-24"
+      className={cn(
+        "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10",
+        {
+          "pb-14": !isReadonly,
+        }
+      )}
     >
       {messages.length === 0 && (hasKeys ? <EmptyMessage /> : <BYOK />)}
 
@@ -120,12 +126,14 @@ export const Messages = ({
 
       {shouldShowThinkingMessage && <ThinkingMessage />}
 
-      <motion.div
-        ref={endRef}
-        className="min-h-[24px] min-w-[24px] shrink-0"
-        onViewportLeave={onViewportLeave}
-        onViewportEnter={onViewportEnter}
-      />
+      {!isReadonly && (
+        <motion.div
+          ref={endRef}
+          className="min-h-[24px] min-w-[24px] shrink-0"
+          onViewportLeave={onViewportLeave}
+          onViewportEnter={onViewportEnter}
+        />
+      )}
     </div>
   );
 };

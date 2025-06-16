@@ -184,9 +184,10 @@ export const getAllCookies = (): Record<string, string> => {
 /**
  * Sets the has-keys flag cookie (client-side only)
  * @param hasKeys - true if user has at least one API key configured
+ * @param userId - the user ID to make the cookie user-specific
  */
-export const setHasKeysCookie = (hasKeys: boolean): void => {
-  setCookie("has-api-keys", hasKeys.toString(), {
+export const setHasKeysCookie = (hasKeys: boolean, userId: string): void => {
+  setCookie(`has-api-keys-${userId}`, hasKeys.toString(), {
     maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
     sameSite: "lax",
   });
@@ -194,10 +195,11 @@ export const setHasKeysCookie = (hasKeys: boolean): void => {
 
 /**
  * Gets the has-keys flag from cookie (client-side only)
+ * @param userId - the user ID to check the user-specific cookie
  * @returns boolean - true if user has keys, false if not, null if not set
  */
-export const getHasKeysFromCookie = (): boolean | null => {
-  const value = getCookie("has-api-keys");
+export const getHasKeysFromCookie = (userId: string): boolean | null => {
+  const value = getCookie(`has-api-keys-${userId}`);
   if (value === null) return null;
   return value === "true";
 };

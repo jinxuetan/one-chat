@@ -36,6 +36,33 @@ export const MessageAttachments = memo<MessageAttachmentsProps>(
           const fileName = `${(attachment.name?.split(".").at(0) ?? "File").substring(0, 20)}...`;
           const fileExtension = attachment.name?.split(".").at(1) ?? "txt";
 
+          // For images, show the actual image preview
+          if (isImage) {
+            return (
+              <div
+                key={attachment.url}
+                className="inline-flex w-fit items-center gap-2 rounded-lg border border-border bg-muted/50 p-2 text-sm transition-colors hover:bg-muted"
+              >
+                <Link
+                  href={attachment.url}
+                  className="flex items-center gap-2 hover:opacity-80"
+                  target="_blank"
+                >
+                  {/* biome-ignore lint/nursery/noImgElement: <explanation> */}
+                  <img
+                    src={attachment.url}
+                    alt={attachment.name || "Uploaded image"}
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                  <span className="truncate font-medium text-sm">
+                    {fileName}.{fileExtension}
+                  </span>
+                </Link>
+              </div>
+            );
+          }
+
+          // For non-images, show the icon as before
           return (
             <div
               key={attachment.url}
