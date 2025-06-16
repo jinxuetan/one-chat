@@ -89,8 +89,8 @@ export const useMessageLogic = ({
       const errorMessage = error.message.includes("Unauthorized")
         ? "You don't have permission to branch this thread"
         : error.message.includes("not found")
-        ? "Message or thread not found"
-        : "Failed to branch out. Please try again.";
+          ? "Message or thread not found"
+          : "Failed to branch out. Please try again.";
       toast.error(errorMessage);
     },
     onSettled: () => {

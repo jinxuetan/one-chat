@@ -697,7 +697,8 @@ export const branchOutFromMessage = async ({
 export { branchOutFromMessage as branchOutFromMessageAlt };
 
 export const getThreadWithMessagesCached = createCachedThreadFunction(
-  getThreadWithMessages
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  getThreadWithMessages as any
 );
 
 export const getUserThreadsCached = createCachedThreadsFunction(
