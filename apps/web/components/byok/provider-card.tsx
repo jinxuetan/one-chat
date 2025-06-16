@@ -136,13 +136,19 @@ export const ProviderCard = ({
   };
 
   return (
-    <div className={cn("space-y-3 border-border/20 dark:border-border/10 border-b last:border-b-0 pb-6 last:pb-0")}>
+    <div
+      className={cn(
+        "space-y-3 border-border/20 border-b pb-6 last:border-b-0 last:pb-0 dark:border-border/10"
+      )}
+    >
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <ProviderIcon provider={provider} className="size-8" />
           <div>
-            <h3 className="font-medium text-base text-foreground">{config.name}</h3>
+            <h3 className="font-medium text-base text-foreground">
+              {config.name}
+            </h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
               {config.description}
             </p>
@@ -152,7 +158,10 @@ export const ProviderCard = ({
           {provider === "openrouter" && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="outline" className="h-5 text-xs border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                <Badge
+                  variant="outline"
+                  className="h-5 border-blue-200 bg-blue-50 text-blue-700 text-xs dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                >
                   Recommended
                 </Badge>
               </TooltipTrigger>
@@ -164,12 +173,18 @@ export const ProviderCard = ({
             </Tooltip>
           )}
           {hasExistingKey ? (
-            <Badge variant="default" className="h-5 text-xs bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
+            <Badge
+              variant="default"
+              className="h-5 border-green-200 bg-green-100 text-green-700 text-xs dark:border-green-800 dark:bg-green-950 dark:text-green-300"
+            >
               <CheckCircle className="mr-1 size-3" />
               Ready
             </Badge>
           ) : (
-            <Badge variant="outline" className="h-5 text-xs border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300">
+            <Badge
+              variant="outline"
+              className="h-5 border-orange-200 bg-orange-50 text-orange-700 text-xs dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300"
+            >
               Setup required
             </Badge>
           )}
@@ -205,21 +220,25 @@ export const ProviderCard = ({
                   validationResult?.error ? `${provider}-error` : undefined
                 }
                 className={cn(
-                  "h-9 pr-10 text-base bg-background dark:bg-card/50 border-border dark:border-border/60 focus-visible:border-border/80 dark:focus-visible:border-border/80 transition-colors duration-200",
-                  validationResult?.isValid === false && "border-destructive/50 dark:border-destructive/30 focus-visible:border-destructive dark:focus-visible:border-destructive/80"
+                  "h-9 border-border bg-background pr-10 text-base transition-colors duration-200 focus-visible:border-border/80 dark:border-border/60 dark:bg-card/50 dark:focus-visible:border-border/80",
+                  validationResult?.isValid === false &&
+                    "border-destructive/50 focus-visible:border-destructive dark:border-destructive/30 dark:focus-visible:border-destructive/80"
                 )}
               />
 
               {hasExistingKey ? (
                 <div className="absolute top-0 right-0 flex size-9 items-center justify-center">
-                  <CopyButton onCopy={handleCopyKey} className="rounded-sm hover:bg-accent dark:hover:bg-accent/60 transition-colors duration-200" />
+                  <CopyButton
+                    onCopy={handleCopyKey}
+                    className="rounded-sm transition-colors duration-200 hover:bg-accent dark:hover:bg-accent/60"
+                  />
                 </div>
               ) : (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute top-0 right-0 size-9 px-0 hover:bg-accent dark:hover:bg-accent/60 transition-colors duration-200"
+                  className="absolute top-0 right-0 size-9 px-0 transition-colors duration-200 hover:bg-accent dark:hover:bg-accent/60"
                   onClick={() => setShowKey(!showKey)}
                   aria-label={showKey ? "Hide API key" : "Show API key"}
                 >
@@ -240,7 +259,7 @@ export const ProviderCard = ({
                   variant="outline"
                   size="sm"
                   onClick={handleRemoveKey}
-                  className="h-9 text-muted-foreground text-sm hover:text-destructive hover:border-destructive/30 dark:hover:border-destructive/20 hover:bg-destructive/10 dark:hover:bg-destructive/5 transition-all duration-200"
+                  className="h-9 text-muted-foreground text-sm transition-all duration-200 hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive dark:hover:border-destructive/20 dark:hover:bg-destructive/5"
                 >
                   <Trash2 className="size-3" />
                 </Button>
@@ -254,7 +273,7 @@ export const ProviderCard = ({
               onClick={handleSaveKey}
               disabled={isButtonDisabled}
               size="sm"
-              className="h-9 w-16 text-sm bg-primary dark:bg-primary hover:bg-primary/90 dark:hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="h-9 w-16 bg-primary text-sm transition-all duration-200 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary dark:hover:bg-primary/90"
             >
               {isSaving ? <Loader className="size-3 animate-spin" /> : "Save"}
             </Button>
@@ -266,7 +285,7 @@ export const ProviderCard = ({
             id={`${provider}-error`}
             role="alert"
             aria-live="polite"
-            className="flex max-w-full items-start gap-1.5 border-destructive/20 dark:border-destructive/10 border-l-2 pl-2 text-destructive dark:text-destructive/90 text-sm bg-destructive/5 dark:bg-destructive/5 py-2 rounded-r-md"
+            className="flex max-w-full items-start gap-1.5 rounded-r-md border-destructive/20 border-l-2 bg-destructive/5 py-2 pl-2 text-destructive text-sm dark:border-destructive/10 dark:bg-destructive/5 dark:text-destructive/90"
           >
             <XCircle className="mt-0.5 size-3 flex-shrink-0" />
             <span className="min-w-0 flex-1 break-words">

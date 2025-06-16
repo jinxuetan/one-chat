@@ -10,12 +10,12 @@ import { OneChatSDKError } from "../errors";
 import { getOpenRouterModel } from "../utils";
 import {
   AVAILABLE_MODELS,
+  DEFAULT_MODEL,
+  DEFAULT_MODEL_PRIORITY,
   type Model,
   type ModelConfig,
   type ModelFilters,
   type Provider,
-  DEFAULT_MODEL,
-  DEFAULT_MODEL_PRIORITY,
 } from "./config";
 
 // Core Functions
@@ -234,7 +234,7 @@ export const getBestAvailableDefaultModel = (keys: {
     if (modelKey.startsWith("anthropic:")) return Boolean(keys.anthropic);
     if (modelKey.startsWith("google:")) return Boolean(keys.google);
     if (modelKey.startsWith("openrouter:")) return Boolean(keys.openrouter);
-    
+
     return false;
   };
 

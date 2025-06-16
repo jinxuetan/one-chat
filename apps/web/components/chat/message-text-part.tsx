@@ -1,15 +1,14 @@
-import type { Model, ModelConfig } from "@/lib/ai";
+import type { Model } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { SourceUIPart } from "@ai-sdk/ui-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { memo } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { Markdown } from "./markdown";
 import { EditMessage } from "./edit-message";
+import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { MessageSources } from "./message-sources";
-import { resolveModel } from "@/lib/utils";
 
 interface MessageTextPartProps {
   message: MessageWithMetadata;

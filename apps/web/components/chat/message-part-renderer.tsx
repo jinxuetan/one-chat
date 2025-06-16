@@ -1,4 +1,4 @@
-import type { Model, ModelConfig } from "@/lib/ai";
+import type { Model } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { SourceUIPart } from "@ai-sdk/ui-utils";

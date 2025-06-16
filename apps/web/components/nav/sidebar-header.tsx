@@ -1,18 +1,19 @@
 "use client";
 
 import { useSidebar } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 import { SidebarNewThread } from "./sidebar-new-thread";
 import { SidebarTrigger } from "./sidebar-trigger";
-import { cn } from "@workspace/ui/lib/utils";
 
 export const SidebarActions = () => {
   const { open } = useSidebar();
   return (
     <div
       className={cn(
-        "pointer-events-auto fixed left-2 top-2.5 z-50 flex flex-row gap-0.5 p-1 border border-transparent transition-all duration-200",
+        "pointer-events-auto fixed top-2.5 left-2 z-50 flex flex-row gap-0.5 border border-transparent p-1 transition-all duration-200",
         {
-          "bg-background/95 dark:bg-card/90 backdrop-blur-sm border-border/50 dark:border-border/30 rounded-md shadow-sm dark:shadow-md": !open,
+          "rounded-md border-border/50 bg-background/95 shadow-sm backdrop-blur-sm dark:border-border/30 dark:bg-card/90 dark:shadow-md":
+            !open,
         }
       )}
     >

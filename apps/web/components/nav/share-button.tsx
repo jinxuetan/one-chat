@@ -9,8 +9,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
-import { Switch } from "@workspace/ui/components/switch";
 import { toast } from "@workspace/ui/components/sonner";
+import { Switch } from "@workspace/ui/components/switch";
 import { cn } from "@workspace/ui/lib/utils";
 import { Globe, Lock, Share } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -30,9 +30,9 @@ const VisibilityToggle = ({
   onToggle: () => void;
 }) => {
   return (
-    <div className="flex items-center justify-between group">
+    <div className="group flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center size-8 rounded-lg bg-accent/50 dark:bg-accent/20 group-hover:bg-accent/70 dark:group-hover:bg-accent/30 transition-colors">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-accent/50 transition-colors group-hover:bg-accent/70 dark:bg-accent/20 dark:group-hover:bg-accent/30">
           {isPublic ? (
             <Globe className="size-4 text-foreground" />
           ) : (
@@ -40,7 +40,7 @@ const VisibilityToggle = ({
           )}
         </div>
         <div className="flex flex-col gap-0.5">
-          <div className="font-medium text-sm leading-none text-foreground">
+          <div className="font-medium text-foreground text-sm leading-none">
             {isPublic ? "Public" : "Private"}
           </div>
           <div className="text-muted-foreground text-xs leading-none">
@@ -115,9 +115,9 @@ export const ShareButton = ({
             variant="ghost"
             size="sm"
             className={cn(
-              "hover:bg-accent dark:hover:bg-accent/60 rounded-[6px] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring",
+              "rounded-[6px] transition-all duration-200 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent/60",
               className,
-              disabled && "opacity-50 cursor-not-allowed"
+              disabled && "cursor-not-allowed opacity-50"
             )}
             disabled={disabled}
             aria-label="Share conversation"
@@ -128,14 +128,14 @@ export const ShareButton = ({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-80 p-0 rounded-xl shadow-sm border border-border/50 dark:border-border/30 bg-background dark:bg-card"
+        className="w-80 rounded-xl border border-border/50 bg-background p-0 shadow-sm dark:border-border/30 dark:bg-card"
         align="end"
         sideOffset={8}
       >
-        <div className="p-5 space-y-5">
+        <div className="space-y-5 p-5">
           {/* Header */}
           <div className="space-y-1">
-            <h3 className="text-lg tracking-tight flex items-center gap-2 text-foreground">
+            <h3 className="flex items-center gap-2 text-foreground text-lg tracking-tight">
               <Share className="size-4" />
               Share conversation
             </h3>
@@ -150,13 +150,13 @@ export const ShareButton = ({
           {/* Share Link */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="font-medium text-xs text-muted-foreground tracking-wide">
+              <label className="font-medium text-muted-foreground text-xs tracking-wide">
                 SHARE LINK
               </label>
               {isPublic && (
                 <div className="flex items-center gap-1">
                   <div className="size-1.5 rounded-full bg-green-500"></div>
-                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                  <span className="font-medium text-green-600 text-xs dark:text-green-400">
                     Active
                   </span>
                 </div>
@@ -170,11 +170,11 @@ export const ShareButton = ({
                   readOnly
                   disabled={!isPublic}
                   className={cn(
-                    "h-9 pr-3 text-xs font-mono bg-muted/30 dark:bg-muted/20 border-border/50 dark:border-border/30 focus-visible:border-border focus-visible:bg-background dark:focus-visible:bg-card transition-colors",
-                    !isPublic && "opacity-50 cursor-not-allowed"
+                    "h-9 border-border/50 bg-muted/30 pr-3 font-mono text-xs transition-colors focus-visible:border-border focus-visible:bg-background dark:border-border/30 dark:bg-muted/20 dark:focus-visible:bg-card",
+                    !isPublic && "cursor-not-allowed opacity-50"
                   )}
                   placeholder={
-                    !isPublic ? "Enable sharing to generate link" : ""
+                    isPublic ? "" : "Enable sharing to generate link"
                   }
                 />
               </div>
@@ -182,7 +182,7 @@ export const ShareButton = ({
                 onCopy={handleCopyLink}
                 className={cn(
                   "transition-opacity duration-200",
-                  !isPublic && "opacity-50 pointer-events-none"
+                  !isPublic && "pointer-events-none opacity-50"
                 )}
                 disabled={!isPublic}
               />

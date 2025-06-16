@@ -54,11 +54,6 @@ export const overusedGrotesk = localFont({
   display: "swap",
 });
 
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",

@@ -46,7 +46,7 @@ const SharePage = async ({ params }: SharePageProps) => {
   );
 
   return (
-    <div className="flex flex-col h-dvh w-full items-center justify-center">
+    <div className="flex h-dvh w-full flex-col items-center justify-center">
       <Chat
         threadId={id}
         initialMessages={messagesWithMetadata}

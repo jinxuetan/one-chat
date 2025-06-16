@@ -12,8 +12,8 @@ export const SidebarTrigger = () => {
       variant="ghost"
       size="sm"
       className={cn(
-        "transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-muted-foreground hover:text-foreground",
-        !open && "hover:bg-accent dark:hover:bg-accent/60 rounded-[6px]",
+        "text-muted-foreground transition-all duration-200 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        !open && "rounded-[6px] hover:bg-accent dark:hover:bg-accent/60",
         open && "hover:bg-accent dark:hover:bg-accent/60"
       )}
       onClick={toggleSidebar}

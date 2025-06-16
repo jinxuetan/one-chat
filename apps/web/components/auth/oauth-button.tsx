@@ -30,9 +30,9 @@ export const OAuthButton = () => {
   };
 
   return (
-    <Button 
-      className="py-6 text-lg bg-background dark:bg-card border border-border dark:border-border/60 text-foreground hover:bg-accent dark:hover:bg-accent/80 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
-      onClick={handleClick} 
+    <Button
+      className="border border-border bg-background py-6 text-foreground text-lg transition-all duration-200 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-border/60 dark:bg-card dark:hover:bg-accent/80"
+      onClick={handleClick}
       disabled={isPending}
       variant="outline"
       aria-label="Continue with Google"

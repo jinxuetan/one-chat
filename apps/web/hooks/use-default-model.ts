@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
-import { useApiKeys } from "./use-api-keys";
+import type { Model } from "@/lib/ai/config";
 import { getBestAvailableDefaultModel } from "@/lib/ai/models";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
-import type { Model } from "@/lib/ai/config";
+import { useMemo } from "react";
+import { useApiKeys } from "./use-api-keys";
 
 /**
  * Hook to get the best available default model based on user's API keys

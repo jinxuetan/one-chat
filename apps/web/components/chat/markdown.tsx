@@ -91,7 +91,7 @@ export const Markdown = memo(
     return (
       <div
         className={cn(
-          "prose prose-neutral dark:prose-invert prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0 max-w-none !w-full",
+          "prose prose-neutral dark:prose-invert !w-full prose-pre:m-0 max-w-none prose-pre:bg-transparent prose-pre:p-0",
           className
         )}
         {...props}

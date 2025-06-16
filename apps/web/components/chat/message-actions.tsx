@@ -1,4 +1,4 @@
-import { getModelByKey, type Model, type ModelConfig } from "@/lib/ai";
+import { type Model, getModelByKey } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import { Button } from "@workspace/ui/components/button";
 import { CopyButton } from "@workspace/ui/components/copy-button";

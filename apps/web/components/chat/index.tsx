@@ -233,7 +233,7 @@ export const Chat = ({
   return (
     <div className="relative flex h-dvh min-w-0 flex-col bg-background">
       {!isReadonly && (
-        <div className="pointer-events-auto fixed right-2 top-2 z-50 flex flex-row gap-0.5 p-1 bg-neutral-50 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/50 dark:border-border/30 rounded-md shadow-xs transition-all duration-200">
+        <div className="pointer-events-auto fixed top-2 right-2 z-50 flex flex-row gap-0.5 rounded-md border border-border/50 bg-neutral-50 p-1 shadow-xs backdrop-blur-sm transition-all duration-200 dark:border-border/30 dark:bg-neutral-800/90">
           {pathname !== "/" && (
             <ShareButton
               threadId={threadId}

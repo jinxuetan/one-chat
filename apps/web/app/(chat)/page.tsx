@@ -33,7 +33,7 @@ const ChatPage = async () => {
       isReadonly={false}
       initialVisibilityType="private"
       autoResume={false}
-      initialIsNewThread={true} 
+      initialIsNewThread={true}
       hasKeys={hasKeysFromCookie}
     />
   );

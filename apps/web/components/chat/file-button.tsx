@@ -1,18 +1,17 @@
 import {
+  AVAILABLE_MODELS,
   type Model,
   getModelAcceptTypes,
-  AVAILABLE_MODELS,
 } from "@/lib/ai/config";
 import { useSession } from "@/lib/auth/client";
 import { upload } from "@vercel/blob/client";
 import { Button } from "@workspace/ui/components/button";
+import { toast } from "@workspace/ui/components/sonner";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import { toast } from "@workspace/ui/components/sonner";
 import { Loader2, Paperclip } from "lucide-react";
 import { useRef, useState } from "react";
 

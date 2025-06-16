@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Box, Key } from "lucide-react";
+import { Box } from "lucide-react";
 import { BYOK } from "./index";
 
 export const BYOKModel = () => {
@@ -18,7 +18,7 @@ export const BYOKModel = () => {
           Manage Models
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <BYOK />
       </DialogContent>
     </Dialog>

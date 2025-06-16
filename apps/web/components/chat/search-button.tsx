@@ -51,7 +51,7 @@ export const SearchButton = ({
 }: SearchButtonProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { keys } = useApiKeys();
-  
+
   // Check if native search requirements are met
   const hasGoogleKey = Boolean(keys.google);
   const isAutoRouting = getRoutingFromCookie() !== true; // true means OpenRouter only, false/null means Auto
@@ -62,19 +62,19 @@ export const SearchButton = ({
     if (newMode === "native" && !canUseNativeSearch) {
       return;
     }
-    
+
     // If currently on native search and requirements are no longer met, switch to off
     if (searchMode === "native" && !canUseNativeSearch) {
       onSearchModeChange("off");
       setIsPopoverOpen(false);
       return;
     }
-    
+
     onSearchModeChange(newMode);
     setIsPopoverOpen(false);
   };
 
-  const availableModes = supportsNativeSearch 
+  const availableModes = supportsNativeSearch
     ? (["off", "native", "tool"] as const)
     : (["off", "tool"] as const);
 
@@ -98,9 +98,9 @@ export const SearchButton = ({
     <TooltipProvider>
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="h-8 gap-1.5 px-2.5"
             disabled={disabled}
           >
@@ -119,7 +119,9 @@ export const SearchButton = ({
               const IconComponent = config.icon;
               const isNativeMode = mode === "native";
               const isDisabled = isNativeMode && !canUseNativeSearch;
-              const tooltipContent = isNativeMode ? getNativeSearchTooltip() : null;
+              const tooltipContent = isNativeMode
+                ? getNativeSearchTooltip()
+                : null;
 
               const buttonContent = (
                 <button
@@ -127,15 +129,16 @@ export const SearchButton = ({
                   type="button"
                   className={cn(
                     "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors",
-                    isDisabled && "opacity-50 cursor-not-allowed",
+                    isDisabled && "cursor-not-allowed opacity-50",
                     !isDisabled && searchMode === mode
                       ? "bg-accent text-accent-foreground"
-                      : !isDisabled && "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
+                      : !isDisabled &&
+                          "text-foreground hover:bg-accent/60 hover:text-accent-foreground"
                   )}
                   onClick={() => handleSearchModeSelect(mode)}
                   disabled={disabled || isDisabled}
                 >
-                  <div className="flex items-center gap-2.5 flex-1">
+                  <div className="flex flex-1 items-center gap-2.5">
                     <IconComponent className="size-3.5 shrink-0 text-current" />
                     <div className="min-w-0 flex-1">
                       <div className="font-medium">{config.label}</div>
@@ -153,9 +156,7 @@ export const SearchButton = ({
               if (tooltipContent) {
                 return (
                   <Tooltip key={mode}>
-                    <TooltipTrigger asChild>
-                      {buttonContent}
-                    </TooltipTrigger>
+                    <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
                     <TooltipContent side="left" className="max-w-xs">
                       {tooltipContent}
                     </TooltipContent>

@@ -13,5 +13,3 @@ export const EFFORT_PERCENTAGE_MAP: Record<Effort, number> = {
   medium: 0.5, // 50% of max_tokens
   high: 0.8, // 80% of max_tokens
 };
-
-

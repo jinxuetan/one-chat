@@ -1,4 +1,5 @@
 import { useMessageLogic } from "@/hooks/use-message-logic";
+import type { Model } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { cn } from "@workspace/ui/lib/utils";
@@ -7,7 +8,6 @@ import { AnimatePresence, motion } from "motion/react";
 import type { SVGProps } from "react";
 import { MessageAttachments } from "./message-attachments";
 import { MessagePartRenderer } from "./message-part-renderer";
-import type { Model } from "@/lib/ai";
 
 interface MessageComponentProps {
   threadId: string;
@@ -61,7 +61,7 @@ export const Message = ({
       >
         <div
           className={cn(
-            "group/message w-full flex gap-3 group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-3xl",
+            "group/message flex w-full gap-3 group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-3xl",
             {
               "w-full": displayMode === "edit",
               "group-data-[role=user]/message:w-fit": displayMode !== "edit",

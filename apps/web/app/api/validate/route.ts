@@ -40,7 +40,7 @@ export const GET = async (request: NextRequest) => {
     }
 
     return NextResponse.json({ isValid: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Network error during validation" },
       { status: 500 }

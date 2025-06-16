@@ -14,7 +14,8 @@ export const SidebarNewThread = () => {
       className={buttonVariants({
         variant: "ghost",
         size: "sm",
-        className: "text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent/60 !rounded-[6px] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        className:
+          "!rounded-[6px] text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-accent/60",
       })}
       aria-label="Start new chat"
     >

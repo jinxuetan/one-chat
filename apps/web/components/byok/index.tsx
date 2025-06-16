@@ -26,12 +26,14 @@ export const BYOK = () => {
     <div className="m-auto max-w-xl space-y-8">
       {/* Header */}
       <div className="space-y-4 text-center">
-        <div className="inline-flex rounded-full border border-border dark:border-border/60 bg-accent/50 dark:bg-accent/20 p-2 transition-colors duration-200">
+        <div className="inline-flex rounded-full border border-border bg-accent/50 p-2 transition-colors duration-200 dark:border-border/60 dark:bg-accent/20">
           <Key className="size-5 text-muted-foreground" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="font-semibold text-xl text-foreground">Connect Your AI Models</h1>
+          <h1 className="font-semibold text-foreground text-xl">
+            Connect Your AI Models
+          </h1>
           <p className="text-muted-foreground text-sm">
             Use your own API keys for unlimited access. Stored securely in your
             browser.
@@ -51,7 +53,7 @@ export const BYOK = () => {
       </div>
 
       {/* Provider List */}
-      <div className="space-y-6 bg-card/30 dark:bg-card/20 border border-border/30 dark:border-border/20 rounded-xl p-6 backdrop-blur-sm">
+      <div className="space-y-6 rounded-xl border border-border/30 bg-card/30 p-6 backdrop-blur-sm dark:border-border/20 dark:bg-card/20">
         {PROVIDER_ORDER.map((provider) => (
           <ProviderCard
             key={provider}

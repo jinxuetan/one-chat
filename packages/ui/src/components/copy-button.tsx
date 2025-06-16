@@ -195,7 +195,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       <motion.div
         className={cn(
           "absolute inset-0 rounded-md bg-border/50 dark:bg-border",
-          "disabled:opacity-50 disabled:cursor-not-allowed",
+          "disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
         style={{

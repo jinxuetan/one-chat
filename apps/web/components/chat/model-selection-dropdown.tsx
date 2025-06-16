@@ -1,5 +1,6 @@
 "use client";
 
+import { useApiKeys } from "@/hooks/use-api-keys";
 import type { Model, ModelConfig, Provider } from "@/lib/ai/config";
 import { getAvailableModels } from "@/lib/ai/models";
 import {
@@ -15,7 +16,6 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { Brain, Eye, FileText, Image, Lock, Search } from "lucide-react";
 import { memo, useCallback, useMemo } from "react";
-import { useApiKeys } from "@/hooks/use-api-keys";
 import { ProviderIcon } from "./model-selection-popover";
 
 interface ModelSelectionDropdownProps {
@@ -75,16 +75,19 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
       ) as Model;
     }, []);
 
-    const canUseModel = useCallback((model: ModelConfig): boolean => {
-      const modelKey = getModelKey(model);
-      
-      // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
-      const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
-      
-      return requiresOpenAIDirectly 
-        ? Boolean(keys.openai)
-        : canUseModelWithKeys(modelKey);
-    }, [keys, canUseModelWithKeys, getModelKey]);
+    const canUseModel = useCallback(
+      (model: ModelConfig): boolean => {
+        const modelKey = getModelKey(model);
+
+        // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
+        const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
+
+        return requiresOpenAIDirectly
+          ? Boolean(keys.openai)
+          : canUseModelWithKeys(modelKey);
+      },
+      [keys, canUseModelWithKeys, getModelKey]
+    );
 
     const providerOrder: Provider[] = [
       "openai",
@@ -178,13 +181,13 @@ const ModelSelectionDropdown = memo<ModelSelectionDropdownProps>(
                           }}
                           disabled={!canUse}
                           className={`flex min-h-[44px] items-center justify-between gap-3 px-3 py-2 ${
-                            !canUse 
-                              ? "opacity-50 cursor-not-allowed" 
-                              : "cursor-pointer"
+                            canUse
+                              ? "cursor-pointer"
+                              : "cursor-not-allowed opacity-50"
                           }`}
                         >
                           {/* Model name */}
-                          <div className="flex items-center gap-2 flex-1">
+                          <div className="flex flex-1 items-center gap-2">
                             <span className="truncate font-medium text-sm">
                               {model.name}
                             </span>

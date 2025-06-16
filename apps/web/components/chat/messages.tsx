@@ -1,16 +1,16 @@
-import { useMessages } from "@/hooks/use-messages";
 import { useDefaultModel } from "@/hooks/use-default-model";
-import { resolveModel, getModelFromCookie } from "@/lib/utils";
+import { useMessages } from "@/hooks/use-messages";
+import type { Model } from "@/lib/ai";
+import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
+import { getModelFromCookie, resolveModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
 import { motion } from "motion/react";
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { BYOK } from "../byok";
 import { EmptyMessage } from "./empty-message";
 import { Message, ThinkingMessage } from "./message";
-import type { Model } from "@/lib/ai";
-import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 
 interface MessagesProps {
   threadId: string;
@@ -97,7 +97,7 @@ export const Messages = ({
       ref={containerRef}
       className="relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10 pb-24"
     >
-      {messages.length === 0 && (!hasKeys ? <BYOK /> : <EmptyMessage />)}
+      {messages.length === 0 && (hasKeys ? <EmptyMessage /> : <BYOK />)}
 
       {messages.map((message, index) => (
         <Message

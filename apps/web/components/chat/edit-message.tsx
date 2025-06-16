@@ -1,9 +1,8 @@
 "use client";
 
-import { Model } from "@/lib/ai";
+import type { Model } from "@/lib/ai";
 import { trpc } from "@/lib/trpc/client";
-import { resolveModel } from "@/lib/utils";
-import { MessageWithMetadata } from "@/types";
+import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import {
   type Dispatch,

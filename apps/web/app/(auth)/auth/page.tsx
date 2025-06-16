@@ -30,13 +30,14 @@ const AuthPage = async () => {
                 alt="OneChat"
                 width={126}
                 height={25}
-                className="dark:invert transition-all duration-200"
+                className="transition-all duration-200 dark:invert"
               />
             </span>
           </h1>
           <p className="text-lg text-muted-foreground">
-            Access multiple premium AI models including GPT-4.1, Claude, and more.
-            Experience the best AI models in a clean, simple chat interface.
+            Access multiple premium AI models including GPT-4.1, Claude, and
+            more. Experience the best AI models in a clean, simple chat
+            interface.
           </p>
         </div>
         <OAuthButton />

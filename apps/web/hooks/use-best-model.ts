@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
-import { useApiKeys } from "./use-api-keys";
+import type { Model } from "@/lib/ai/config";
 import { getBestAvailableDefaultModel } from "@/lib/ai/models";
 import { setModelCookie } from "@/lib/utils";
-import type { Model } from "@/lib/ai/config";
+import { useCallback, useRef } from "react";
+import { useApiKeys } from "./use-api-keys";
 
 interface UseBestModelOptions {
   /**

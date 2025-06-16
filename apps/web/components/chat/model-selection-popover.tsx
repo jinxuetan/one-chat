@@ -1,5 +1,7 @@
 "use client";
 
+import { useApiKeys } from "@/hooks/use-api-keys";
+import { useDefaultModel } from "@/hooks/use-default-model";
 import type { Model, ModelConfig, Provider } from "@/lib/ai/config";
 import { getAvailableModels, getRecommendedModels } from "@/lib/ai/models";
 import { getRoutingFromCookie, setRoutingCookie } from "@/lib/utils/cookie";
@@ -60,8 +62,6 @@ import {
   Zap,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useApiKeys } from "@/hooks/use-api-keys";
-import { useDefaultModel } from "@/hooks/use-default-model";
 
 type ViewMode = "grid" | "list";
 type CapabilityFilter = Exclude<keyof typeof CAPABILITY_ICONS, "tools">;
@@ -327,12 +327,12 @@ const ModelCard = memo(
   }: ModelComponentProps) => {
     const { canUseModelWithKeys, keys } = useApiKeys();
     const capabilities = getModelCapabilities(model);
-    
+
     // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
     const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
-    const canUse = requiresOpenAIDirectly 
+    const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai)
-      : (isRestrictedToOpenRouter || canUseModelWithKeys(modelKey));
+      : isRestrictedToOpenRouter || canUseModelWithKeys(modelKey);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -355,7 +355,7 @@ const ModelCard = memo(
         type="button"
         className={cn(
           "group relative flex h-full cursor-pointer flex-col rounded-md border p-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 dark:focus-visible:ring-neutral-400",
-          !canUse && "opacity-50 cursor-not-allowed border-dashed",
+          !canUse && "cursor-not-allowed border-dashed opacity-50",
           isSelected
             ? "border-neutral-400 bg-neutral-100 text-neutral-900 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-100"
             : "border-neutral-200 bg-transparent hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:bg-neutral-900/50"
@@ -373,7 +373,7 @@ const ModelCard = memo(
             <h4 className="flex-1 truncate font-semibold text-foreground text-sm">
               {model.name}
             </h4>
-            {!canUse && <Lock className="size-3 text-muted-foreground mr-1" />}
+            {!canUse && <Lock className="mr-1 size-3 text-muted-foreground" />}
           </div>
           {isSelected && (
             <div className="size-4 flex-shrink-0">
@@ -422,12 +422,12 @@ const ModelListItem = memo(
   }: ModelComponentProps) => {
     const { canUseModelWithKeys, keys } = useApiKeys();
     const capabilities = getModelCapabilities(model);
-    
+
     // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
     const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
-    const canUse = requiresOpenAIDirectly 
+    const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai)
-      : (isRestrictedToOpenRouter || canUseModelWithKeys(modelKey));
+      : isRestrictedToOpenRouter || canUseModelWithKeys(modelKey);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -450,7 +450,7 @@ const ModelListItem = memo(
         type="button"
         className={cn(
           "group relative flex w-full cursor-pointer items-center gap-3 rounded-md border p-2 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 dark:focus-visible:ring-neutral-400",
-          !canUse && "opacity-50 cursor-not-allowed border-dashed",
+          !canUse && "cursor-not-allowed border-dashed opacity-50",
           isSelected
             ? "border-neutral-400 bg-neutral-100 text-neutral-900 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-100"
             : "border-neutral-200 bg-transparent hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:bg-neutral-900/50"
@@ -553,15 +553,15 @@ const ProviderToggle = memo(
           <Package className="size-3.5 text-muted-foreground" />
           <span className="font-medium text-foreground text-sm">Provider</span>
         </div>
-        <div className="flex w-full items-center rounded-lg border bg-muted/20 p-1 gap-1">
+        <div className="flex w-full items-center gap-1 rounded-lg border bg-muted/20 p-1">
           <button
             type="button"
             disabled={!hasNativeKeys}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 px-3 py-2 font-medium text-xs rounded-md transition-all duration-200 ease-out border border-transparent",
-              !hasNativeKeys && "opacity-50 cursor-not-allowed border-dashed",
+              "flex flex-1 items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 font-medium text-xs transition-all duration-200 ease-out",
+              !hasNativeKeys && "cursor-not-allowed border-dashed opacity-50",
               !isRestrictedToOpenRouter && hasNativeKeys
-                ? "bg-neutral-200/50 text-neutral-900 border border-neutral-200 dark:bg-neutral-100 dark:text-neutral-900"
+                ? "border border-neutral-200 bg-neutral-200/50 text-neutral-900 dark:bg-neutral-100 dark:text-neutral-900"
                 : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
             )}
             onClick={handleAutoClick}
@@ -574,10 +574,10 @@ const ProviderToggle = memo(
             type="button"
             disabled={!hasOpenRouter}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 px-3 py-2 font-medium text-xs rounded-md transition-all duration-200 ease-out border border-transparent",
-              !hasOpenRouter && "opacity-50 cursor-not-allowed border-dashed",
+              "flex flex-1 items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 font-medium text-xs transition-all duration-200 ease-out",
+              !hasOpenRouter && "cursor-not-allowed border-dashed opacity-50",
               isRestrictedToOpenRouter && hasOpenRouter
-                ? "bg-neutral-200/50 text-neutral-900 border border-neutral-200 dark:bg-neutral-100 dark:text-neutral-900"
+                ? "border border-neutral-200 bg-neutral-200/50 text-neutral-900 dark:bg-neutral-100 dark:text-neutral-900"
                 : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
             )}
             onClick={handleOpenRouterClick}
@@ -592,12 +592,12 @@ const ProviderToggle = memo(
             {isRestrictedToOpenRouter
               ? "Routing all models through OpenRouter API"
               : onlyHasOpenRouter
-              ? "Only OpenRouter key available - native routing disabled"
-              : !hasNativeKeys
-              ? "Native provider API keys required for auto routing"
-              : !hasOpenRouter
-              ? "OpenRouter API key required to use OpenRouter routing"
-              : "Using native provider APIs automatically"}
+                ? "Only OpenRouter key available - native routing disabled"
+                : hasNativeKeys
+                  ? hasOpenRouter
+                    ? "Using native provider APIs automatically"
+                    : "OpenRouter API key required to use OpenRouter routing"
+                  : "Native provider API keys required for auto routing"}
           </p>
         </div>
       </div>
@@ -636,12 +636,12 @@ const FilterControls = memo(
               "relative flex size-10 items-center justify-center rounded-lg border border-border/80 backdrop-blur-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               selectedCapabilities.length > 0
                 ? "bg-primary text-primary-foreground shadow-lg hover:bg-primary/90"
-                : "bg-background dark:bg-card text-muted-foreground shadow-sm hover:bg-accent dark:hover:bg-accent/80 hover:text-foreground"
+                : "bg-background text-muted-foreground shadow-sm hover:bg-accent hover:text-foreground dark:bg-card dark:hover:bg-accent/80"
             )}
           >
             <Filter className="size-4" />
             {selectedCapabilities.length > 0 && (
-              <div className="-top-1 -right-1 absolute flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm border border-background dark:border-card">
+              <div className="-top-1 -right-1 absolute flex size-5 items-center justify-center rounded-full border border-background bg-primary font-medium text-primary-foreground text-xs shadow-sm dark:border-card">
                 {selectedCapabilities.length}
               </div>
             )}
@@ -660,7 +660,7 @@ const FilterControls = memo(
                 key={capability}
                 onClick={() => handleCapabilityToggle(capability)}
                 className={cn(
-                  "flex items-center justify-between gap-2 py-2 px-3",
+                  "flex items-center justify-between gap-2 px-3 py-2",
                   isSelected && "bg-neutral-100 dark:bg-neutral-800"
                 )}
               >
@@ -706,14 +706,14 @@ const ViewModeToggle = memo(
     }, [onViewModeChange]);
 
     return (
-      <div className="flex items-center overflow-hidden rounded-lg border border-border/80 bg-background dark:bg-card shadow-sm backdrop-blur-sm">
+      <div className="flex items-center overflow-hidden rounded-lg border border-border/80 bg-background shadow-sm backdrop-blur-sm dark:bg-card">
         <button
           type="button"
           className={cn(
-            "flex items-center justify-center size-10 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "flex size-10 items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             viewMode === "grid"
               ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:bg-accent dark:hover:bg-accent/60 hover:text-foreground"
+              : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-accent/60"
           )}
           onClick={handleGridClick}
         >
@@ -722,10 +722,10 @@ const ViewModeToggle = memo(
         <button
           type="button"
           className={cn(
-            "flex items-center justify-center size-10 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "flex size-10 items-center justify-center transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             viewMode === "list"
               ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:bg-accent dark:hover:bg-accent/60 hover:text-foreground"
+              : "text-muted-foreground hover:bg-accent hover:text-foreground dark:hover:bg-accent/60"
           )}
           onClick={handleListClick}
         >
@@ -799,7 +799,7 @@ const GradientOverlay = memo(({ isVisible }: { isVisible: boolean }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="absolute bottom-0 w-full left-0 h-64 bg-gradient-to-t from-background dark:from-card from-10% via-50% via-background/50 dark:via-card/50 to-transparent pointer-events-none isolate" />
+    <div className="pointer-events-none absolute bottom-0 left-0 isolate h-64 w-full bg-gradient-to-t from-10% from-background via-50% via-background/50 to-transparent dark:from-card dark:via-card/50" />
   );
 });
 GradientOverlay.displayName = "GradientOverlay";
@@ -814,11 +814,11 @@ const ShowAllModelsButton = memo(
     isShowingAllModels: boolean;
     onToggle: () => void;
   }) => (
-          <button
-        type="button"
-        className="flex h-10 items-center justify-center gap-2 rounded-lg border border-border/80 bg-background dark:bg-card px-4 font-medium text-muted-foreground text-sm shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-accent dark:hover:bg-accent/80 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        onClick={onToggle}
-      >
+    <button
+      type="button"
+      className="flex h-10 items-center justify-center gap-2 rounded-lg border border-border/80 bg-background px-4 font-medium text-muted-foreground text-sm shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-card dark:hover:bg-accent/80"
+      onClick={onToggle}
+    >
       <Layers className="size-4" />
       {isShowingAllModels
         ? "Hide Additional Models"
@@ -935,7 +935,7 @@ export const ModelSelectionPopover = ({
       </PopoverTrigger>
 
       <PopoverContent
-        className="min-h-[50vh] w-[540px] rounded-xl p-0 overflow-hidden shadow-sm"
+        className="min-h-[50vh] w-[540px] overflow-hidden rounded-xl p-0 shadow-sm"
         align="start"
         sideOffset={8}
       >
@@ -987,7 +987,7 @@ export const ModelSelectionPopover = ({
           <GradientOverlay isVisible={!isAtBottom} />
 
           {/* Bottom Controls */}
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+          <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between">
             {additionalModels.length > 0 && !shouldAutoExpand && (
               <ShowAllModelsButton
                 additionalModelsCount={additionalModels.length}
@@ -996,7 +996,7 @@ export const ModelSelectionPopover = ({
               />
             )}
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="ml-auto flex items-center gap-2">
               <FilterControls
                 selectedCapabilities={selectedCapabilities}
                 onCapabilitiesChange={setSelectedCapabilities}

@@ -22,7 +22,7 @@ export const AppSidebar = () => {
             alt="OneChat"
             width={100}
             height={20}
-            className="dark:invert transition-all duration-200"
+            className="transition-all duration-200 dark:invert"
           />
         </div>
         <div className="flex flex-col gap-1">

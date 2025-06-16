@@ -2,7 +2,7 @@
 
 import { TextShimmer } from "@workspace/ui/components/text-shimmer";
 import { ChevronRightIcon, Loader } from "lucide-react";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Markdown } from "./markdown";
 
 interface MessageReasoningProps {
@@ -111,11 +111,11 @@ export const MessageReasoning = ({
         <div
           ref={measureContentHeight}
           data-testid="message-reasoning"
-          className={`flex flex-col gap-4 rounded-r-xl rounded-l-md border bg-neutral-50 dark:bg-neutral-900 p-2 pl-3 text-neutral-600 shadow-xs dark:text-neutral-400 transition-opacity duration-150 ${
+          className={`flex flex-col gap-4 rounded-r-xl rounded-l-md border bg-neutral-50 p-2 pl-3 text-neutral-600 shadow-xs transition-opacity duration-150 dark:bg-neutral-900 dark:text-neutral-400 ${
             isExpanded ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Markdown className="text-sm w-full">{reasoning}</Markdown>
+          <Markdown className="w-full text-sm">{reasoning}</Markdown>
         </div>
       </div>
     </div>

@@ -15,9 +15,13 @@ import {
 } from "@/lib/api-keys";
 import { useSession } from "@/lib/auth/client";
 import { setModelCookie } from "@/lib/utils";
+import {
+  getHasKeysFromCookie,
+  setHasKeysCookie,
+  setRoutingCookie,
+} from "@/lib/utils/cookie";
 import { toast } from "@workspace/ui/components/sonner";
 import { useCallback, useState } from "react";
-import { setRoutingCookie, setHasKeysCookie, getHasKeysFromCookie } from "@/lib/utils/cookie";
 
 interface ValidationResult {
   isValid: boolean;
@@ -155,9 +159,10 @@ export const useApiKeys = (): UseApiKeysReturn => {
   // Use cookie flag to prevent flash on initial load
   const hasKeysFromCookie = getHasKeysFromCookie();
   const hasKeysFromLocalStorage = Object.values(keys).some(Boolean);
-  
+
   // Use cookie value if available, otherwise fallback to localStorage
-  const hasKeys = hasKeysFromCookie !== null ? hasKeysFromCookie : hasKeysFromLocalStorage;
+  const hasKeys =
+    hasKeysFromCookie !== null ? hasKeysFromCookie : hasKeysFromLocalStorage;
   const availableProviders = getAvailableProviders(keys);
   const hasOpenRouter = hasOpenRouterAccess(keys);
 
@@ -222,11 +227,11 @@ export const useApiKeys = (): UseApiKeysReturn => {
       setStoredKeys((prev) => {
         const newKeys = { ...prev };
         delete newKeys[provider];
-        
+
         // Check if there are any remaining keys
         const hasRemainingKeys = Object.keys(newKeys).length > 0;
         setHasKeysCookie(hasRemainingKeys);
-        
+
         return newKeys;
       });
       if (provider === "openrouter") {

@@ -22,7 +22,7 @@ export const FilePreview = ({
   fileSize,
   onRemove,
 }: FilePreviewProps) => (
-  <div className="flex items-center gap-2 rounded-lg border border-border dark:border-border/60 bg-background dark:bg-card/80 px-3 py-2 text-sm shadow-sm dark:shadow-none transition-colors duration-200">
+  <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm transition-colors duration-200 dark:border-border/60 dark:bg-card/80 dark:shadow-none">
     {fileType && (
       <div className="flex-shrink-0">
         {fileType.startsWith("image/") ? (
@@ -47,7 +47,7 @@ export const FilePreview = ({
       size="icon"
       variant="ghost"
       onClick={onRemove}
-      className="h-6 w-6 flex-shrink-0 text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent/60 disabled:opacity-50 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+      className="h-6 w-6 flex-shrink-0 text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:opacity-50 dark:hover:bg-accent/60"
       title="Remove file"
       aria-label="Remove file"
     >
