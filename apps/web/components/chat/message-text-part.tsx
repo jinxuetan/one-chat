@@ -25,6 +25,7 @@ interface MessageTextPartProps {
   reload: UseChatHelpers["reload"];
   isReloading: boolean;
   isBranching: boolean;
+  threadId: string;
 }
 
 export const MessageTextPart = memo<MessageTextPartProps>(
@@ -43,6 +44,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
     reload,
     isReloading,
     isBranching,
+    threadId,
   }) => {
     return (
       <div
@@ -93,6 +95,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
           isReloading={isReloading}
           isBranching={isBranching}
           textContent={text}
+          threadId={threadId}
         />
       </div>
     );

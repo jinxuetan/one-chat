@@ -30,7 +30,7 @@ export const ThemeButton = () => {
     <Button
       variant="ghost"
       size="sm"
-      className="rounded-[6px] transition-all duration-200 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent/60"
+      className="rounded-[6px] transition-all duration-200 hover:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-neutral-700"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >

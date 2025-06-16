@@ -52,7 +52,7 @@ const SharePage = async ({ params }: SharePageProps) => {
         initialMessages={messagesWithMetadata}
         initialChatModel={resolvedInitialModel}
         initialVisibilityType={chat.thread?.visibility}
-        isReadonly={!isOwner}
+        isReadonly={true}
         autoResume={true}
       />
     </div>

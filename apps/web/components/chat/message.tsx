@@ -96,6 +96,7 @@ export const Message = ({
               reload={reload}
               isReloading={isReloading}
               isBranching={isBranchingThread}
+              threadId={threadId}
             />
 
             {message.isErrored && (

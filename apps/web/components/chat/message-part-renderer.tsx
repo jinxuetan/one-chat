@@ -23,6 +23,7 @@ interface MessagePartRendererProps {
   reload: UseChatHelpers["reload"];
   isReloading: boolean;
   isBranching: boolean;
+  threadId: string;
 }
 
 export const MessagePartRenderer = memo<MessagePartRendererProps>((props) => {

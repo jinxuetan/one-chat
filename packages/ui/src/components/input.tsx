@@ -7,12 +7,14 @@ function Input({
   className,
   type,
   icon: Icon,
+  shellClassName,
   ...props
 }: React.ComponentProps<"input"> & {
   icon?: LucideIcon;
+  shellClassName?: string;
 }) {
   return (
-    <div className="relative">
+    <div className={cn("relative", shellClassName)}>
       <input
         type={type}
         data-slot="input"

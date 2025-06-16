@@ -20,6 +20,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface ChatProps {
   threadId: string;
@@ -241,7 +242,12 @@ export const Chat = ({
   }, [messages, status]);
 
   return (
-    <div className="relative flex h-dvh min-w-0 flex-col bg-background">
+    <div
+      className={cn(
+        "relative flex h-dvh min-w-0 flex-col bg-background",
+        isReadonly && "w-full"
+      )}
+    >
       {!isReadonly && (
         <div className="pointer-events-auto fixed top-2 right-2 z-50 flex flex-row gap-0.5 rounded-md border border-border/50 bg-neutral-50 p-1 shadow-xs backdrop-blur-sm transition-all duration-200 dark:border-border/30 dark:bg-neutral-800/90">
           {pathname !== "/" && (
