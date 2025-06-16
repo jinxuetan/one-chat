@@ -88,10 +88,10 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
             variant: "ghost",
             size: "sm",
             className:
-              "rounded-lg group-hover/item:bg-accent group-hover/item:text-accent-foreground dark:group-hover/item:bg-accent/50",
+              "rounded-lg group-hover/item:bg-accent dark:group-hover/item:bg-accent/60 group-hover/item:text-accent-foreground transition-all duration-200",
           }),
-          "h-auto min-h-8 w-full justify-start gap-2 border border-transparent px-2 py-1.5",
-          isActive && "border-secondary bg-secondary text-secondary-foreground",
+          "h-auto min-h-8 w-full justify-start gap-2 border border-transparent px-2 py-1.5 text-foreground",
+          isActive && "border-border/60 dark:border-border/40 bg-accent/50 dark:bg-accent/30 text-accent-foreground",
           isDeleting && "pointer-events-none opacity-50"
         )}
       >
@@ -110,18 +110,18 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
       </Link>
 
       {!isCloningOrGenerating && (
-        <div className="-translate-y-1/2 absolute top-1/2 right-1 flex gap-1 bg-neutral-100 opacity-0 transition-opacity group-hover/item:opacity-100">
+        <div className="-translate-y-1/2 absolute top-1/2 right-1 flex gap-1 opacity-0 transition-opacity group-hover/item:opacity-100">
           <Button
             size="icon"
             variant="ghost"
-            className="group/pin flex size-6 shrink-0 items-center justify-center rounded-md hover:bg-accent"
+            className="group/pin flex size-6 shrink-0 items-center justify-center rounded-md hover:bg-accent dark:hover:bg-accent/60 text-muted-foreground hover:text-foreground transition-all duration-200"
             onClick={handleTogglePin}
             title={pinned ? "Unpin thread" : "Pin thread"}
           >
             {pinned ? (
-              <PinOff className="size-3 transition-transform group-hover/pin:scale-110" />
+              <PinOff className="size-3 mt-[1.5px] transition-transform group-hover/pin:scale-110" />
             ) : (
-              <Pin className="size-3 transition-transform group-hover/pin:scale-110" />
+              <Pin className="size-3 mt-[1.5px] transition-transform group-hover/pin:scale-110" />
             )}
             <span className="sr-only">
               {pinned ? "Unpin thread" : "Pin thread"}
@@ -131,7 +131,7 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
           <Button
             size="icon"
             variant="ghost"
-            className="group/delete flex size-6 shrink-0 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className="group/delete flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/5 transition-all duration-200"
             onClick={handleDelete}
             disabled={isDeleting}
             title="Delete thread"

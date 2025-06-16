@@ -94,13 +94,13 @@ const StopButton = ({ threadId, onStop, setMessages }: StopButtonProps) => {
 
   return (
     <Button
-      className="rounded-full border dark:border-zinc-600"
+      className="rounded-full border border-border dark:border-border/60 bg-background dark:bg-card hover:bg-accent dark:hover:bg-accent/80 transition-colors duration-200"
       size="icon"
       onClick={handleStop}
       disabled={isStopping}
       title={isStopping ? "Stopping..." : "Stop generation"}
     >
-      <div className="size-3.5 rounded-xs bg-neutral-50 dark:bg-neutral-900" />
+      <div className="size-3.5 rounded-xs bg-foreground dark:bg-foreground/90" />
     </Button>
   );
 };
@@ -262,7 +262,7 @@ export const ChatInput = memo(
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 >
                   <Button
-                    className="rounded-full"
+                    className="rounded-full bg-background dark:bg-card border border-border dark:border-border/60 hover:bg-accent dark:hover:bg-accent/80 transition-colors duration-200"
                     size="icon"
                     variant="outline"
                     onClick={(event) => {
@@ -270,7 +270,7 @@ export const ChatInput = memo(
                       scrollToBottom();
                     }}
                   >
-                    <ArrowDown />
+                    <ArrowDown className="size-4 text-foreground dark:text-foreground/90" />
                   </Button>
                 </motion.div>
               )}
@@ -278,15 +278,15 @@ export const ChatInput = memo(
           </div>
           {/* Error Display */}
           {status === "error" && (
-            <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-rose-200 border-b-0 bg-rose-50 p-2">
+            <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-destructive/30 dark:border-destructive/20 border-b-0 bg-destructive/10 dark:bg-destructive/5 p-2">
               <div className="flex items-center justify-between">
-                <p className="text-rose-900 text-sm">Something went wrong</p>
+                <p className="text-destructive dark:text-destructive/90 text-sm">Something went wrong</p>
                 {reload && (
                   <Button
                     onClick={async () => await reload()}
                     size="sm"
                     variant="outline"
-                    className="h-6 rounded-sm border-rose-300 border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100"
+                    className="h-6 rounded-sm border-destructive/30 dark:border-destructive/20 bg-destructive/10 dark:bg-destructive/5 text-destructive dark:text-destructive/90 hover:bg-destructive/20 dark:hover:bg-destructive/10 transition-colors duration-200"
                   >
                     Retry
                   </Button>
@@ -298,7 +298,7 @@ export const ChatInput = memo(
           {/* Input Form */}
           <form
             onSubmit={handleSubmit}
-            className="relative w-full rounded-xl border border-alpha-400 bg-neutral-50 shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04)] transition-shadow"
+            className="relative w-full rounded-xl border border-border dark:border-border/60 bg-muted/30 dark:bg-card/50 shadow-sm dark:shadow-none backdrop-blur-sm transition-all duration-200 focus-within:border-border/80 dark:focus-within:border-border/80 focus-within:shadow-md dark:focus-within:shadow-lg"
           >
             <textarea
               ref={textareaRef}
@@ -310,7 +310,7 @@ export const ChatInput = memo(
                 maxHeight: "384px",
               }}
               spellCheck={false}
-              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 outline-none ring-0 placeholder:text-neutral-500 disabled:opacity-50"
+              className="w-full flex-1 resize-none overflow-auto bg-transparent p-3 pb-1.5 outline-none ring-0 placeholder:text-muted-foreground text-foreground disabled:opacity-50 transition-colors duration-200"
               placeholder={
                 isProcessing
                   ? "AI is responding..."
@@ -330,7 +330,7 @@ export const ChatInput = memo(
 
             {/* File previews */}
             {selectedFiles.length > 0 && (
-              <div className="border-alpha-200 border-t px-3 py-2">
+              <div className="border-border/30 dark:border-border/20 border-t px-3 py-2">
                 <div className="flex flex-wrap gap-2">
                   {selectedFiles.map((file) => (
                     <FilePreview
@@ -390,7 +390,7 @@ export const ChatInput = memo(
                   <Button
                     type="submit"
                     size="icon"
-                    className="rounded-lg transition-all duration-300 ease-in-out"
+                    className="rounded-lg bg-primary dark:bg-primary hover:bg-primary/90 dark:hover:bg-primary/90 text-primary-foreground transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={cannotSubmit || disabled}
                     title={
                       isUploading

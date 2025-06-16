@@ -180,19 +180,19 @@ export const CodeBlockWithSave = ({
           <CodeBlockWrapButton />
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="size-8 p-0 text-foreground/50 hover:bg-neutral-200 hover:text-foreground dark:hover:bg-neutral-800"
-              >
+                        <Button
+            variant="ghost"
+            size="sm"
+            className="size-8 p-0 text-muted-foreground hover:bg-accent dark:hover:bg-accent/60 hover:text-foreground transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
                 <DownloadIcon className="size-4" />
                 <span className="sr-only">Download code</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
-              <div className="space-y-4">
+                          <PopoverContent className="w-80 bg-background dark:bg-card border-border dark:border-border/60" align="end">
+                <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-sm">Save to File</h4>
+                  <h4 className="font-medium text-sm text-foreground">Save to File</h4>
                   <p className="mt-1 text-muted-foreground text-xs">
                     {bytes} bytes • {lines} lines
                   </p>

@@ -15,11 +15,11 @@ import { cn } from "@workspace/ui/lib/utils";
 import { Globe, Lock, Share } from "lucide-react";
 import { useCallback, useState } from "react";
 
-interface SharePopoverProps {
+interface ShareButtonProps {
   threadId: string;
   initialVisibility: "private" | "public";
   className?: string;
-  children?: React.ReactNode;
+  disabled?: boolean;
 }
 
 const VisibilityToggle = ({
@@ -32,7 +32,7 @@ const VisibilityToggle = ({
   return (
     <div className="flex items-center justify-between group">
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center size-8 rounded-lg bg-accent/50 group-hover:bg-accent/70 transition-colors">
+        <div className="flex items-center justify-center size-8 rounded-lg bg-accent/50 dark:bg-accent/20 group-hover:bg-accent/70 dark:group-hover:bg-accent/30 transition-colors">
           {isPublic ? (
             <Globe className="size-4 text-foreground" />
           ) : (
@@ -40,7 +40,7 @@ const VisibilityToggle = ({
           )}
         </div>
         <div className="flex flex-col gap-0.5">
-          <div className="font-medium text-sm leading-none">
+          <div className="font-medium text-sm leading-none text-foreground">
             {isPublic ? "Public" : "Private"}
           </div>
           <div className="text-muted-foreground text-xs leading-none">
@@ -52,18 +52,19 @@ const VisibilityToggle = ({
       <Switch
         checked={isPublic}
         onCheckedChange={onToggle}
-        className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-muted"
+        className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-muted dark:data-[state=unchecked]:bg-muted/60"
       />
     </div>
   );
 };
 
-export const SharePopover = ({
+export const ShareButton = ({
   threadId,
   initialVisibility,
   className,
   children,
-}: SharePopoverProps) => {
+  disabled = false,
+}: ShareButtonProps & { children?: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPublic, setIsPublic] = useState(initialVisibility === "public");
 
@@ -113,22 +114,28 @@ export const SharePopover = ({
           <Button
             variant="ghost"
             size="sm"
-            className={`hover:bg-neutral-200 rounded-[6px] ${className || ""}`}
+            className={cn(
+              "hover:bg-accent dark:hover:bg-accent/60 rounded-[6px] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring",
+              className,
+              disabled && "opacity-50 cursor-not-allowed"
+            )}
+            disabled={disabled}
+            aria-label="Share conversation"
           >
-            <Share className="size-4" />
+            <Share className="size-4 text-muted-foreground" />
           </Button>
         )}
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-80 p-0 rounded-xl shadow-sm border border-border/50"
+        className="w-80 p-0 rounded-xl shadow-sm border border-border/50 dark:border-border/30 bg-background dark:bg-card"
         align="end"
         sideOffset={8}
       >
         <div className="p-5 space-y-5">
           {/* Header */}
           <div className="space-y-1">
-            <h3 className="text-lg tracking-tight flex items-center gap-2">
+            <h3 className="text-lg tracking-tight flex items-center gap-2 text-foreground">
               <Share className="size-4" />
               Share conversation
             </h3>
@@ -149,7 +156,7 @@ export const SharePopover = ({
               {isPublic && (
                 <div className="flex items-center gap-1">
                   <div className="size-1.5 rounded-full bg-green-500"></div>
-                  <span className="text-xs text-green-600 font-medium">
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
                     Active
                   </span>
                 </div>
@@ -163,7 +170,7 @@ export const SharePopover = ({
                   readOnly
                   disabled={!isPublic}
                   className={cn(
-                    "h-9 pr-3 text-xs font-mono bg-muted/30 border-border/50 focus-visible:border-border focus-visible:bg-background transition-colors",
+                    "h-9 pr-3 text-xs font-mono bg-muted/30 dark:bg-muted/20 border-border/50 dark:border-border/30 focus-visible:border-border focus-visible:bg-background dark:focus-visible:bg-card transition-colors",
                     !isPublic && "opacity-50 cursor-not-allowed"
                   )}
                   placeholder={
@@ -174,6 +181,7 @@ export const SharePopover = ({
               <CopyButton
                 onCopy={handleCopyLink}
                 className={cn(
+                  "transition-opacity duration-200",
                   !isPublic && "opacity-50 pointer-events-none"
                 )}
                 disabled={!isPublic}

@@ -1,5 +1,7 @@
 "use client";
 
+import { ShareButton } from "@/components/nav/share-button";
+import { ThemeButton } from "@/components/nav/theme-button";
 import { useApiKeys } from "@/hooks/use-api-keys";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import type { Model } from "@/lib/ai";
@@ -12,15 +14,12 @@ import { getRoutingFromCookie } from "@/lib/utils/cookie";
 import type { ChatSubmitData } from "@/types";
 import { useChat } from "@ai-sdk/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import type { UIMessage } from "ai";
-import { Moon } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { Messages } from "./messages";
-import { SharePopover } from "./share-popover";
 
 interface ChatProps {
   threadId: string;
@@ -47,6 +46,7 @@ export const Chat = ({
   const { data: session } = useSession();
   const { keys: userApiKeys, hasKeys: hasKeysFromApiKeys } = useApiKeys();
   const trpcUtils = trpc.useUtils();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
   const [isNewThread, setIsNewThread] = useState(initialIsNewThread);
@@ -232,15 +232,17 @@ export const Chat = ({
 
   return (
     <div className="relative flex h-dvh min-w-0 flex-col bg-background">
-      <div className="pointer-events-auto fixed right-2 top-2 z-50 flex flex-row gap-0.5 p-1 bg-neutral-50 border rounded-md">
-        <SharePopover 
-          threadId={threadId}
-          initialVisibility={initialVisibilityType}
-        />
-        <Button variant="ghost" size="sm" className="hover:bg-neutral-200 rounded-[6px]">
-          <Moon className="size-4" />
-        </Button>
-      </div>
+      {!isReadonly && (
+        <div className="pointer-events-auto fixed right-2 top-2 z-50 flex flex-row gap-0.5 p-1 bg-neutral-50 dark:bg-neutral-800/90 backdrop-blur-sm border border-border/50 dark:border-border/30 rounded-md shadow-xs transition-all duration-200">
+          {pathname !== "/" && (
+            <ShareButton
+              threadId={threadId}
+              initialVisibility={initialVisibilityType}
+            />
+          )}
+          <ThemeButton />
+        </div>
+      )}
       <Messages
         threadId={threadId}
         status={status}

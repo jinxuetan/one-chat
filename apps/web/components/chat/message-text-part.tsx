@@ -5,7 +5,7 @@ import type { SourceUIPart } from "@ai-sdk/ui-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { memo } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { AIResponse } from "./ai-response";
+import { Markdown } from "./markdown";
 import { EditMessage } from "./edit-message";
 import { MessageActions } from "./message-actions";
 import { MessageSources } from "./message-sources";
@@ -60,13 +60,13 @@ export const MessageTextPart = memo<MessageTextPartProps>(
                 "rounded-xl bg-primary px-3 py-2": message.role === "user",
               })}
             >
-              <AIResponse
+              <Markdown
                 className={cn({
                   "text-primary-foreground": message.role === "user",
                 })}
               >
                 {text}
-              </AIResponse>
+              </Markdown>
             </div>
           ) : (
             <EditMessage

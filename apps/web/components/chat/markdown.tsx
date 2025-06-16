@@ -11,7 +11,7 @@ import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
 import { CodeComponent } from "./code-component";
 
-export type AIResponseProps = HTMLAttributes<HTMLDivElement> & {
+export type MarkdownProps = HTMLAttributes<HTMLDivElement> & {
   options?: Options;
   children: Options["children"];
 };
@@ -86,8 +86,8 @@ const components: Options["components"] = {
 const remarkPlugins = [remarkGfm, remarkMath];
 const rehypePlugins = [rehypeKatex];
 
-export const AIResponse = memo(
-  ({ className, options, children, ...props }: AIResponseProps) => {
+export const Markdown = memo(
+  ({ className, options, children, ...props }: MarkdownProps) => {
     return (
       <div
         className={cn(
@@ -109,4 +109,4 @@ export const AIResponse = memo(
   (prevProps, nextProps) => prevProps.children === nextProps.children
 );
 
-AIResponse.displayName = "AIResponse";
+Markdown.displayName = "Markdown";

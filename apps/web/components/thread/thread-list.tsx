@@ -126,7 +126,7 @@ export const ThreadList = ({ search }: ThreadListProps) => {
     return <EmptyState hasSearch={deferredSearch.trim().length > 0} />;
 
   return (
-    <div className="space-y-2 py-2" key={renderKey}>
+    <div className="space-y-2" key={renderKey}>
       {isSearching && (
         <div className="animate-pulse px-2 text-muted-foreground text-xs">
           Searching...

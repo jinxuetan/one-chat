@@ -633,15 +633,15 @@ const FilterControls = memo(
           <button
             type="button"
             className={cn(
-              "relative flex size-10 items-center justify-center rounded-lg border border-border/80 backdrop-blur-xs transition-all duration-150 ease-out",
+              "relative flex size-10 items-center justify-center rounded-lg border border-border/80 backdrop-blur-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               selectedCapabilities.length > 0
-                ? "bg-neutral-900/90 text-neutral-100 shadow-lg dark:bg-neutral-100/90 dark:text-neutral-900"
-                : "bg-white/90 text-neutral-600 shadow-xs hover:bg-neutral-50/90 hover:text-neutral-800 dark:bg-neutral-900/90 dark:text-neutral-400 dark:hover:bg-neutral-800/90 dark:hover:text-neutral-200"
+                ? "bg-primary text-primary-foreground shadow-lg hover:bg-primary/90"
+                : "bg-background dark:bg-card text-muted-foreground shadow-sm hover:bg-accent dark:hover:bg-accent/80 hover:text-foreground"
             )}
           >
             <Filter className="size-4" />
             {selectedCapabilities.length > 0 && (
-              <div className="-top-1 -right-1 absolute flex size-5 items-center justify-center rounded-full bg-neutral-900 font-medium text-neutral-100 text-xs shadow-sm dark:bg-neutral-100 dark:text-neutral-900">
+              <div className="-top-1 -right-1 absolute flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm border border-background dark:border-card">
                 {selectedCapabilities.length}
               </div>
             )}
@@ -706,14 +706,14 @@ const ViewModeToggle = memo(
     }, [onViewModeChange]);
 
     return (
-      <div className="flex items-center overflow-hidden rounded-lg border border-border/80 bg-white/90 shadow-xs backdrop-blur-sm dark:bg-neutral-900/90">
+      <div className="flex items-center overflow-hidden rounded-lg border border-border/80 bg-background dark:bg-card shadow-sm backdrop-blur-sm">
         <button
           type="button"
           className={cn(
-            "flex items-center justify-center size-10 transition-all duration-150 ease-out",
+            "flex items-center justify-center size-10 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             viewMode === "grid"
-              ? "bg-neutral-700 text-neutral-100 dark:bg-neutral-100 dark:text-neutral-700"
-              : "text-muted-foreground hover:bg-neutral-50/60 hover:text-foreground dark:hover:bg-neutral-800/60"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent dark:hover:bg-accent/60 hover:text-foreground"
           )}
           onClick={handleGridClick}
         >
@@ -722,10 +722,10 @@ const ViewModeToggle = memo(
         <button
           type="button"
           className={cn(
-            "flex items-center justify-center size-10 transition-all duration-150 ease-out",
+            "flex items-center justify-center size-10 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             viewMode === "list"
-              ? "bg-neutral-700 text-neutral-100 dark:bg-neutral-100 dark:text-neutral-700"
-              : "text-muted-foreground hover:bg-neutral-50/60 hover:text-foreground dark:hover:bg-neutral-800/60"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent dark:hover:bg-accent/60 hover:text-foreground"
           )}
           onClick={handleListClick}
         >
@@ -799,7 +799,7 @@ const GradientOverlay = memo(({ isVisible }: { isVisible: boolean }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="absolute bottom-0 w-full left-0 h-64 bg-gradient-to-t from-[#fefefe] from-10% via-50% via-[#fefefe]/50 to-transparent pointer-events-none isolate" />
+    <div className="absolute bottom-0 w-full left-0 h-64 bg-gradient-to-t from-background dark:from-card from-10% via-50% via-background/50 dark:via-card/50 to-transparent pointer-events-none isolate" />
   );
 });
 GradientOverlay.displayName = "GradientOverlay";
@@ -814,11 +814,11 @@ const ShowAllModelsButton = memo(
     isShowingAllModels: boolean;
     onToggle: () => void;
   }) => (
-    <button
-      type="button"
-      className="flex h-10 items-center justify-center gap-2 rounded-lg border border-border/80 bg-white/90 px-4 font-medium text-muted-foreground text-sm shadow-sm backdrop-blur-sm transition-all duration-150 ease-out hover:bg-neutral-50/90 hover:text-foreground dark:bg-neutral-900/90 dark:hover:bg-neutral-800/90"
-      onClick={onToggle}
-    >
+          <button
+        type="button"
+        className="flex h-10 items-center justify-center gap-2 rounded-lg border border-border/80 bg-background dark:bg-card px-4 font-medium text-muted-foreground text-sm shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-accent dark:hover:bg-accent/80 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        onClick={onToggle}
+      >
       <Layers className="size-4" />
       {isShowingAllModels
         ? "Hide Additional Models"

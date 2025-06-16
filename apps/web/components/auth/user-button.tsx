@@ -31,7 +31,7 @@ export const UserButton = () => {
   }
 
   return (
-    <div className="flex items-center justify-between gap-2 p-2">
+    <div className="flex items-center justify-between gap-2 p-2 rounded-lg">
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {user.image ? (
           <Image
@@ -39,16 +39,16 @@ export const UserButton = () => {
             alt={user.name ?? "User avatar"}
             width={32}
             height={32}
-            className="rounded-full"
+            className="rounded-full border border-border/30 dark:border-border/20"
           />
         ) : (
-          <div className="flex size-8 items-center justify-center rounded-full border bg-muted">
-            <User className="size-4" />
+          <div className="flex size-8 items-center justify-center rounded-full border border-border dark:border-border/60 bg-muted dark:bg-muted/60">
+            <User className="size-4 text-muted-foreground" />
           </div>
         )}
         <div className="min-w-0 flex-1">
           {user.name && (
-            <p className="truncate font-medium text-sm">{user.name}</p>
+            <p className="truncate font-medium text-sm text-foreground">{user.name}</p>
           )}
           {user.email && (
             <p className="truncate text-muted-foreground text-xs">
@@ -61,6 +61,8 @@ export const UserButton = () => {
         variant="ghost"
         size="icon"
         onClick={handleSignOut}
+        disabled={isLoading}
+        className="h-8 w-8 hover:bg-accent dark:hover:bg-accent/60 text-muted-foreground hover:text-foreground transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label="Log out"
       >
         {isLoading ? (
