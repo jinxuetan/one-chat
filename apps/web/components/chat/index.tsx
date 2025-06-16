@@ -19,6 +19,7 @@ import type { UIMessage } from "ai";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
+import { DragDropOverlay } from "./drag-drop-overlay";
 import { Messages } from "./messages";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -55,6 +56,12 @@ export const Chat = ({
   const [isAtBottom, setIsAtBottom] = useState(true);
   const scrollToBottomRef = useRef<(() => void) | null>(null);
   const [hasKeys, setHasKeys] = useState(hasKeysFromProps);
+  
+  // Drag and drop state
+  const [isDragOverlay, setIsDragOverlay] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [dragCounter, setDragCounter] = useState(0);
+  const fileHandlerRef = useRef<((files: FileList) => Promise<void>) | null>(null);
 
   const { mutate: generateAndUpdateThreadTitle } =
     trpc.thread.generateAndUpdateThreadTitle.useMutation({
@@ -241,12 +248,74 @@ export const Chat = ({
     );
   }, [messages, status]);
 
+  // Drag and drop handlers
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setDragCounter((prev) => prev + 1);
+    
+    if (e.dataTransfer?.items) {
+      const hasFiles = Array.from(e.dataTransfer.items).some(
+        (item) => item.kind === "file"
+      );
+      if (hasFiles) {
+        setIsDragOverlay(true);
+      }
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setDragCounter((prev) => {
+      const newCount = prev - 1;
+      if (newCount <= 0) {
+        setIsDragOverlay(false);
+        setIsDragOver(false);
+        return 0;
+      }
+      return newCount;
+    });
+  }, []);
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsDragOverlay(false);
+    setIsDragOver(false);
+    setDragCounter(0);
+
+    if (!fileHandlerRef.current) return;
+    
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      await fileHandlerRef.current(files);
+    }
+  }, []);
+
+  const handleFileHandlerSet = useCallback((handler: (files: FileList) => Promise<void>) => {
+    fileHandlerRef.current = handler;
+  }, []);
+
   return (
     <div
       className={cn(
         "relative flex h-dvh min-w-0 flex-col bg-background",
         isReadonly && "w-full"
       )}
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       {!isReadonly && (
         <div className="pointer-events-auto fixed top-2 right-2 z-50 flex flex-row gap-0.5 rounded-md border border-border/50 bg-neutral-50 p-1 shadow-xs backdrop-blur-sm transition-all duration-200 dark:border-border/30 dark:bg-neutral-800/90">
@@ -285,8 +354,10 @@ export const Chat = ({
           scrollToBottom={scrollToBottom}
           isStreamInterrupted={isStreamInterrupted}
           disabled={!hasKeys}
+          onExternalFileDrop={handleFileHandlerSet}
         />
       )}
+      <DragDropOverlay isVisible={isDragOverlay} isDragOver={isDragOver} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 "use client";
 import { useBestModel } from "@/hooks/use-best-model";
+import { useFileHandler } from "@/hooks/use-file-handler";
 import type { Effort, Model } from "@/lib/ai/config";
 import { getModelByKey } from "@/lib/ai/models";
 import { trpc } from "@/lib/trpc/client";
@@ -120,6 +121,7 @@ interface ChatInputProps {
   scrollToBottom: () => void;
   isStreamInterrupted: boolean;
   disabled?: boolean;
+  onExternalFileDrop?: (handleFiles: (files: FileList) => Promise<void>) => void;
 }
 
 const convertToAttachment = (file: SelectedFile): Attachment => ({
@@ -143,8 +145,9 @@ export const ChatInput = memo(
     isAtBottom,
     scrollToBottom,
     isStreamInterrupted,
-    disabled = false,
-  }: ChatInputProps) => {
+          disabled = false,
+      onExternalFileDrop,
+    }: ChatInputProps) => {
     const [reasoningEffort, setReasoningEffort] = useState<Effort>("medium");
     const [searchStrategy, setSearchStrategy] = useState<SearchMode>("off");
     const [selectedModel, setSelectedModel] = useState<Model>(initialChatModel);
@@ -203,6 +206,20 @@ export const ChatInput = memo(
       },
       [setInput]
     );
+
+    // Set up shared file handler for drag and drop
+    const dragDropFileHandler = useFileHandler({
+      selectedModel,
+      onFileChange: handleFileChange,
+      onUploadStateChange: handleUploadStateChange,
+    });
+
+    // Expose file handling to parent via callback
+    useEffect(() => {
+      if (onExternalFileDrop) {
+        onExternalFileDrop(dragDropFileHandler.handleFiles);
+      }
+    }, [onExternalFileDrop, dragDropFileHandler.handleFiles]);
 
     useEffect(() => {
       // Set cookie when model changes

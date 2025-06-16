@@ -562,7 +562,7 @@ const ProviderToggle = memo(
             type="button"
             disabled={!hasNativeKeys}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 font-medium text-xs transition-all duration-200 ease-out",
+              "flex flex-1 items-center justify-center gap-2 rounded-sm border border-transparent px-3 py-2 font-medium text-xs transition-all duration-200 ease-out",
               !hasNativeKeys && "cursor-not-allowed border-dashed opacity-50",
               !isRestrictedToOpenRouter && hasNativeKeys
                 ? "border border-neutral-200 bg-neutral-200/50 text-neutral-900 dark:bg-neutral-100 dark:text-neutral-900"
@@ -578,7 +578,7 @@ const ProviderToggle = memo(
             type="button"
             disabled={!hasOpenRouter}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 rounded-md border border-transparent px-3 py-2 font-medium text-xs transition-all duration-200 ease-out",
+              "flex flex-1 items-center justify-center gap-2 rounded-sm border border-transparent px-3 py-2 font-medium text-xs transition-all duration-200 ease-out",
               !hasOpenRouter && "cursor-not-allowed border-dashed opacity-50",
               isRestrictedToOpenRouter && hasOpenRouter
                 ? "border border-neutral-200 bg-neutral-200/50 text-neutral-900 dark:bg-neutral-100 dark:text-neutral-900"

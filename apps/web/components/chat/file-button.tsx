@@ -1,19 +1,13 @@
-import {
-  AVAILABLE_MODELS,
-  type Model,
-  getModelAcceptTypes,
-} from "@/lib/ai/config";
-import { useSession } from "@/lib/auth/client";
-import { upload } from "@vercel/blob/client";
+import { type Model } from "@/lib/ai/config";
+import { useFileHandler } from "@/hooks/use-file-handler";
 import { Button } from "@workspace/ui/components/button";
-import { toast } from "@workspace/ui/components/sonner";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { Loader2, Paperclip } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 interface FileButtonProps {
   selectedModel?: Model;
@@ -28,28 +22,24 @@ interface FileButtonProps {
   disabled?: boolean;
 }
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
-const MAX_FILES = 10;
-
 export const FileButton = ({
   selectedModel,
   onFileChange,
   onUploadStateChange,
   disabled = false,
 }: FileButtonProps) => {
-  const { data: session } = useSession();
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const getAllowedFileTypes = () => {
-    return selectedModel ? getModelAcceptTypes(selectedModel) : ["text/plain"];
-  };
-
-  const getSupportedFileExtensions = () => {
-    if (!selectedModel) return ["txt"];
-    const model = AVAILABLE_MODELS[selectedModel];
-    return model?.supportedFileTypes || ["txt"];
-  };
+  
+  const {
+    isUploading,
+    handleFiles,
+    getAllowedFileTypes,
+    getSupportedFileExtensions,
+  } = useFileHandler({
+    selectedModel,
+    onFileChange,
+    onUploadStateChange,
+  });
 
   const getTooltipContent = () => {
     const extensions = getSupportedFileExtensions();
@@ -66,104 +56,17 @@ export const FileButton = ({
     return formattedExtensions;
   };
 
-  const validateFile = (file: File): string | null => {
-    const allowedTypes = getAllowedFileTypes();
-
-    if (!allowedTypes.includes(file.type)) {
-      const modelName = selectedModel?.split(":")[1] || "selected model";
-      return `File "${file.name}" is not supported by ${modelName}`;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return `File "${file.name}" is too large (max 8MB)`;
-    }
-
-    return null;
-  };
-
-  const uploadFile = async (file: File) => {
-    const blob = await upload(
-      `${session?.user?.id}/attachments/${file.name}`,
-      file,
-      {
-        access: "public",
-        handleUploadUrl: "/api/files/upload",
-      }
-    );
-
-    return {
-      fileKey: blob.pathname,
-      fileUrl: blob.url,
-      fileSize: file.size,
-      fileType: file.type,
-      fileName: file.name,
-    };
-  };
-
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    if (files.length > MAX_FILES) {
-      toast.error(`Maximum ${MAX_FILES} files allowed`);
-      return;
-    }
-
-    const validFiles: File[] = [];
-    const errors: string[] = [];
-
-    // Validate all files first
-    for (const file of Array.from(files)) {
-      const error = validateFile(file);
-      if (error) {
-        errors.push(error);
-      } else {
-        validFiles.push(file);
-      }
-    }
-
-    // Show validation errors
-    if (errors.length > 0) {
-      for (const error of errors) {
-        toast.error(error);
-      }
-      if (validFiles.length === 0) return;
-    }
-
-    setIsUploading(true);
-    onUploadStateChange?.(true);
-
-    try {
-      // Upload all valid files
-      const results = await Promise.allSettled(validFiles.map(uploadFile));
-
-      let errorCount = 0;
-
-      for (const result of results) {
-        if (result.status === "fulfilled") {
-          onFileChange(result.value);
-        } else {
-          errorCount++;
-        }
-      }
-
-      if (errorCount > 0) {
-        toast.error(
-          errorCount === 1
-            ? "1 file failed to upload"
-            : `${errorCount} files failed to upload`
-        );
-      }
-    } catch (_error) {
-      toast.error("Upload failed. Please try again.");
-    } finally {
-      setIsUploading(false);
-      onUploadStateChange?.(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+    await handleFiles(files);
+    
+    // Clear the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
