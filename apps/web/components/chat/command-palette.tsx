@@ -1,13 +1,13 @@
 "use client";
 
-import { useEventListener } from "@/hooks/use-event-listener";
 import { useCommandPalette } from "@/hooks/use-command-palette";
+import { useEventListener } from "@/hooks/use-event-listener";
 import { useRouter } from "next/navigation";
 import { ThreadCommandDialog } from "./command-dialog";
 
 export const CommandPalette = () => {
   const router = useRouter();
-  const { isOpen, open, close, toggle } = useCommandPalette();
+  const { isOpen, close, toggle } = useCommandPalette();
 
   useEventListener("keydown", (event: KeyboardEvent) => {
     if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
@@ -36,10 +36,6 @@ export const CommandPalette = () => {
   });
 
   return (
-    <ThreadCommandDialog
-      open={isOpen}
-      onOpenChange={toggle}
-      onClose={close}
-    />
+    <ThreadCommandDialog open={isOpen} onOpenChange={toggle} onClose={close} />
   );
 };

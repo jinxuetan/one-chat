@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
-import { Home, Search, MessageCircle, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Home, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,7 +20,7 @@ const suggestions = [
 
 export default function NotFound() {
   const handleGoBack = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.history.back();
     }
   };
@@ -52,7 +52,8 @@ export default function NotFound() {
             </h2>
           </div>
           <p className="mx-auto max-w-md text-lg text-muted-foreground leading-relaxed">
-            Sorry, we couldn't find the page you're looking for. It might have been moved or doesn't exist.
+            Sorry, we couldn't find the page you're looking for. It might have
+            been moved or doesn't exist.
           </p>
         </div>
 

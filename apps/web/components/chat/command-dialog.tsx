@@ -27,13 +27,19 @@ interface ThreadCommandDialogProps {
 }
 
 interface ThreadCommandItemProps {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   thread: any;
   isPinned: boolean;
   onSelect: (threadId: string) => void;
 }
 
-const ThreadCommandItem = ({ thread, isPinned, onSelect }: ThreadCommandItemProps) => {
-  const isBusy = thread.title === "Cloning..." || thread.title === "Generating Title...";
+const ThreadCommandItem = ({
+  thread,
+  isPinned,
+  onSelect,
+}: ThreadCommandItemProps) => {
+  const isBusy =
+    thread.title === "Cloning..." || thread.title === "Generating Title...";
 
   return (
     <CommandItem
@@ -42,12 +48,18 @@ const ThreadCommandItem = ({ thread, isPinned, onSelect }: ThreadCommandItemProp
       onSelect={() => !isBusy && onSelect(thread.id)}
       disabled={isBusy}
     >
-      <div className="flex items-center gap-2 min-w-0 flex-1">
-        {isPinned && <Pin className="size-3.5 shrink-0 text-muted-foreground" />}
-        {thread.originThreadId && <Split className="size-3.5 shrink-0 text-muted-foreground" />}
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        {isPinned && (
+          <Pin className="size-3.5 shrink-0 text-muted-foreground" />
+        )}
+        {thread.originThreadId && (
+          <Split className="size-3.5 shrink-0 text-muted-foreground" />
+        )}
         <span className="truncate">{thread.title}</span>
       </div>
-      {isBusy && <Loader className="size-3.5 shrink-0 animate-spin text-muted-foreground" />}
+      {isBusy && (
+        <Loader className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+      )}
     </CommandItem>
   );
 };
@@ -61,13 +73,16 @@ export const ThreadCommandDialog = ({
   const [searchQuery, setSearchQuery] = useState("");
   const { pinnedThreadIds, isLoaded: pinnedThreadsLoaded } = usePinnedThreads();
 
-  const { data: threads = [], isLoading } = trpc.thread.getUserThreads.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    retry: (failureCount, error) => {
-      if (error?.data?.code === "UNAUTHORIZED") return false;
-      return failureCount < 3;
-    },
-  });
+  const { data: threads = [], isLoading } = trpc.thread.getUserThreads.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+      retry: (failureCount, error) => {
+        if (error?.data?.code === "UNAUTHORIZED") return false;
+        return failureCount < 3;
+      },
+    }
+  );
 
   const groupedThreads = useMemo(() => {
     if (!threads || !pinnedThreadsLoaded) return null;
@@ -82,10 +97,13 @@ export const ThreadCommandDialog = ({
     onClose?.();
   }, [onOpenChange, onClose]);
 
-  const handleThreadSelect = useCallback((threadId: string) => {
-    router.push(`/thread/${threadId}`);
-    handleClose();
-  }, [router, handleClose]);
+  const handleThreadSelect = useCallback(
+    (threadId: string) => {
+      router.push(`/thread/${threadId}`);
+      handleClose();
+    },
+    [router, handleClose]
+  );
 
   const handleNewThread = useCallback(() => {
     router.push("/");
@@ -118,7 +136,9 @@ export const ThreadCommandDialog = ({
         {isLoading ? (
           <div className="flex items-center justify-center py-6">
             <Loader className="size-4 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-muted-foreground text-sm">Loading threads...</span>
+            <span className="ml-2 text-muted-foreground text-sm">
+              Loading threads...
+            </span>
           </div>
         ) : (
           <>
@@ -152,4 +172,4 @@ export const ThreadCommandDialog = ({
       </CommandList>
     </CommandDialog>
   );
-}; 
+};

@@ -5,8 +5,8 @@ import { Input } from "@workspace/ui/components/input";
 import { SidebarContent as SidebarContentComponent } from "@workspace/ui/components/sidebar";
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { CommandPaletteButton } from "./command-palette-button";
 import { ThreadList } from "../thread/thread-list";
+import { CommandPaletteButton } from "./command-palette-button";
 
 export const SidebarContent = () => {
   const [filterQuery, setFilterQuery] = useState("");

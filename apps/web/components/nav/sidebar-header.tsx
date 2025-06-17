@@ -3,11 +3,6 @@
 import { useCommandPalette } from "@/hooks/use-command-palette";
 import { Button } from "@workspace/ui/components/button";
 import { useSidebar } from "@workspace/ui/components/sidebar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { Search } from "lucide-react";
 import { SidebarNewThread } from "./sidebar-new-thread";
