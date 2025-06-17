@@ -14,6 +14,7 @@ import { CodeComponent } from "./code-component";
 export type MarkdownProps = HTMLAttributes<HTMLDivElement> & {
   options?: Options;
   children: Options["children"];
+  role?: "assistant" | "user";
 };
 
 const components: Options["components"] = {
@@ -87,11 +88,14 @@ const remarkPlugins = [remarkGfm, remarkMath];
 const rehypePlugins = [rehypeKatex];
 
 export const Markdown = memo(
-  ({ className, options, children, ...props }: MarkdownProps) => {
+  ({ className, options, children, role, ...props }: MarkdownProps) => {
     return (
       <div
         className={cn(
-          "prose prose-neutral dark:prose-invert !w-full prose-pre:m-0 max-w-none prose-pre:bg-transparent prose-pre:p-0",
+          "prose !w-full prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0",
+          role === "user"
+            ? "prose-invert dark:prose-neutral"
+            : "prose-neutral dark:prose-invert max-w-none",
           className
         )}
         {...props}

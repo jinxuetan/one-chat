@@ -76,6 +76,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
                 className={cn({
                   "text-primary-foreground": message.role === "user",
                 })}
+                role={message.role === "user" ? "user" : "assistant"}
               >
                 {text}
               </Markdown>
