@@ -56,6 +56,8 @@ export const MessageTextPart = memo<MessageTextPartProps>(
         ? webSearchTool.toolInvocation.result
         : undefined;
 
+    const allSources = sources.concat(toolSearch ?? []);
+
     return (
       <div
         className={cn("group relative mb-12 gap-2", {
@@ -89,8 +91,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
             />
           )}
 
-          {sources.length > 0 && <MessageSources sources={sources} />}
-          {toolSearch && <MessageSources sources={toolSearch} />}
+          <MessageSources sources={allSources} />
         </div>
 
         <MessageActions

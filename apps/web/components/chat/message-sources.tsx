@@ -54,10 +54,10 @@ export const MessageSources = ({ sources, className }: MessageSourcesProps) => {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {sources.map((source) => (
+        {sources.map((source, i) => (
           <button
             type="button"
-            key={source.id}
+            key={`${source.id}-${i}`}
             onClick={() => handleSourceClick(source.url)}
             className="flex items-center gap-1.5 rounded-full border bg-muted/50 py-1.5 pr-2 pl-1.5 text-xs transition-colors hover:bg-muted"
           >
