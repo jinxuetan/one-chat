@@ -7,11 +7,70 @@ import { resolveInitialModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 
 interface SharePageProps {
   params: Promise<{
     id: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: SharePageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    const chat = await getThreadWithMessagesCached(id);
+
+    if (!chat?.thread || chat.thread.visibility === "private") {
+      return {
+        title: "Chat Not Found | One Chat",
+        description:
+          "The requested chat thread could not be found or is private.",
+      };
+    }
+
+    const firstUserMessage = chat.messages.find(
+      (msg) => msg.role === "user"
+    )?.content;
+
+    const description = firstUserMessage
+      ? typeof firstUserMessage === "string"
+        ? firstUserMessage.slice(0, 160) +
+          (firstUserMessage.length > 160 ? "..." : "")
+        : "Shared AI conversation"
+      : "Shared AI conversation";
+
+    const title = chat.thread.title || "Shared Chat";
+    const fullTitle = `${title} | One Chat`;
+
+    return {
+      title: fullTitle,
+      description,
+      openGraph: {
+        title: fullTitle,
+        description,
+        type: "article",
+        url: `/share/${id}`,
+        siteName: "One Chat",
+      },
+      twitter: {
+        card: "summary",
+        title: fullTitle,
+        description,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Chat Not Found | One Chat",
+      description: "The requested chat thread could not be found.",
+    };
+  }
 }
 
 const SharePage = async ({ params }: SharePageProps) => {

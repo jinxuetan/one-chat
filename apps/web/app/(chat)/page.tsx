@@ -6,6 +6,28 @@ import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { generateUUID, resolveInitialModel } from "@/lib/utils";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "One Chat | AI-Powered Conversations",
+  description: "Start intelligent conversations with AI models. Fast, open-source, and privacy-focused chat application.",
+  openGraph: {
+    title: "One Chat | AI-Powered Conversations",
+    description: "Start intelligent conversations with AI models. Fast, open-source, and privacy-focused chat application.",
+    type: "website",
+    url: "/",
+    siteName: "One Chat",
+  },
+  twitter: {
+    card: "summary",
+    title: "One Chat | AI-Powered Conversations",
+    description: "Start intelligent conversations with AI models. Fast, open-source, and privacy-focused chat application.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 const ChatPage = async () => {
   const requestHeaders = await headers();

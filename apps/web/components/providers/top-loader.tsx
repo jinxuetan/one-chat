@@ -9,6 +9,7 @@ export const TopLoader = () => {
     <NextTopLoader
       color={theme === "dark" ? "#d4d4d4" : "#171717"}
       shadow={false}
+      showSpinner={false}
     />
   );
 };

@@ -150,7 +150,6 @@ export const ShareButton = ({
     try {
       const partialShareUrl = `${window.location.origin}/share/partial/${token}`;
       await navigator.clipboard.writeText(partialShareUrl);
-      toast.success("Partial share link copied");
     } catch {
       toast.error("Failed to copy partial share link");
     }
