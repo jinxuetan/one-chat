@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { BYOK } from "../byok";
 import { EmptyMessage } from "./empty-message";
 import { Message, ThinkingMessage } from "./message";
+import { useSearchParams } from "next/navigation";
 
 interface MessagesProps {
   threadId: string;
@@ -53,6 +54,8 @@ export const Messages = ({
     threadId,
     status,
   });
+  const searchParams = useSearchParams();
+  const isNewBranch = searchParams.get("branch") === "true";
 
   const defaultModel = useDefaultModel();
 
@@ -108,7 +111,7 @@ export const Messages = ({
       )}
     >
       {messages.length === 0 &&
-        (hasKeys ? (
+        (hasKeys && !isNewBranch ? (
           <EmptyMessage username={username} onMessageClick={append} />
         ) : (
           <BYOK />
