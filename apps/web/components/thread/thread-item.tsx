@@ -28,10 +28,12 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
   const deleteThreadMutation = trpc.thread.deleteThread.useMutation({
     onMutate: async ({ threadId }) => {
       setIsDeleting(true);
+      if (isActive) router.push("/");
 
       await trpcUtils.thread.getUserThreads.cancel();
 
       const previousThreads = trpcUtils.thread.getUserThreads.getData();
+
 
       trpcUtils.thread.getUserThreads.setData(undefined, (old) => {
         if (!old) return old;
@@ -50,11 +52,6 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
       toast.error(error.message || "Failed to delete thread");
       setIsDeleting(false);
     },
-    onSuccess: () => {
-      if (isActive) {
-        router.push("/");
-      }
-    },
     onSettled: () => {
       setIsDeleting(false);
     },
@@ -65,7 +62,6 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
     e.stopPropagation();
     if (isDeleting) return;
     deleteThreadMutation.mutate({ threadId: thread.id });
-    if (isActive) router.push("/");
   };
 
   const handleTogglePin = (e: React.MouseEvent) => {
