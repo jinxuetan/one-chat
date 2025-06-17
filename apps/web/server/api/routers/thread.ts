@@ -209,12 +209,19 @@ export const threadRouter = router({
    * Used for sharing threads up to a certain point
    */
   createPartialShare: protectedProcedure
-    .input(z.object({ threadId: z.string(), messageId: z.string() }))
+    .input(
+      z.object({
+        threadId: z.string(),
+        messageId: z.string(),
+        token: z.string().optional(),
+      })
+    )
     .mutation(async ({ input }) => {
       try {
         const result = await createPartialShare({
           threadId: input.threadId,
           messageId: input.messageId,
+          token: input.token,
         });
         return result;
       } catch (error) {

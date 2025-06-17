@@ -72,6 +72,7 @@ export const POST = async (request: NextRequest) => {
       reasoningEffort,
       searchStrategy,
       userApiKeys,
+      userSettings,
     } = chatRequestSchema.parse(requestBody);
 
     const userSession = await auth.api.getSession({ headers: request.headers });
@@ -170,6 +171,7 @@ export const POST = async (request: NextRequest) => {
             selectedModel: modelConfig?.name || model,
             searchStrategy,
             isImageGeneration: selectedModel === IMAGE_GENERATION_MODEL,
+            userSettings,
           }),
           maxSteps: MAX_STEPS,
           messages: conversationMessages,

@@ -25,9 +25,11 @@ const USER_PARTIAL_SHARES_KEY_PREFIX = "user_partial_shares:";
 export const createPartialShare = async ({
   threadId,
   messageId,
+  token: providedToken,
 }: {
   threadId: string;
   messageId: string;
+  token?: string;
 }): Promise<PartialShare> => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -49,7 +51,7 @@ export const createPartialShare = async ({
     throw new Error("Message not found in this thread");
   }
 
-  const token = nanoid(12);
+  const token = providedToken || nanoid(12);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + PARTIAL_SHARE_TTL * 1000);
 

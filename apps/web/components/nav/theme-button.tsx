@@ -30,14 +30,14 @@ export const ThemeButton = () => {
     <Button
       variant="ghost"
       size="sm"
-      className="rounded-[6px] transition-all duration-200 hover:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-neutral-700"
+      className="rounded-[6px] text-muted-foreground transition-all duration-200 hover:bg-neutral-200 focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-neutral-700"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
       {theme === "dark" ? (
-        <Sun className="size-4 text-muted-foreground" />
+        <Sun className="size-4" />
       ) : (
-        <Moon className="size-4 text-muted-foreground" />
+        <Moon className="size-4" />
       )}
     </Button>
   );

@@ -2,8 +2,10 @@
 
 import { ShareButton } from "@/components/nav/share-button";
 import { ThemeButton } from "@/components/nav/theme-button";
+import { SettingsButton } from "@/components/settings/settings-button";
 import { useApiKeys } from "@/hooks/use-api-keys";
 import { useAutoResume } from "@/hooks/use-auto-resume";
+import { useUserSettings } from "@/hooks/use-user-settings";
 import type { Model } from "@/lib/ai";
 import { useSession } from "@/lib/auth/client";
 import { OneChatSDKError } from "@/lib/errors";
@@ -54,6 +56,7 @@ export const Chat = ({
   const { keys: userApiKeys, hasKeys: hasKeysFromApiKeys } = useApiKeys({
     userId: user?.id || session?.user?.id || "anonymous",
   });
+  const { settings: userSettings } = useUserSettings();
   const trpcUtils = trpc.useUtils();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -139,6 +142,7 @@ export const Chat = ({
       message: messages.at(-1),
       userApiKeys,
       forceOpenRouter: getRoutingFromCookie() ?? false,
+      userSettings: userSettings.usePersonalization ? userSettings : null,
       ...requestBody,
     }),
     onError: (error) => {
@@ -339,6 +343,7 @@ export const Chat = ({
             />
           )}
           <ThemeButton />
+          <SettingsButton />
         </div>
       )}
       <Messages

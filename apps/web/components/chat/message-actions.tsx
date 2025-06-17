@@ -11,6 +11,7 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import { LinkIcon, PencilIcon, RotateCcwIcon, Split } from "lucide-react";
+import { nanoid } from "nanoid";
 import { memo, useState } from "react";
 import { ModelSelectionDropdown } from "./model-selection-dropdown";
 import { ProviderIcon } from "./model-selection-popover";
@@ -50,10 +51,8 @@ export const MessageActions = memo<MessageActionsProps>(
 
     const createPartialShareMutation =
       trpc.thread.createPartialShare.useMutation({
-        onSuccess: (data) => {
-          const shareUrl = `${window.location.origin}/share/partial/${data.token}`;
-          navigator.clipboard.writeText(shareUrl);
-          toast.success("Partial share link copied to clipboard!");
+        onSuccess: () => {
+          // Success feedback is already handled optimistically
         },
         onError: (error) => {
           toast.error(error.message || "Failed to create partial share");
@@ -61,9 +60,19 @@ export const MessageActions = memo<MessageActionsProps>(
       });
 
     const handlePartialShare = () => {
+      // Generate token on frontend for optimistic rendering
+      const token = nanoid(12);
+      const shareUrl = `${window.location.origin}/share/partial/${token}`;
+
+      // Immediately copy to clipboard and show success toast
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Partial share link copied to clipboard!");
+
+      // Call backend to actually create the share
       createPartialShareMutation.mutate({
         threadId,
         messageId: message.id,
+        token,
       });
     };
 

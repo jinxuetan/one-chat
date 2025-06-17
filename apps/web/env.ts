@@ -36,7 +36,7 @@ export const env = createEnv({
     // TODO: use the .env, but the problem is that it's throwing validation error on the client
     // - Notes: I've logged the process.env.NEXT_PUBLIC_APP_URL, it was defined. I don't what's up with this validation error.
     // - If someone knows how to fix this, please do.
-    NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+    NEXT_PUBLIC_APP_URL: z.string().url().default("https://www.1chat.tech"),
   },
 
   /**

@@ -20,6 +20,18 @@ export const chatRequestSchema = z.object({
     })
     .optional(),
 
+  // User settings for personalization
+  userSettings: z
+    .object({
+      name: z.string(),
+      occupation: z.string(),
+      traits: z.array(z.string()),
+      additionalContext: z.string(),
+      responseStyle: z.enum(["concise", "detailed", "balanced"]),
+      usePersonalization: z.boolean(),
+    })
+    .optional(),
+
   // Loose types for AI SDK
   message: z.any(),
   experimental_attachments: z.any(),
