@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { UserButton } from "../auth/user-button";
 import { BYOKModel } from "../byok/model";
+import { InfoDialog } from "../settings/info-dialog";
 import { SidebarContent } from "./sidebar-content";
 import { SidebarActions } from "./sidebar-header";
 
@@ -33,7 +34,12 @@ export const AppSidebar = () => {
       </SidebarHeader>
       <SidebarContent />
       <SidebarFooter>
-        <BYOKModel />
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <BYOKModel />
+          </div>
+          <InfoDialog />
+        </div>
         <UserButton />
       </SidebarFooter>
     </Sidebar>

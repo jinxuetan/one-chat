@@ -124,7 +124,7 @@ export const UserSettingsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] w-[95vw] max-w-4xl overflow-y-auto md:min-w-3xl">
+      <DialogContent className="max-h-[90dvh] w-[95vw] max-w-4xl overflow-y-auto md:left-[calc(50%+8rem)] md:min-w-3xl">
         <DialogHeader>
           <DialogTitle>Customize Your AI Experience</DialogTitle>
           <DialogDescription>
@@ -200,9 +200,9 @@ export const UserSettingsDialog = ({
             </div>
             <div className="space-y-6 md:col-span-2">
               <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-3">
-                <label className="font-medium text-sm sm:col-span-1 sm:pt-2">
+                <span className="font-medium text-sm sm:col-span-1 sm:pt-2">
                   Personality Traits
-                </label>
+                </span>
                 <div className="space-y-3 sm:col-span-2">
                   <div className="flex min-h-[2.25rem] flex-wrap gap-2 rounded-md border bg-muted/20 p-2">
                     {formData.traits.map((trait) => (

@@ -38,7 +38,7 @@ const defaultSettings: UserSettings = {
 
 export const useUserSettings = create<UserSettingsStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       settings: defaultSettings,
 
       updateSettings: (newSettings) =>

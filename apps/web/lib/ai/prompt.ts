@@ -80,7 +80,8 @@ const BASE_SYSTEM_PROMPT = (
 - Present code in Markdown code blocks with the correct language extension indicated.`;
 };
 
-const IMAGE_GENERATION_PROMPT = () => `You are OneChat, an AI assistant powered by image generation capabilities. Your role is to assist and engage in conversation while being helpful, respectful, and engaging.
+const IMAGE_GENERATION_PROMPT =
+  () => `You are OneChat, an AI assistant powered by image generation capabilities. Your role is to assist and engage in conversation while being helpful, respectful, and engaging.
 
 When the user requests an image:
 - Use the generateImage tool to create the image.
