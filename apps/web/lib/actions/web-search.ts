@@ -17,6 +17,11 @@ export const webSearch = tool({
     if (!crawlResponse.success) {
       throw new Error(`Failed to crawl: ${crawlResponse.error}`);
     }
-    return crawlResponse.data;
+    return crawlResponse.data.map((item) => ({
+      id: item.url,
+      title: item.title,
+      url: item.url,
+      markdown: item.markdown,
+    }));
   },
 });

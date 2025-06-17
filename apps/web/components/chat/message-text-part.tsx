@@ -1,7 +1,7 @@
 import type { Model } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
-import type { SourceUIPart } from "@ai-sdk/ui-utils";
+import type { SourceUIPart, ToolInvocationUIPart } from "@ai-sdk/ui-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { memo } from "react";
 import type { Dispatch, SetStateAction } from "react";
@@ -46,6 +46,16 @@ export const MessageTextPart = memo<MessageTextPartProps>(
     isBranching,
     threadId,
   }) => {
+    const webSearchTool = message.parts.find(
+      (part): part is ToolInvocationUIPart =>
+        part.type === "tool-invocation" &&
+        part.toolInvocation.toolName === "webSearch"
+    );
+    const toolSearch =
+      webSearchTool?.toolInvocation.state === "result"
+        ? webSearchTool.toolInvocation.result
+        : undefined;
+
     return (
       <div
         className={cn("group relative mb-12 gap-2", {
@@ -80,6 +90,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
           )}
 
           {sources.length > 0 && <MessageSources sources={sources} />}
+          {toolSearch && <MessageSources sources={toolSearch} />}
         </div>
 
         <MessageActions

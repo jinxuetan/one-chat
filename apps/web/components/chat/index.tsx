@@ -345,6 +345,7 @@ export const Chat = ({
         isReadonly={isReadonly}
         onScrollStateChange={handleScrollStateChange}
         hasKeys={hasKeys}
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         username={username || session?.user?.name!}
         append={(message) => setInput(message)}
       />

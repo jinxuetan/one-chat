@@ -2,7 +2,7 @@
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
   images: {
-    domains: ["lh3.googleusercontent.com"],
+    domains: ["lh3.googleusercontent.com", "www.google.com"],
     remotePatterns: [
       {
         protocol: "https",

@@ -13,7 +13,7 @@ export const BYOKModel = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2 justify-start">
+        <Button variant="outline" className="justify-start gap-2">
           <Box className="size-4" />
           Manage Models
         </Button>

@@ -177,7 +177,7 @@ export const ShareButton = ({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-80 rounded-xl border border-border/80 bg-background/95 p-0 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-card/95"
+        className="w-80 rounded-xl border border-border/80 bg-background p-0 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-card"
         align="end"
         sideOffset={8}
       >
@@ -219,9 +219,8 @@ export const ShareButton = ({
                 readOnly
                 disabled={!isPublic}
                 className={cn(
-                  "h-11 min-w-0 flex-1 border-border/80 bg-background/80 font-mono text-xs transition-all duration-200 focus-visible:border-border focus-visible:bg-background focus-visible:shadow-sm dark:border-border/60 dark:bg-card/40 dark:focus-visible:bg-card/60",
-                  !isPublic &&
-                    "cursor-not-allowed border-border/50 bg-background/40 opacity-60 dark:border-border/40 dark:bg-card/20"
+                  "h-11 min-w-0 flex-1 font-mono text-xs",
+                  !isPublic && "cursor-not-allowed opacity-60"
                 )}
                 placeholder={isPublic ? "" : "Enable sharing to generate link"}
                 shellClassName="w-full"
@@ -229,9 +228,8 @@ export const ShareButton = ({
               <CopyButton
                 onCopy={handleCopyShareLink}
                 className={cn(
-                  "size-11 flex-shrink-0 border border-border/80 bg-background/80 transition-all duration-200 hover:border-border hover:bg-background hover:shadow-sm dark:border-border/60 dark:bg-card/40 dark:hover:border-border/80 dark:hover:bg-card/60",
-                  !isPublic &&
-                    "pointer-events-none border-border/50 bg-background/40 opacity-50 dark:border-border/40 dark:bg-card/20"
+                  "flex-shrink-0",
+                  !isPublic && "pointer-events-none border-border/50 opacity-50"
                 )}
                 disabled={!isPublic}
               />
@@ -259,7 +257,7 @@ export const ShareButton = ({
                 {partialShares.map((share) => (
                   <div
                     key={share.token}
-                    className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/70 p-3.5 shadow-sm transition-all duration-200 hover:border-border/90 hover:bg-background/90 hover:shadow dark:border-border/50 dark:bg-card/30 dark:hover:border-border/70 dark:hover:bg-card/50"
+                    className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/70 p-3.5 shadow-sm transition-all dark:bg-card/30 dark:hover:border-border/70 dark:hover:bg-card/50"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-mono text-foreground/70 text-xs dark:text-foreground/60">
@@ -272,12 +270,12 @@ export const ShareButton = ({
                     <div className="flex items-center gap-2">
                       <CopyButton
                         onCopy={() => handleCopyPartialShare(share.token)}
-                        className="size-8 border border-border/60 bg-background/60 transition-all duration-200 hover:border-border/80 hover:bg-background/80 hover:shadow-sm dark:border-border/50 dark:bg-card/30 dark:hover:border-border/70 dark:hover:bg-card/50"
+                        className="size-8"
                       />
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="size-8 border border-transparent bg-background/40 p-0 text-foreground/60 transition-all duration-200 hover:border-red-300 hover:bg-red-50 hover:text-red-600 hover:shadow-sm dark:bg-card/20 dark:text-foreground/50 dark:hover:border-red-700/60 dark:hover:bg-red-950/60 dark:hover:text-red-400"
+                        className="size-8 border border-transparent bg-background/40 p-0 text-foreground/60 hover:border-red-300 hover:bg-red-50 hover:text-red-600 hover:shadow-sm dark:bg-card/20 dark:text-foreground/50 dark:hover:border-red-700/60 dark:hover:bg-red-950/60 dark:hover:text-red-400"
                         onClick={() => handleDeletePartialShare(share.token)}
                       >
                         <X className="size-4" />

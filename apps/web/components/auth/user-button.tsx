@@ -33,7 +33,7 @@ export const UserButton = () => {
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <Skeleton className="size-8 rounded-full" />
           <div className="min-w-0 flex-1">
-            <Skeleton className="h-[1rem] w-24 mb-1 rounded-sm" />
+            <Skeleton className="mb-1 h-[1rem] w-24 rounded-sm" />
             <Skeleton className="h-[1rem] w-32 rounded-sm" />
           </div>
         </div>

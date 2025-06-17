@@ -1,8 +1,8 @@
 import type { SourceUIPart } from "@ai-sdk/ui-utils";
 import { cn } from "@workspace/ui/lib/utils";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Globe } from "lucide-react";
 import Image from "next/image";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 const WWW_PREFIX_REGEX = /^www\./;
 
@@ -11,7 +11,13 @@ interface MessageSourcesProps {
   className?: string;
 }
 
+interface FaviconState {
+  [key: string]: boolean;
+}
+
 export const MessageSources = ({ sources, className }: MessageSourcesProps) => {
+  const [failedFavicons, setFailedFavicons] = useState<FaviconState>({});
+
   const getDomainFromUrl = useCallback((url: string) => {
     try {
       const urlObj = new URL(url);
@@ -24,13 +30,17 @@ export const MessageSources = ({ sources, className }: MessageSourcesProps) => {
   const getFaviconUrl = useCallback(
     (url: string) => {
       const domain = getDomainFromUrl(url);
-      return `https://www.google.com/s2/favicons?domain=${domain}&sz=16`;
+      return `https://twenty-icons.com/${domain}/16`;
     },
     [getDomainFromUrl]
   );
 
   const handleSourceClick = useCallback((url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
+  }, []);
+
+  const handleFaviconError = useCallback((sourceId: string) => {
+    setFailedFavicons((prev) => ({ ...prev, [sourceId]: true }));
   }, []);
 
   if (!sources || sources.length === 0) {
@@ -49,16 +59,21 @@ export const MessageSources = ({ sources, className }: MessageSourcesProps) => {
             type="button"
             key={source.id}
             onClick={() => handleSourceClick(source.url)}
-            className="flex items-center gap-1.5 rounded-full border bg-muted/50 px-2 py-1.5 text-xs transition-colors hover:bg-muted"
+            className="flex items-center gap-1.5 rounded-full border bg-muted/50 py-1.5 pr-2 pl-1.5 text-xs transition-colors hover:bg-muted"
           >
-            <Image
-              src={getFaviconUrl(source.url)}
-              alt=""
-              className="size-4 shrink-0"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
+            {failedFavicons[source.id] ? (
+              <Globe className="size-4 shrink-0 text-muted-foreground" />
+            ) : (
+              <Image
+                src={getFaviconUrl(source.url)}
+                alt=""
+                width={16}
+                height={16}
+                className="size-4 shrink-0"
+                unoptimized
+                onError={() => handleFaviconError(source.id)}
+              />
+            )}
             <span className="max-w-32 truncate">{source.title}</span>
             <span className="text-muted-foreground">•</span>
             <span className="text-muted-foreground">

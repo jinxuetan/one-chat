@@ -19,31 +19,31 @@ importers:
         version: 5.7.3
       ultracite:
         specifier: ^4.2.8
-        version: 4.2.10
+        version: 4.2.11
 
   apps/web:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: ^1.2.12
-        version: 1.2.12(zod@3.25.64)
+        version: 1.2.12(zod@3.25.67)
       '@ai-sdk/google':
         specifier: ^1.2.19
-        version: 1.2.19(zod@3.25.64)
+        version: 1.2.19(zod@3.25.67)
       '@ai-sdk/openai':
         specifier: ^1.3.22
-        version: 1.3.22(zod@3.25.64)
+        version: 1.3.22(zod@3.25.67)
       '@ai-sdk/react':
         specifier: ^1.2.12
-        version: 1.2.12(react@19.1.0)(zod@3.25.64)
+        version: 1.2.12(react@19.1.0)(zod@3.25.67)
       '@ai-sdk/ui-utils':
         specifier: ^1.2.11
-        version: 1.2.11(zod@3.25.64)
+        version: 1.2.11(zod@3.25.67)
       '@icons-pack/react-simple-icons':
         specifier: ^13.1.0
         version: 13.1.0(react@19.1.0)
       '@lobehub/icons':
         specifier: ^2.4.0
-        version: 2.4.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 2.4.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mendable/firecrawl-js':
         specifier: ^1.25.5
         version: 1.25.5
@@ -52,10 +52,10 @@ importers:
         version: 1.0.1
       '@openai/agents':
         specifier: ^0.0.7
-        version: 0.0.7(ws@8.18.2)(zod@3.25.64)
+        version: 0.0.7(ws@8.18.2)(zod@3.25.67)
       '@openrouter/ai-sdk-provider':
         specifier: ^0.7.1
-        version: 0.7.2(ai@4.3.16(react@19.1.0)(zod@3.25.64))(zod@3.25.64)
+        version: 0.7.2(ai@4.3.16(react@19.1.0)(zod@3.25.67))(zod@3.25.67)
       '@radix-ui/react-scroll-area':
         specifier: ^1.2.9
         version: 1.2.9(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -73,7 +73,7 @@ importers:
         version: 3.6.0
       '@t3-oss/env-core':
         specifier: ^0.13.8
-        version: 0.13.8(typescript@5.8.3)(zod@3.25.64)
+        version: 0.13.8(typescript@5.8.3)(zod@3.25.67)
       '@tanstack/react-query':
         specifier: ^5.80.6
         version: 5.80.7(react@19.1.0)
@@ -103,7 +103,7 @@ importers:
         version: link:../../packages/ui
       ai:
         specifier: ^4.3.16
-        version: 4.3.16(react@19.1.0)(zod@3.25.64)
+        version: 4.3.16(react@19.1.0)(zod@3.25.67)
       better-auth:
         specifier: ^1.2.9
         version: 1.2.9
@@ -139,7 +139,7 @@ importers:
         version: 3.8.16(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       openai:
         specifier: ^5.3.0
-        version: 5.3.0(ws@8.18.2)(zod@3.25.64)
+        version: 5.5.0(ws@8.18.2)(zod@3.25.67)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -172,7 +172,7 @@ importers:
         version: 8.18.2
       zod:
         specifier: ^3.25.60
-        version: 3.25.64
+        version: 3.25.67
       zustand:
         specifier: ^5.0.5
         version: 5.0.5(@types/react@19.1.8)(immer@10.1.1)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
@@ -274,7 +274,7 @@ importers:
         version: 1.3.4
       zod:
         specifier: ^3.24.2
-        version: 3.25.64
+        version: 3.25.67
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.0.8
@@ -2334,8 +2334,8 @@ packages:
       antd: '>=5.8.1'
       react: '>=18'
 
-  antd@5.26.0:
-    resolution: {integrity: sha512-iMPYKFTo2HvIRGutUOuN5AG+Uf+B2QaqcGQbdPp/100fqV3FAil6vFZLVuV3C4XEUOlDNkkUlJKhLR9V5rzIEg==}
+  antd@5.26.1:
+    resolution: {integrity: sha512-CiLGZ2Ftld+fuoj+U3OL8uouuqUppqFJnW4O/4bOgSWzM9XsJGibpNtUa9QArhrZ5ndfnzlPP/4RVXUK/xfSvQ==}
     peerDependencies:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
@@ -3038,8 +3038,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-to-chromium@1.5.167:
-    resolution: {integrity: sha512-LxcRvnYO5ez2bMOFpbuuVuAI5QNeY1ncVytE/KXaL6ZNfzX1yPlAO0nSOyIHx2fVAuUprMqPs/TdVhUFZy7SIQ==}
+  electron-to-chromium@1.5.168:
+    resolution: {integrity: sha512-RUNQmFLNIWVW6+z32EJQ5+qx8ci6RGvdtDC0Ls+F89wz6I2AthpXF0w0DIrn2jpLX0/PU9ZCo+Qp7bg/EckJmA==}
 
   emoji-mart@5.6.0:
     resolution: {integrity: sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==}
@@ -4264,8 +4264,8 @@ packages:
   oniguruma-to-es@4.3.3:
     resolution: {integrity: sha512-rPiZhzC3wXwE59YQMRDodUwwT9FZ9nNBwQQfsd1wfdtlKEyCdRV0avrTcSZ5xlIvGRVPd/cx6ZN45ECmS39xvg==}
 
-  openai@5.3.0:
-    resolution: {integrity: sha512-VIKmoF7y4oJCDOwP/oHXGzM69+x0dpGFmN9QmYO+uPbLFOmmnwO+x1GbsgUtI+6oraxomGZ566Y421oYVu191w==}
+  openai@5.5.0:
+    resolution: {integrity: sha512-j6y9a/VyEWTqm8mS2FT6Qboz6aTgwlRIpKlgP0cTmvkaKYEfnginPsiEAzqtk0O/fQBXTyNS3v0wRc2QmkGePw==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -4404,8 +4404,8 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.5.5:
-    resolution: {integrity: sha512-d/jtm+rdNT8tpXuHY5MMtcbJFBkhXE6593XVR9UoGCH8jSFGci7jGvMGH5RYd5PBJW+00NZQt6gf7CbagJCrhg==}
+  postcss@8.5.6:
+    resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -4663,8 +4663,8 @@ packages:
       react: '>=16.9.0'
       react-dom: '>=16.9.0'
 
-  rc-table@7.51.0:
-    resolution: {integrity: sha512-7ZlvW6lB0IDKaSFInD6OfJsCepSJJtfsQv2PZLtzEeZd/PLzQnKliXPaoZqkqDdLdJ3jxE2x4sane4DjxcAg+g==}
+  rc-table@7.51.1:
+    resolution: {integrity: sha512-5iq15mTHhvC42TlBLRCoCBLoCmGlbRZAlyF21FonFnS/DIC8DeRqnmdyVREwt2CFbPceM0zSNdEeVfiGaqYsKw==}
     engines: {node: '>=8.x'}
     peerDependencies:
       react: '>=16.9.0'
@@ -5376,8 +5376,8 @@ packages:
     engines: {node: '>=0.8.0'}
     hasBin: true
 
-  ultracite@4.2.10:
-    resolution: {integrity: sha512-4CWIocizBZrUydXT8Ty+jD3Ma/Mz7xHlggVeAVYCb1IzsG/4WjCxpNNfUSryLE4UNaHoAGDFD/NljR2G4u3ZTw==}
+  ultracite@4.2.11:
+    resolution: {integrity: sha512-PyUOGvcgoTZ6QT3j7n7vPp6hmiUOcOcOSbVlZkQ3AW4UCTZngJptDmrydVb7zFLjVvRTpGLiSOeXWaOtwtEqOg==}
     hasBin: true
 
   uncrypto@0.1.3:
@@ -5596,8 +5596,8 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
-  zod@3.25.64:
-    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
   zustand@3.7.2:
     resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
@@ -5631,51 +5631,51 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/anthropic@1.2.12(zod@3.25.64)':
+  '@ai-sdk/anthropic@1.2.12(zod@3.25.67)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      zod: 3.25.64
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      zod: 3.25.67
 
-  '@ai-sdk/google@1.2.19(zod@3.25.64)':
+  '@ai-sdk/google@1.2.19(zod@3.25.67)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      zod: 3.25.64
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      zod: 3.25.67
 
-  '@ai-sdk/openai@1.3.22(zod@3.25.64)':
+  '@ai-sdk/openai@1.3.22(zod@3.25.67)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      zod: 3.25.64
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      zod: 3.25.67
 
-  '@ai-sdk/provider-utils@2.2.8(zod@3.25.64)':
+  '@ai-sdk/provider-utils@2.2.8(zod@3.25.67)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
       nanoid: 3.3.11
       secure-json-parse: 2.7.0
-      zod: 3.25.64
+      zod: 3.25.67
 
   '@ai-sdk/provider@1.1.3':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@1.2.12(react@19.1.0)(zod@3.25.64)':
+  '@ai-sdk/react@1.2.12(react@19.1.0)(zod@3.25.67)':
     dependencies:
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.64)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.67)
       react: 19.1.0
       swr: 2.3.3(react@19.1.0)
       throttleit: 2.1.0
     optionalDependencies:
-      zod: 3.25.64
+      zod: 3.25.67
 
-  '@ai-sdk/ui-utils@1.2.11(zod@3.25.64)':
+  '@ai-sdk/ui-utils@1.2.11(zod@3.25.67)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      zod: 3.25.64
-      zod-to-json-schema: 3.24.5(zod@3.25.64)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      zod: 3.25.67
+      zod-to-json-schema: 3.24.5(zod@3.25.67)
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -6362,12 +6362,12 @@ snapshots:
 
   '@lobehub/emojilib@1.0.0': {}
 
-  '@lobehub/fluent-emoji@2.0.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@lobehub/fluent-emoji@2.0.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@lobehub/emojilib': 1.0.0
-      '@lobehub/ui': 2.5.6(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      antd: 5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      antd-style: 3.7.1(@types/react@19.1.8)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@lobehub/ui': 2.5.6(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd: 5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd-style: 3.7.1(@types/react@19.1.8)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       emoji-regex: 10.4.0
       lodash-es: 4.17.21
       lucide-react: 0.469.0(react@19.1.0)
@@ -6382,11 +6382,11 @@ snapshots:
       - framer-motion
       - supports-color
 
-  '@lobehub/icons@2.4.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@lobehub/icons@2.4.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@lobehub/ui': 2.5.6(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      antd: 5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      antd-style: 3.7.1(@types/react@19.1.8)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@lobehub/ui': 2.5.6(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd: 5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd-style: 3.7.1(@types/react@19.1.8)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       lucide-react: 0.469.0(react@19.1.0)
       polished: 4.3.1
       react: 19.1.0
@@ -6399,7 +6399,7 @@ snapshots:
       - framer-motion
       - supports-color
 
-  '@lobehub/ui@2.5.6(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@lobehub/ui@2.5.6(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@ant-design/cssinjs': 1.23.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@dnd-kit/core': 6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -6410,16 +6410,16 @@ snapshots:
       '@emoji-mart/react': 1.1.1(emoji-mart@5.6.0)(react@19.1.0)
       '@floating-ui/react': 0.27.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@giscus/react': 3.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@lobehub/fluent-emoji': 2.0.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@lobehub/icons': 2.4.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@lobehub/fluent-emoji': 2.0.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@lobehub/icons': 2.4.0(@babel/core@7.27.4)(@types/react@19.1.8)(acorn@8.15.0)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(framer-motion@12.18.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mdx-js/mdx': 3.1.0(acorn@8.15.0)
       '@mdx-js/react': 3.1.0(@types/react@19.1.8)(react@19.1.0)
       '@radix-ui/react-slot': 1.2.3(@types/react@19.1.8)(react@19.1.0)
       '@shikijs/transformers': 3.6.0
       '@splinetool/runtime': 0.9.526
       ahooks: 3.8.5(react@19.1.0)
-      antd: 5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      antd-style: 3.7.1(@types/react@19.1.8)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd: 5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd-style: 3.7.1(@types/react@19.1.8)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       chroma-js: 3.1.2
       class-variance-authority: 0.7.1
       dayjs: 1.11.13
@@ -6508,8 +6508,8 @@ snapshots:
     dependencies:
       axios: 1.10.0
       typescript-event-target: 1.1.1
-      zod: 3.25.64
-      zod-to-json-schema: 3.24.5(zod@3.25.64)
+      zod: 3.25.67
+      zod-to-json-schema: 3.24.5(zod@3.25.67)
     transitivePeerDependencies:
       - debug
 
@@ -6528,8 +6528,8 @@ snapshots:
       express-rate-limit: 7.5.0(express@5.1.0)
       pkce-challenge: 5.0.0
       raw-body: 3.0.0
-      zod: 3.25.64
-      zod-to-json-schema: 3.24.5(zod@3.25.64)
+      zod: 3.25.67
+      zod-to-json-schema: 3.24.5(zod@3.25.67)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -6581,33 +6581,33 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@openai/agents-core@0.0.7(ws@8.18.2)(zod@3.25.64)':
+  '@openai/agents-core@0.0.7(ws@8.18.2)(zod@3.25.67)':
     dependencies:
-      '@openai/zod': zod@3.25.64
+      '@openai/zod': zod@3.25.67
       debug: 4.4.1
-      openai: 5.3.0(ws@8.18.2)(zod@3.25.64)
+      openai: 5.5.0(ws@8.18.2)(zod@3.25.67)
     optionalDependencies:
       '@modelcontextprotocol/sdk': 1.12.3
-      zod: 3.25.64
+      zod: 3.25.67
     transitivePeerDependencies:
       - supports-color
       - ws
 
-  '@openai/agents-openai@0.0.7(ws@8.18.2)(zod@3.25.64)':
+  '@openai/agents-openai@0.0.7(ws@8.18.2)(zod@3.25.67)':
     dependencies:
-      '@openai/agents-core': 0.0.7(ws@8.18.2)(zod@3.25.64)
-      '@openai/zod': zod@3.25.64
+      '@openai/agents-core': 0.0.7(ws@8.18.2)(zod@3.25.67)
+      '@openai/zod': zod@3.25.67
       debug: 4.4.1
-      openai: 5.3.0(ws@8.18.2)(zod@3.25.64)
+      openai: 5.5.0(ws@8.18.2)(zod@3.25.67)
     transitivePeerDependencies:
       - supports-color
       - ws
       - zod
 
-  '@openai/agents-realtime@0.0.7(zod@3.25.64)':
+  '@openai/agents-realtime@0.0.7(zod@3.25.67)':
     dependencies:
-      '@openai/agents-core': 0.0.7(ws@8.18.2)(zod@3.25.64)
-      '@openai/zod': zod@3.25.64
+      '@openai/agents-core': 0.0.7(ws@8.18.2)(zod@3.25.67)
+      '@openai/zod': zod@3.25.67
       '@types/ws': 8.18.1
       debug: 4.4.1
       ws: 8.18.2
@@ -6617,13 +6617,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@openai/agents@0.0.7(ws@8.18.2)(zod@3.25.64)':
+  '@openai/agents@0.0.7(ws@8.18.2)(zod@3.25.67)':
     dependencies:
-      '@openai/agents-core': 0.0.7(ws@8.18.2)(zod@3.25.64)
-      '@openai/agents-openai': 0.0.7(ws@8.18.2)(zod@3.25.64)
-      '@openai/agents-realtime': 0.0.7(zod@3.25.64)
+      '@openai/agents-core': 0.0.7(ws@8.18.2)(zod@3.25.67)
+      '@openai/agents-openai': 0.0.7(ws@8.18.2)(zod@3.25.67)
+      '@openai/agents-realtime': 0.0.7(zod@3.25.67)
       debug: 4.4.1
-      openai: 5.3.0(ws@8.18.2)(zod@3.25.64)
+      openai: 5.5.0(ws@8.18.2)(zod@3.25.67)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -6631,12 +6631,12 @@ snapshots:
       - ws
       - zod
 
-  '@openrouter/ai-sdk-provider@0.7.2(ai@4.3.16(react@19.1.0)(zod@3.25.64))(zod@3.25.64)':
+  '@openrouter/ai-sdk-provider@0.7.2(ai@4.3.16(react@19.1.0)(zod@3.25.67))(zod@3.25.67)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      ai: 4.3.16(react@19.1.0)(zod@3.25.64)
-      zod: 3.25.64
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      ai: 4.3.16(react@19.1.0)(zod@3.25.67)
+      zod: 3.25.67
 
   '@opentelemetry/api@1.9.0': {}
 
@@ -7402,10 +7402,10 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@t3-oss/env-core@0.13.8(typescript@5.8.3)(zod@3.25.64)':
+  '@t3-oss/env-core@0.13.8(typescript@5.8.3)(zod@3.25.67)':
     optionalDependencies:
       typescript: 5.8.3
-      zod: 3.25.64
+      zod: 3.25.67
 
   '@tailwindcss/node@4.1.10':
     dependencies:
@@ -7476,7 +7476,7 @@ snapshots:
       '@alloc/quick-lru': 5.2.0
       '@tailwindcss/node': 4.1.10
       '@tailwindcss/oxide': 4.1.10
-      postcss: 8.5.5
+      postcss: 8.5.6
       tailwindcss: 4.1.10
 
   '@tailwindcss/typography@0.5.16(tailwindcss@4.1.10)':
@@ -7823,15 +7823,15 @@ snapshots:
       screenfull: 5.2.0
       tslib: 2.8.1
 
-  ai@4.3.16(react@19.1.0)(zod@3.25.64):
+  ai@4.3.16(react@19.1.0)(zod@3.25.67):
     dependencies:
       '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.64)
-      '@ai-sdk/react': 1.2.12(react@19.1.0)(zod@3.25.64)
-      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.64)
+      '@ai-sdk/provider-utils': 2.2.8(zod@3.25.67)
+      '@ai-sdk/react': 1.2.12(react@19.1.0)(zod@3.25.67)
+      '@ai-sdk/ui-utils': 1.2.11(zod@3.25.67)
       '@opentelemetry/api': 1.9.0
       jsondiffpatch: 0.6.0
-      zod: 3.25.64
+      zod: 3.25.67
     optionalDependencies:
       react: 19.1.0
 
@@ -7857,7 +7857,7 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
 
-  antd-style@3.7.1(@types/react@19.1.8)(antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  antd-style@3.7.1(@types/react@19.1.8)(antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@ant-design/cssinjs': 1.23.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@babel/runtime': 7.27.6
@@ -7866,7 +7866,7 @@ snapshots:
       '@emotion/react': 11.14.0(@types/react@19.1.8)(react@19.1.0)
       '@emotion/serialize': 1.3.3
       '@emotion/utils': 1.4.2
-      antd: 5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      antd: 5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       use-merge-value: 1.2.0(react@19.1.0)
     transitivePeerDependencies:
@@ -7874,7 +7874,7 @@ snapshots:
       - react-dom
       - supports-color
 
-  antd@5.26.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  antd@5.26.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@ant-design/colors': 7.2.1
       '@ant-design/cssinjs': 1.23.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -7915,7 +7915,7 @@ snapshots:
       rc-slider: 11.1.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       rc-steps: 6.0.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       rc-switch: 4.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      rc-table: 7.51.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      rc-table: 7.51.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       rc-tabs: 15.6.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       rc-textarea: 1.10.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       rc-tooltip: 6.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -8023,7 +8023,7 @@ snapshots:
       jose: 5.10.0
       kysely: 0.28.2
       nanostores: 0.11.4
-      zod: 3.25.64
+      zod: 3.25.67
 
   better-call@1.0.9:
     dependencies:
@@ -8069,7 +8069,7 @@ snapshots:
   browserslist@4.25.0:
     dependencies:
       caniuse-lite: 1.0.30001723
-      electron-to-chromium: 1.5.167
+      electron-to-chromium: 1.5.168
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.0)
 
@@ -8606,7 +8606,7 @@ snapshots:
   ee-first@1.1.1:
     optional: true
 
-  electron-to-chromium@1.5.167: {}
+  electron-to-chromium@1.5.168: {}
 
   emoji-mart@5.6.0: {}
 
@@ -10295,10 +10295,10 @@ snapshots:
       regex: 6.0.1
       regex-recursion: 6.0.2
 
-  openai@5.3.0(ws@8.18.2)(zod@3.25.64):
+  openai@5.5.0(ws@8.18.2)(zod@3.25.67):
     optionalDependencies:
       ws: 8.18.2
-      zod: 3.25.64
+      zod: 3.25.67
 
   ora@4.1.1:
     dependencies:
@@ -10460,7 +10460,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postcss@8.5.5:
+  postcss@8.5.6:
     dependencies:
       nanoid: 3.3.11
       picocolors: 1.1.1
@@ -10793,7 +10793,7 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  rc-table@7.51.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  rc-table@7.51.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@babel/runtime': 7.27.6
       '@rc-component/context': 1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -11627,7 +11627,7 @@ snapshots:
   uglify-js@3.19.3:
     optional: true
 
-  ultracite@4.2.10:
+  ultracite@4.2.11:
     dependencies:
       commander: 14.0.0
 
@@ -11823,11 +11823,11 @@ snapshots:
 
   yn@3.1.1: {}
 
-  zod-to-json-schema@3.24.5(zod@3.25.64):
+  zod-to-json-schema@3.24.5(zod@3.25.67):
     dependencies:
-      zod: 3.25.64
+      zod: 3.25.67
 
-  zod@3.25.64: {}
+  zod@3.25.67: {}
 
   zustand@3.7.2(react@19.1.0):
     optionalDependencies:
