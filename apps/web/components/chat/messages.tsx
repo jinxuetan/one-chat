@@ -25,6 +25,8 @@ interface MessagesProps {
     scrollToBottom: () => void
   ) => void;
   hasKeys?: boolean;
+  append: (message: string) => void;
+  username: string;
 }
 
 export const Messages = ({
@@ -36,6 +38,8 @@ export const Messages = ({
   reload,
   onScrollStateChange,
   hasKeys = false,
+  append,
+  username,
 }: MessagesProps) => {
   const {
     containerRef,
@@ -99,11 +103,16 @@ export const Messages = ({
       className={cn(
         "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10",
         {
-          "pb-14": !isReadonly,
+          "pb-14": !isReadonly && messages.length > 0,
         }
       )}
     >
-      {messages.length === 0 && (hasKeys ? <EmptyMessage /> : <BYOK />)}
+      {messages.length === 0 &&
+        (hasKeys ? (
+          <EmptyMessage username={username} onMessageClick={append} />
+        ) : (
+          <BYOK />
+        ))}
 
       {messages.map((message, index) => (
         <Message

@@ -60,6 +60,7 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
         isReadonly={false}
         autoResume={false}
         hasKeys={hasKeysFromCookie}
+        username={session.user.name}
       />
     );
   }
@@ -89,6 +90,7 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
       isReadonly={session.user?.id !== chat.thread?.userId}
       autoResume={true}
       hasKeys={hasKeysFromCookie}
+      username={session.user.name}
     />
   );
 };

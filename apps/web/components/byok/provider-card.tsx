@@ -159,7 +159,7 @@ export const ProviderCard = ({
               <TooltipTrigger asChild>
                 <Badge
                   variant="outline"
-                  className="h-5 border-blue-200 bg-blue-50 text-blue-700 text-xs dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                  className="h-5 border-blue-200 bg-blue-50 text-blue-700 text-xs dark:border-blue-800/50 dark:bg-blue-950/50 dark:text-blue-400"
                 >
                   Recommended
                 </Badge>
@@ -174,7 +174,7 @@ export const ProviderCard = ({
           {hasExistingKey ? (
             <Badge
               variant="default"
-              className="h-5 border-green-200 bg-green-100 text-green-700 text-xs dark:border-green-800 dark:bg-green-950 dark:text-green-300"
+              className="h-5 border-green-200 bg-green-100 text-green-700 text-xs dark:border-green-800/50 dark:bg-green-950/50 dark:text-green-400"
             >
               <CheckCircle className="mr-1 size-3" />
               Ready
@@ -182,7 +182,7 @@ export const ProviderCard = ({
           ) : (
             <Badge
               variant="outline"
-              className="h-5 border-orange-200 bg-orange-50 text-orange-700 text-xs dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300"
+              className="h-5 border-orange-200 bg-orange-50 text-orange-700 text-xs dark:border-orange-800/50 dark:bg-orange-950/50 dark:text-orange-400"
             >
               Setup required
             </Badge>

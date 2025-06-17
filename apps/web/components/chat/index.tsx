@@ -32,6 +32,7 @@ interface ChatProps {
   autoResume: boolean;
   initialIsNewThread?: boolean;
   hasKeys?: boolean;
+  username?: string;
 }
 
 export const Chat = ({
@@ -41,6 +42,7 @@ export const Chat = ({
   initialVisibilityType,
   isReadonly,
   autoResume,
+  username,
   initialIsNewThread = false,
   hasKeys: hasKeysFromProps = false,
 }: ChatProps) => {
@@ -343,6 +345,8 @@ export const Chat = ({
         isReadonly={isReadonly}
         onScrollStateChange={handleScrollStateChange}
         hasKeys={hasKeys}
+        username={username || session?.user?.name!}
+        append={(message) => setInput(message)}
       />
       {!isReadonly && (
         <ChatInput

@@ -1,10 +1,12 @@
 "use client";
+import { useApiKeys } from "@/hooks/use-api-keys";
 import { useBestModel } from "@/hooks/use-best-model";
 import { useFileHandler } from "@/hooks/use-file-handler";
 import type { Effort, Model } from "@/lib/ai/config";
 import { getModelByKey } from "@/lib/ai/models";
 import { trpc } from "@/lib/trpc/client";
 import { setModelCookie } from "@/lib/utils";
+import { getRoutingFromCookie, setRoutingCookie } from "@/lib/utils/cookie";
 import type { ChatSubmitData, SearchMode } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { Button } from "@workspace/ui/components/button";
@@ -154,13 +156,39 @@ export const ChatInput = memo(
     const [searchStrategy, setSearchStrategy] = useState<SearchMode>("off");
     const [selectedModel, setSelectedModel] = useState<Model>(initialChatModel);
     const [isRestrictedToOpenRouter, setIsRestrictedToOpenRouter] =
-      useState<boolean>(false);
+      useState<boolean>(getRoutingFromCookie() ?? false);
     const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const voiceButtonRef = useRef<VoiceButtonRef>(null);
     const deleteAttachment = trpc.attachment.delete.useMutation();
+    const { keys, hasOpenRouter } = useApiKeys();
+
+    useEffect(() => {
+      const hasNativeKeys = Boolean(
+        keys.openai || keys.anthropic || keys.google
+      );
+      const onlyHasOpenRouter = hasOpenRouter && !hasNativeKeys;
+      const cookieRouting = getRoutingFromCookie();
+
+      // If a routing preference is already set in cookies, respect it.
+      if (cookieRouting !== null) {
+        if (isRestrictedToOpenRouter !== cookieRouting) {
+          setIsRestrictedToOpenRouter(cookieRouting);
+        }
+        return;
+      }
+
+      // If no cookie is set, determine routing based on keys.
+      if (onlyHasOpenRouter) {
+        setIsRestrictedToOpenRouter(true);
+        setRoutingCookie(true);
+      } else {
+        setIsRestrictedToOpenRouter(false);
+        setRoutingCookie(false);
+      }
+    }, [keys, hasOpenRouter, isRestrictedToOpenRouter]);
 
     // Auto-switch to best model when API keys change
     useBestModel({

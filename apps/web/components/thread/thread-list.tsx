@@ -52,12 +52,12 @@ const LoadingSkeleton = () => (
   <div className="space-y-4 py-2">
     {Array.from({ length: 3 }).map((_, i) => (
       <div key={i} className="space-y-2">
-        <div className="h-4 w-20 animate-pulse rounded border bg-secondary px-2" />
+        <div className="h-4 w-20 animate-pulse rounded bg-secondary px-2" />
         <div className="space-y-1">
           {Array.from({ length: 10 }).map((_, j) => (
             <div
               key={j}
-              className="mx-1 h-8 animate-pulse rounded border bg-secondary"
+              className="mx-1 h-8 animate-pulse rounded bg-secondary"
             />
           ))}
         </div>

@@ -92,7 +92,7 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
           }),
           "h-auto min-h-8 w-full justify-start gap-2 border border-transparent px-2 py-1.5 text-foreground",
           isActive &&
-            "border-border/60 bg-accent/50 text-accent-foreground dark:border-border/40 dark:bg-accent/30",
+            "border-border/60 inset-shadow-xs bg-accent/50 text-accent-foreground dark:border-border/40 dark:bg-accent/30",
           isDeleting && "pointer-events-none opacity-50"
         )}
       >

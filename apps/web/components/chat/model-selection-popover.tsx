@@ -4,7 +4,7 @@ import { useApiKeys } from "@/hooks/use-api-keys";
 import { useDefaultModel } from "@/hooks/use-default-model";
 import type { Model, ModelConfig, Provider } from "@/lib/ai/config";
 import { getAvailableModels, getRecommendedModels } from "@/lib/ai/models";
-import { getRoutingFromCookie, setRoutingCookie } from "@/lib/utils/cookie";
+import { setRoutingCookie } from "@/lib/utils/cookie";
 import {
   Anthropic,
   DeepSeek,
@@ -181,17 +181,7 @@ const shouldAutoExpandModels = (
   return searchQuery.length > 0 || selectedCapabilities.length > 0;
 };
 
-const useProviderRouting = (
-  initialValue: boolean,
-  onRoutingChange: (value: boolean) => void
-) => {
-  useEffect(() => {
-    const cookieRouting = getRoutingFromCookie();
-    if (cookieRouting !== null && cookieRouting !== initialValue) {
-      onRoutingChange(cookieRouting);
-    }
-  }, [initialValue, onRoutingChange]);
-
+const useProviderRouting = (onRoutingChange: (value: boolean) => void) => {
   const handleRoutingChange = useCallback(
     (newValue: boolean) => {
       onRoutingChange(newValue);
@@ -841,7 +831,6 @@ export const ModelSelectionPopover = ({
   disabled = false,
 }: ModelSelectionPopoverProps) => {
   const defaultModel = useDefaultModel();
-  const { keys, hasOpenRouter } = useApiKeys();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -851,7 +840,6 @@ export const ModelSelectionPopover = ({
   const [isShowingAllModels, setIsShowingAllModels] = useState(false);
 
   const { handleRoutingChange } = useProviderRouting(
-    isRestrictedToOpenRouter,
     onIsRestrictedToOpenRouterChange
   );
   const { recommendedModels, additionalModels } = useModelFiltering(
@@ -901,16 +889,6 @@ export const ModelSelectionPopover = ({
   const handleToggleAllModels = useCallback(() => {
     setIsShowingAllModels((prev) => !prev);
   }, []);
-
-  // Auto-switch to OpenRouter if user only has OpenRouter key
-  useEffect(() => {
-    const hasNativeKeys = Boolean(keys.openai || keys.anthropic || keys.google);
-    const onlyHasOpenRouter = hasOpenRouter && !hasNativeKeys;
-
-    if (onlyHasOpenRouter && !isRestrictedToOpenRouter) {
-      handleRoutingChange(true);
-    }
-  }, [keys, hasOpenRouter, isRestrictedToOpenRouter, handleRoutingChange]);
 
   return (
     <Popover open={isPopoverOpen} onOpenChange={handlePopoverOpenChange}>

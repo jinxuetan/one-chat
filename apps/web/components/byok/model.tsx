@@ -13,12 +13,12 @@ export const BYOKModel = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2 justify-start">
           <Box className="size-4" />
           Manage Models
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="left-[calc(50%+8rem)] max-h-[90vh] max-w-2xl overflow-y-auto">
         <BYOK />
       </DialogContent>
     </Dialog>

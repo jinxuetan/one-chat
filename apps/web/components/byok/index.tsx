@@ -2,7 +2,7 @@
 
 import { useApiKeys } from "@/hooks/use-api-keys";
 import type { ApiProvider } from "@/lib/api-keys";
-import { Key, Shield, Zap } from "lucide-react";
+import { Key } from "lucide-react";
 import { ProviderCard } from "./provider-card";
 
 const PROVIDER_ORDER: ApiProvider[] = [
@@ -23,7 +23,7 @@ export const BYOK = () => {
   } = useApiKeys();
 
   return (
-    <div className="m-auto max-w-xl space-y-8">
+    <div className="m-auto max-w-xl space-y-6">
       {/* Header */}
       <div className="space-y-4 text-center">
         <div className="inline-flex rounded-full border border-border bg-accent/50 p-2 transition-colors duration-200 dark:border-border/60 dark:bg-accent/20">
@@ -38,17 +38,6 @@ export const BYOK = () => {
             Use your own API keys for unlimited access. Stored securely in your
             browser.
           </p>
-        </div>
-
-        <div className="flex justify-center gap-6 text-muted-foreground text-sm">
-          <div className="flex items-center gap-1.5">
-            <Shield className="h-3 w-3" />
-            <span>Private</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Zap className="h-3 w-3" />
-            <span>Instant Setup</span>
-          </div>
         </div>
       </div>
 
@@ -70,7 +59,7 @@ export const BYOK = () => {
       </div>
 
       {/* Footer Info */}
-      <div className="pt-6 text-center text-muted-foreground text-sm">
+      <div className="text-center text-muted-foreground text-sm">
         <div className="space-y-1">
           <p className="font-medium text-foreground">Your keys, your control</p>
           <p>Stored locally • Never shared • Always private</p>

@@ -2,6 +2,7 @@
 
 import { signOut, useSession } from "@/lib/auth/client";
 import { Button } from "@workspace/ui/components/button";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { toast } from "@workspace/ui/components/sonner";
 import { Loader, LogOut, User } from "lucide-react";
 import Image from "next/image";
@@ -9,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export const UserButton = () => {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const user = session?.user;
@@ -25,6 +26,21 @@ export const UserButton = () => {
       setIsLoading(false);
     }
   };
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-between gap-2 rounded-lg p-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Skeleton className="size-8 rounded-full" />
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-[1rem] w-24 mb-1 rounded-sm" />
+            <Skeleton className="h-[1rem] w-32 rounded-sm" />
+          </div>
+        </div>
+        <Skeleton className="size-6 rounded-md" />
+      </div>
+    );
+  }
 
   if (!user) {
     return null;

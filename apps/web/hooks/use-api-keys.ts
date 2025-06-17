@@ -45,6 +45,7 @@ interface UseApiKeysReturn {
   clearAllKeys: () => void;
   clearValidation: (provider: ApiProvider) => void;
   canUseModelWithKeys: (modelKey: string) => boolean;
+  resetRouting: () => void;
 }
 
 const validateKeyWithProvider = async (
@@ -251,6 +252,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
   const clearAllKeys = useCallback(() => {
     clearStoredKeys();
     setHasKeysCookie(false, userId);
+    setRoutingCookie(false);
     setValidationStatus({
       openai: null,
       anthropic: null,
@@ -270,6 +272,11 @@ export const useApiKeys = (): UseApiKeysReturn => {
     [keys]
   );
 
+  const resetRouting = useCallback(() => {
+    // This is a dummy function to be replaced by the component
+    // that uses this hook to reset its own state.
+  }, []);
+
   return {
     keys,
     hasKeys,
@@ -283,5 +290,6 @@ export const useApiKeys = (): UseApiKeysReturn => {
     clearAllKeys,
     clearValidation,
     canUseModelWithKeys,
+    resetRouting,
   };
 };
