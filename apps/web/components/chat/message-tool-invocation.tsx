@@ -68,7 +68,7 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
             alt="Generated image"
             width={256}
             height={256}
-            className="rounded-md shadow-xs"
+            className="rounded-md border border-border shadow-xs"
           />
           <Button
             size="sm"
