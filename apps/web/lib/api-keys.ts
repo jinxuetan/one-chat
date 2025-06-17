@@ -32,7 +32,7 @@ export const PROVIDER_CONFIGS: Record<ApiProvider, ProviderConfig> = {
     keyPrefix: "sk-",
     keyPattern: /^sk-[A-Za-z0-9_-]{32,}$/,
     description: "Claude 4 Sonnet and Claude 3.7 Sonnet",
-    validationEndpoint: `${env.NEXT_PUBLIC_VERCEL_URL}/api/validate?provider=anthropic`,
+    validationEndpoint: `${env.NEXT_PUBLIC_APP_URL}/api/validate?provider=anthropic`,
     testMethod: "GET",
   },
   google: {
