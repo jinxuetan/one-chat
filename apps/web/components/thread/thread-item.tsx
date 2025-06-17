@@ -33,6 +33,10 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
 
       const previousThreads = trpcUtils.thread.getUserThreads.getData();
 
+      if (isActive) {
+        router.push("/");
+      }
+
       trpcUtils.thread.getUserThreads.setData(undefined, (old) => {
         if (!old) return old;
         return old.filter((t) => t.id !== threadId);
