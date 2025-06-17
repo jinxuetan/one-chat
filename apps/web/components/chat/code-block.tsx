@@ -185,11 +185,16 @@ const lineNumberClassNames = cn(
 );
 
 const darkModeClassNames = cn(
-  "dark:[&_.shiki]:!text-[var(--shiki-dark)]",
-  "dark:[&_.shiki]:!bg-[var(--shiki-dark-bg)]",
-  "dark:[&_.shiki]:![font-style:var(--shiki-dark-font-style)]",
-  "dark:[&_.shiki]:![font-weight:var(--shiki-dark-font-weight)]",
-  "dark:[&_.shiki]:![text-decoration:var(--shiki-dark-text-decoration)]",
+  // Light theme - use GitHub light colors
+  "[&_.shiki]:!bg-neutral-50/80",
+  "[&_.shiki]:!rounded-none",
+  "[&_.shiki_span]:!text-[var(--shiki-light)]",
+  "[&_.shiki_span]:![font-style:var(--shiki-light-font-style)]",
+  "[&_.shiki_span]:![font-weight:var(--shiki-light-font-weight)]",
+  "[&_.shiki_span]:![text-decoration:var(--shiki-light-text-decoration)]",
+  // Dark theme - use GitHub dark colors
+  "dark:[&_.shiki]:!bg-neutral-900/80",
+  "dark:[&_.shiki]:!rounded-none",
   "dark:[&_.shiki_span]:!text-[var(--shiki-dark)]",
   "dark:[&_.shiki_span]:![font-style:var(--shiki-dark-font-style)]",
   "dark:[&_.shiki_span]:![font-weight:var(--shiki-dark-font-weight)]",
@@ -262,8 +267,9 @@ const highlight = (
     lang: language ?? "typescript",
     themes: themes ?? {
       light: "github-light",
-      dark: "github-dark-default",
+      dark: "github-dark",
     },
+    defaultColor: false,
     transformers: [
       transformerNotationDiff({
         matchAlgorithm: "v3",
@@ -347,9 +353,9 @@ export const CodeBlock = ({
       <div
         className={cn(
           "group relative w-full overflow-hidden rounded-lg border border-border/40",
-          "bg-neutral-100 dark:bg-neutral-900",
+          "bg-neutral-100 dark:bg-neutral-800",
           "transition-colors duration-200",
-          "dark:border-border/30 dark:bg-muted/10",
+          "dark:border-border/30",
           className
         )}
         {...props}
