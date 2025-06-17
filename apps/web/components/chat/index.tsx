@@ -32,7 +32,10 @@ interface ChatProps {
   autoResume: boolean;
   initialIsNewThread?: boolean;
   hasKeys?: boolean;
-  username?: string;
+  user?: {
+    id: string;
+    name: string;
+  };
 }
 
 export const Chat = ({
@@ -42,13 +45,15 @@ export const Chat = ({
   initialVisibilityType,
   isReadonly,
   autoResume,
-  username,
+  user,
   initialIsNewThread = false,
   hasKeys: hasKeysFromProps = false,
 }: ChatProps) => {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
-  const { keys: userApiKeys, hasKeys: hasKeysFromApiKeys } = useApiKeys();
+  const { keys: userApiKeys, hasKeys: hasKeysFromApiKeys } = useApiKeys({
+    userId: user?.id || session?.user?.id || "anonymous",
+  });
   const trpcUtils = trpc.useUtils();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -346,7 +351,7 @@ export const Chat = ({
         onScrollStateChange={handleScrollStateChange}
         hasKeys={hasKeys}
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        username={username || session?.user?.name!}
+        username={user?.name || session?.user?.name!}
         append={(message) => setInput(message)}
       />
       {!isReadonly && (

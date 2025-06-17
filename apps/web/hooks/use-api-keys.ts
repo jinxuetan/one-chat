@@ -128,13 +128,15 @@ const validateKeyWithProvider = async (
   }
 };
 
-export const useApiKeys = (): UseApiKeysReturn => {
+export const useApiKeys = ({
+  userId,
+}: { userId?: string } = {}): UseApiKeysReturn => {
   const { data: session } = useSession();
-  const userId = session?.user?.id || "anonymous";
+  const resolvedUserId = userId || session?.user?.id || "anonymous";
 
   const [storedKeys, setStoredKeys, clearStoredKeys] = useLocalStorage<
     Record<string, string>
-  >(getKeyStorageKey(userId), {});
+  >(getKeyStorageKey(resolvedUserId), {});
 
   const [isValidating, setIsValidating] = useState(false);
   const [validationStatus, setValidationStatus] = useState<
@@ -148,21 +150,21 @@ export const useApiKeys = (): UseApiKeysReturn => {
 
   const keys: ApiKeys = {
     openai: storedKeys.openai
-      ? decryptKey(storedKeys.openai, userId)
+      ? decryptKey(storedKeys.openai, resolvedUserId)
       : undefined,
     anthropic: storedKeys.anthropic
-      ? decryptKey(storedKeys.anthropic, userId)
+      ? decryptKey(storedKeys.anthropic, resolvedUserId)
       : undefined,
     google: storedKeys.google
-      ? decryptKey(storedKeys.google, userId)
+      ? decryptKey(storedKeys.google, resolvedUserId)
       : undefined,
     openrouter: storedKeys.openrouter
-      ? decryptKey(storedKeys.openrouter, userId)
+      ? decryptKey(storedKeys.openrouter, resolvedUserId)
       : undefined,
   };
 
   // Use cookie flag to prevent flash on initial load
-  const hasKeysFromCookie = getHasKeysFromCookie(userId);
+  const hasKeysFromCookie = getHasKeysFromCookie(resolvedUserId);
   const hasKeysFromLocalStorage = Object.values(keys).some(Boolean);
 
   // Use cookie value if available, otherwise fallback to localStorage
@@ -198,7 +200,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
         throw new Error(validation.error);
       }
 
-      const encryptedKey = encryptKey(key, userId);
+      const encryptedKey = encryptKey(key, resolvedUserId);
       setStoredKeys((prev) => ({ ...prev, [provider]: encryptedKey }));
 
       // Get updated keys including the new one
@@ -214,7 +216,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
       setModelCookie(bestModel);
 
       // Update the has-keys cookie flag
-      setHasKeysCookie(true, userId);
+      setHasKeysCookie(true, resolvedUserId);
 
       // Get model config for display name
       const modelConfig = getModelByKey(bestModel);
@@ -225,7 +227,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
       );
     },
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-    [validateKey, setStoredKeys, userId, keys]
+    [validateKey, setStoredKeys, resolvedUserId, keys]
   );
 
   const removeKey = useCallback(
@@ -236,7 +238,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
 
         // Check if there are any remaining keys
         const hasRemainingKeys = Object.keys(newKeys).length > 0;
-        setHasKeysCookie(hasRemainingKeys, userId);
+        setHasKeysCookie(hasRemainingKeys, resolvedUserId);
 
         return newKeys;
       });
@@ -246,12 +248,12 @@ export const useApiKeys = (): UseApiKeysReturn => {
       setValidationStatus((prev) => ({ ...prev, [provider]: null }));
       toast.success(`${PROVIDER_CONFIGS[provider].name} key removed`);
     },
-    [setStoredKeys, userId]
+    [setStoredKeys, resolvedUserId]
   );
 
   const clearAllKeys = useCallback(() => {
     clearStoredKeys();
-    setHasKeysCookie(false, userId);
+    setHasKeysCookie(false, resolvedUserId);
     setRoutingCookie(false);
     setValidationStatus({
       openai: null,
@@ -260,7 +262,7 @@ export const useApiKeys = (): UseApiKeysReturn => {
       openrouter: null,
     });
     toast.success("All API keys cleared");
-  }, [clearStoredKeys, userId]);
+  }, [clearStoredKeys, resolvedUserId]);
 
   const clearValidation = useCallback((provider: ApiProvider) => {
     setValidationStatus((prev) => ({ ...prev, [provider]: null }));

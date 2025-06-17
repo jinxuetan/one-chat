@@ -65,7 +65,10 @@ const ChatPage = async () => {
       autoResume={false}
       initialIsNewThread={true}
       hasKeys={hasKeysFromCookie}
-      username={session.user.name}
+      user={{
+        id: session.user.id,
+        name: session.user.name,
+      }}
     />
   );
 };
