@@ -33,10 +33,6 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
 
       const previousThreads = trpcUtils.thread.getUserThreads.getData();
 
-      if (isActive) {
-        router.push("/");
-      }
-
       trpcUtils.thread.getUserThreads.setData(undefined, (old) => {
         if (!old) return old;
         return old.filter((t) => t.id !== threadId);
@@ -67,10 +63,9 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (isDeleting) return;
-
     deleteThreadMutation.mutate({ threadId: thread.id });
+    if (isActive) router.push("/");
   };
 
   const handleTogglePin = (e: React.MouseEvent) => {
