@@ -5,9 +5,9 @@ import { auth } from "@/lib/auth/server";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { resolveInitialModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
+import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import type { Metadata } from "next";
 
 interface ThreadPageProps {
   params: Promise<{
@@ -78,7 +78,7 @@ export async function generateMetadata({
         follow: false,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       title: "Chat | One Chat",
       description: "AI-powered chat application.",

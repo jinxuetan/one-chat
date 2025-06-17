@@ -4,9 +4,9 @@ import type { Model } from "@/lib/ai";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { resolveInitialModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import type { Metadata } from "next";
 
 interface PartialSharePageProps {
   params: Promise<{
@@ -18,14 +18,15 @@ export async function generateMetadata({
   params,
 }: PartialSharePageProps): Promise<Metadata> {
   const { token } = await params;
-  
+
   try {
     const partialThreadData = await getPartialThreadData(token);
-    
+
     if (!partialThreadData?.thread) {
       return {
         title: "Shared Chat Not Found | One Chat",
-        description: "The requested partial chat share could not be found or has expired.",
+        description:
+          "The requested partial chat share could not be found or has expired.",
       };
     }
 
@@ -33,7 +34,7 @@ export async function generateMetadata({
     const firstUserMessage = partialThreadData.messages.find(
       (msg) => msg.role === "user"
     )?.content;
-    
+
     // Create a truncated description from the first message
     const description = firstUserMessage
       ? typeof firstUserMessage === "string"
@@ -65,7 +66,7 @@ export async function generateMetadata({
         follow: true,
       },
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       title: "Shared Chat Not Found | One Chat",
       description: "The requested partial chat share could not be found.",
