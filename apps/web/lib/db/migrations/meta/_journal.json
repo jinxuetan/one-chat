@@ -43,6 +43,13 @@
       "when": 1750152178107,
       "tag": "0005_cynical_ultimates",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1750197914688,
+      "tag": "0006_shiny_famine",
+      "breakpoints": true
     }
   ]
 }
