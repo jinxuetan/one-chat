@@ -74,14 +74,15 @@ export const SearchButton = ({
     setIsPopoverOpen(false);
   };
 
-  const availableModes = supportsNativeSearch
-    ? (["off", "native", "tool"] as const)
-    : (["off", "tool"] as const);
+  const availableModes = ["off", "native", "tool"] as const;
 
   const currentConfig = SEARCH_CONFIG[searchMode];
   const CurrentIcon = currentConfig.icon;
 
   const getNativeSearchTooltip = () => {
+    if (!supportsNativeSearch) {
+      return "Native search is currently only supported by Gemini models";
+    }
     if (!hasGoogleKey && !isAutoRouting) {
       return "Native search requires Google API Key configured and routing set to Auto Mode";
     }
@@ -120,7 +121,9 @@ export const SearchButton = ({
                   const config = SEARCH_CONFIG[mode];
                   const IconComponent = config.icon;
                   const isNativeMode = mode === "native";
-                  const isDisabled = isNativeMode && !canUseNativeSearch;
+                  const isDisabled =
+                    isNativeMode &&
+                    (!supportsNativeSearch || !canUseNativeSearch);
                   const tooltipContent = isNativeMode
                     ? getNativeSearchTooltip()
                     : null;
@@ -159,7 +162,7 @@ export const SearchButton = ({
                     return (
                       <Tooltip key={mode}>
                         <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
-                        <TooltipContent side="left" className="max-w-xs">
+                        <TooltipContent side="right" className="w-fit">
                           {tooltipContent}
                         </TooltipContent>
                       </Tooltip>

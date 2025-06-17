@@ -172,23 +172,29 @@ export const ChatInput = memo(
       const onlyHasOpenRouter = hasOpenRouter && !hasNativeKeys;
       const cookieRouting = getRoutingFromCookie();
 
-      // If a routing preference is already set in cookies, respect it.
-      if (cookieRouting !== null) {
-        if (isRestrictedToOpenRouter !== cookieRouting) {
-          setIsRestrictedToOpenRouter(cookieRouting);
-        }
+      // Don't set any routing preference if user has no keys at all
+      const hasAnyKeys = hasNativeKeys || hasOpenRouter;
+      if (!hasAnyKeys) {
         return;
       }
 
-      // If no cookie is set, determine routing based on keys.
+      // If user only has OpenRouter, force OpenRouter routing regardless of cookie
       if (onlyHasOpenRouter) {
         setIsRestrictedToOpenRouter(true);
         setRoutingCookie(true);
-      } else {
-        setIsRestrictedToOpenRouter(false);
-        setRoutingCookie(false);
+        return;
       }
-    }, [keys, hasOpenRouter, isRestrictedToOpenRouter]);
+
+      // If user has native keys, respect cookie preference or default to native
+      if (hasNativeKeys) {
+        const shouldUseNative = cookieRouting === null ? true : !cookieRouting;
+        setIsRestrictedToOpenRouter(!shouldUseNative);
+        if (cookieRouting === null) {
+          setRoutingCookie(false); // Default to native routing
+        }
+        return;
+      }
+    }, [keys, hasOpenRouter]);
 
     // Auto-switch to best model when API keys change
     useBestModel({
