@@ -97,6 +97,10 @@ const ThreadPage = async ({ params, searchParams }: ThreadPageProps) => {
 
   if (!session) return redirect("/auth");
 
+  if (chat?.thread.userId !== session.user.id) {
+    return notFound();
+  }
+
   const isBranchingThread = branch === "true";
 
   // Handle optimistic navigation: thread might not exist yet (being created)
