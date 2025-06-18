@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
+import { useSidebar } from "@workspace/ui/components/sidebar";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ import {
 } from "@workspace/ui/components/select";
 import { Switch } from "@workspace/ui/components/switch";
 import { Textarea } from "@workspace/ui/components/textarea";
+import { cn } from "@workspace/ui/lib/utils";
 import { Bot, Briefcase, Settings2, User, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -48,6 +50,7 @@ export const UserSettingsDialog = ({
   open,
   onOpenChange,
 }: UserSettingsDialogProps) => {
+  const { open: sidebarOpen } = useSidebar();
   const { settings, updateSettings, resetSettings } = useUserSettings();
 
   // Local state for form inputs
@@ -124,7 +127,12 @@ export const UserSettingsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] w-[95vw] max-w-4xl overflow-y-auto md:left-[calc(50%+8rem)] md:min-w-3xl">
+      <DialogContent
+        className={cn(
+          "max-h-[90dvh] w-[95vw] max-w-4xl overflow-y-auto md:min-w-3xl",
+          sidebarOpen && "left-[calc(50%+8rem)]"
+        )}
+      >
         <DialogHeader>
           <DialogTitle>Customize Your AI Experience</DialogTitle>
           <DialogDescription>
