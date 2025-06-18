@@ -55,10 +55,11 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: `${siteConfig.url}/assets/opengraph-image.jpg`,
+        url: "/opengraph-image.jpg",
         width: 1200,
         height: 630,
         alt: siteConfig.name,
+        type: "image/jpeg",
       },
     ],
   },
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [`${siteConfig.url}/assets/opengraph-image.jpg`],
+    images: ["/opengraph-image.jpg"],
     creator: "@bharath_uwu",
   },
   icons: {
