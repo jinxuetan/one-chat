@@ -30,6 +30,7 @@ export const CommandPalette = () => {
       if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA") {
         event.preventDefault();
         router.push("/");
+        router.refresh();
         close();
       }
     }

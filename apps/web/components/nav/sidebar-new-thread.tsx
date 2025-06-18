@@ -3,14 +3,22 @@
 import { buttonVariants } from "@workspace/ui/components/button";
 import { useSidebar } from "@workspace/ui/components/sidebar";
 import { Plus } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const SidebarNewThread = () => {
   const { open } = useSidebar();
+  const router = useRouter();
+
+  const handleNewChat = () => {
+    router.push("/");
+    router.refresh();
+  };
+
   if (open) return null;
+  
   return (
-    <Link
-      href="/"
+    <button
+      onClick={handleNewChat}
       className={buttonVariants({
         variant: "ghost",
         size: "sm",
@@ -20,6 +28,6 @@ export const SidebarNewThread = () => {
       aria-label="Start new chat"
     >
       <Plus className="size-4" />
-    </Link>
+    </button>
   );
 };

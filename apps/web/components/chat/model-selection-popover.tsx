@@ -326,7 +326,9 @@ const ModelCard = memo(
     const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
     const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai)
-      : isRestrictedToOpenRouter || canUseModelWithKeys(modelKey);
+      : isRestrictedToOpenRouter 
+        ? canUseModelWithKeys(modelKey)
+        : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -421,7 +423,9 @@ const ModelListItem = memo(
     const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
     const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai)
-      : isRestrictedToOpenRouter || canUseModelWithKeys(modelKey);
+      : isRestrictedToOpenRouter 
+        ? canUseModelWithKeys(modelKey)
+        : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {

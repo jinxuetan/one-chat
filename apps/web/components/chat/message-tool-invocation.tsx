@@ -1,7 +1,7 @@
 import { Button } from "@workspace/ui/components/button";
 import { TextShimmer } from "@workspace/ui/components/text-shimmer";
 import type { ToolInvocation } from "ai";
-import { Download, Loader } from "lucide-react";
+import { Download, Loader, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
@@ -27,6 +27,15 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
         <div className="flex items-center gap-2">
           <Loader className="size-3.5 animate-spin" />
           <TextShimmer>Searching the web...</TextShimmer>
+        </div>
+      );
+    }
+
+    if (state === "result" && toolName === "webSearch") {
+      return (
+        <div className="flex items-center gap-1 w-fit rounded-md border border-border bg-muted px-1 text-sm py-0.5 border-dashed">
+          <Search className="size-3.5" />
+          <span>Searched the web</span>
         </div>
       );
     }

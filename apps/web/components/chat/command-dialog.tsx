@@ -107,6 +107,7 @@ export const ThreadCommandDialog = ({
 
   const handleNewThread = useCallback(() => {
     router.push("/");
+    router.refresh();
     handleClose();
   }, [router, handleClose]);
 

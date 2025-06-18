@@ -100,6 +100,8 @@ export const Messages = ({
   const requiresScrollPadding = (index: number) =>
     hasSentMessage && isLastMessage(index);
 
+  console.info({ messages });
+
   return (
     <div
       ref={containerRef}
