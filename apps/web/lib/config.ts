@@ -6,7 +6,7 @@ export const siteConfig = {
   title: "OneChat - High-Performance AI Chat Application",
   description:
     "A blazing-fast, open-source AI chat platform with multi-model support, real-time streaming, and seamless user experience.",
-  url: `${env.NEXT_PUBLIC_APP_URL}/assets/opengraph-image.jpg`,
+  url: env.NEXT_PUBLIC_APP_URL,
   ogImage: "/og-image.png",
   links: {
     twitter: "https://x.com/bharath_uwu",
