@@ -1,5 +1,7 @@
 # OneChat
 
+![OG Image](https://www.1chat.tech/opengraph-image.jpg)
+
 > Open-source AI chat application that brings together the best of multiple AI models in one seamless experience.
 
 ## What is OneChat?
