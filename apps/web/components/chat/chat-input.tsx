@@ -159,11 +159,21 @@ export const ChatInput = memo(
       useState<boolean>(getRoutingFromCookie() ?? false);
     const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [showStreamInterrupted, setShowStreamInterrupted] = useState(false);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const voiceButtonRef = useRef<VoiceButtonRef>(null);
     const deleteAttachment = trpc.attachment.delete.useMutation();
     const { keys, hasOpenRouter } = useApiKeys();
+
+    useEffect(() => {
+      if (!isStreamInterrupted) {
+        setShowStreamInterrupted(false);
+        return;
+      }
+      const timeoutId = setTimeout(() => setShowStreamInterrupted(true), 1000);
+      return () => clearTimeout(timeoutId);
+    }, [isStreamInterrupted]);
 
     useEffect(() => {
       const hasNativeKeys = Boolean(
@@ -377,7 +387,7 @@ export const ChatInput = memo(
           )}
 
           {/* Interrupted Stream Display */}
-          {status !== "error" && isStreamInterrupted && (
+          {status !== "error" && showStreamInterrupted && (
             <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-amber-300/30 border-b-0 bg-amber-50/80 p-2 pl-3 dark:border-amber-400/20 dark:bg-amber-900/20">
               <div className="flex items-center justify-between">
                 <p className="text-amber-700 text-sm sm:text-base dark:text-amber-300">
@@ -423,8 +433,8 @@ export const ChatInput = memo(
                 isProcessing
                   ? "AI is responding..."
                   : isUploading
-                    ? "Uploading files..."
-                    : "Ask me anything..."
+                  ? "Uploading files..."
+                  : "Ask me anything..."
               }
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -510,10 +520,10 @@ export const ChatInput = memo(
                       isUploading
                         ? "Files are uploading..."
                         : isProcessing
-                          ? "AI is responding..."
-                          : canSubmit
-                            ? "Send message"
-                            : "Enter a message"
+                        ? "AI is responding..."
+                        : canSubmit
+                        ? "Send message"
+                        : "Enter a message"
                     }
                   >
                     <ArrowUp className="size-4" />

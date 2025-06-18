@@ -325,10 +325,10 @@ const ModelCard = memo(
     // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
     const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
     const canUse = requiresOpenAIDirectly
-      ? Boolean(keys.openai)
-      : isRestrictedToOpenRouter 
-        ? canUseModelWithKeys(modelKey)
-        : Boolean(keys[model.provider as keyof typeof keys]);
+      ? Boolean(keys.openai) && !isRestrictedToOpenRouter
+      : isRestrictedToOpenRouter
+      ? canUseModelWithKeys(modelKey)
+      : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -422,10 +422,10 @@ const ModelListItem = memo(
     // Special case: gpt-imagegen requires OpenAI key specifically (not available through OpenRouter)
     const requiresOpenAIDirectly = modelKey === "openai:gpt-imagegen";
     const canUse = requiresOpenAIDirectly
-      ? Boolean(keys.openai)
-      : isRestrictedToOpenRouter 
-        ? canUseModelWithKeys(modelKey)
-        : Boolean(keys[model.provider as keyof typeof keys]);
+      ? Boolean(keys.openai) && !isRestrictedToOpenRouter
+      : isRestrictedToOpenRouter
+      ? canUseModelWithKeys(modelKey)
+      : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -590,12 +590,12 @@ const ProviderToggle = memo(
             {isRestrictedToOpenRouter
               ? "Routing all models through OpenRouter API"
               : onlyHasOpenRouter
-                ? "Only OpenRouter key available - native routing disabled"
-                : hasNativeKeys
-                  ? hasOpenRouter
-                    ? "Using native provider APIs automatically"
-                    : "OpenRouter API key required to use OpenRouter routing"
-                  : "Native provider API keys required for auto routing"}
+              ? "Only OpenRouter key available - native routing disabled"
+              : hasNativeKeys
+              ? hasOpenRouter
+                ? "Using native provider APIs automatically"
+                : "OpenRouter API key required to use OpenRouter routing"
+              : "Native provider API keys required for auto routing"}
           </p>
         </div>
       </div>

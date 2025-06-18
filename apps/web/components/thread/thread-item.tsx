@@ -2,7 +2,7 @@
 
 import { Loader, Pin, PinOff, Split, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { usePinnedThreads } from "@/hooks/use-pinned-threads";
@@ -14,13 +14,15 @@ import { cn } from "@workspace/ui/lib/utils";
 
 interface ThreadItemProps {
   thread: ThreadListItem;
-  isActive?: boolean;
 }
 
-export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
+export const ThreadItem = ({ thread }: ThreadItemProps) => {
   const router = useRouter();
+  const params = useParams();
   const { isPinned, togglePin } = usePinnedThreads();
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const isActive = params.id === thread.id;
 
   const trpcUtils = trpc.useUtils();
   const pinned = isPinned(thread.id);
@@ -33,7 +35,6 @@ export const ThreadItem = ({ thread, isActive = false }: ThreadItemProps) => {
       await trpcUtils.thread.getUserThreads.cancel();
 
       const previousThreads = trpcUtils.thread.getUserThreads.getData();
-
 
       trpcUtils.thread.getUserThreads.setData(undefined, (old) => {
         if (!old) return old;

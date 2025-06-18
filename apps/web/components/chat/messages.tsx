@@ -5,14 +5,16 @@ import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { getModelFromCookie, resolveModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
+import { TextShimmer } from "@workspace/ui/components/text-shimmer";
 import { cn } from "@workspace/ui/lib/utils";
 import type { UIMessage } from "ai";
+import { Loader } from "lucide-react";
 import { motion } from "motion/react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { BYOK } from "../byok";
 import { EmptyMessage } from "./empty-message";
 import { Message, ThinkingMessage } from "./message";
-import { useSearchParams } from "next/navigation";
 
 interface MessagesProps {
   threadId: string;
@@ -109,15 +111,24 @@ export const Messages = ({
         "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10",
         {
           "pb-14": !isReadonly && messages.length > 0,
+          "justify-center items-center": isNewBranch,
         }
       )}
     >
-      {messages.length === 0 &&
-        (hasKeys && !isNewBranch ? (
-          <EmptyMessage username={username} onMessageClick={append} />
+      {messages.length === 0 ? (
+        !isNewBranch ? (
+          hasKeys ? (
+            <EmptyMessage username={username} onMessageClick={append} />
+          ) : (
+            <BYOK />
+          )
         ) : (
-          <BYOK />
-        ))}
+          <div className="flex h-full w-full items-center justify-center gap-2">
+            <Loader className="size-4 animate-spin text-muted-foreground" />
+            <TextShimmer className="text-lg">Cloning...</TextShimmer>
+          </div>
+        )
+      ) : null}
 
       {messages.map((message, index) => (
         <Message

@@ -20,12 +20,10 @@ interface ThreadListProps {
 const ThreadGroupComponent = ({
   label,
   threads,
-  currentThreadId,
   pinnedThreadIds,
 }: {
   label: string;
   threads: ThreadListItem[];
-  currentThreadId?: string;
   pinnedThreadIds: string[];
 }) => (
   <div className="space-y-1">
@@ -41,7 +39,6 @@ const ThreadGroupComponent = ({
             pinnedThreadIds.includes(thread.id) ? "pinned" : "unpinned"
           }`}
           thread={thread}
-          isActive={currentThreadId === thread.id}
         />
       ))}
     </div>
@@ -138,9 +135,6 @@ export const ThreadList = ({ search }: ThreadListProps) => {
           key={group.label}
           label={group.label}
           threads={group.threads}
-          currentThreadId={
-            currentThreadId || window.location.pathname.split("/").pop()
-          }
           pinnedThreadIds={pinnedThreadIds}
         />
       ))}

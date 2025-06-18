@@ -109,7 +109,7 @@ export const POST = async (request: NextRequest) => {
           ({
             ...messageItem,
             content: "",
-          }) as UIMessage
+          } as UIMessage)
       ),
       message: userMessage,
     });
