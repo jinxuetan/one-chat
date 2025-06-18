@@ -30,8 +30,10 @@ export const PROVIDER_CONFIGS: Record<ApiProvider, ProviderConfig> = {
     validationEndpoint: "https://api.openai.com/v1/models",
     testMethod: "GET",
     requiresVerification: true,
-    verificationNote: "Organization verification required for reasoning (o3, o1) and image models",
-    verificationUrl: "https://platform.openai.com/settings/organization/general",
+    verificationNote:
+      "Organization verification required for reasoning (o3, o1) and image models",
+    verificationUrl:
+      "https://platform.openai.com/settings/organization/general",
   },
   anthropic: {
     name: "Anthropic",

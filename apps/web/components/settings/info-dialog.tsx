@@ -10,6 +10,8 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Separator } from "@workspace/ui/components/separator";
+import { useSidebar } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   CircleHelp,
   ExternalLink,
@@ -23,8 +25,6 @@ import {
   Twitter,
   Volume2,
 } from "lucide-react";
-import { useSidebar } from "@workspace/ui/components/sidebar";
-import { cn } from "@workspace/ui/lib/utils";
 
 export const InfoDialog = () => {
   const { open: sidebarOpen } = useSidebar();

@@ -15,7 +15,7 @@ export const SidebarNewThread = () => {
   };
 
   if (open) return null;
-  
+
   return (
     <button
       onClick={handleNewChat}

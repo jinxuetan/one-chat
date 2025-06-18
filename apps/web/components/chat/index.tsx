@@ -131,7 +131,7 @@ export const Chat = ({
     messages,
     setMessages,
     reload,
-    error
+    error,
   } = useChat({
     id: threadId,
     initialMessages,

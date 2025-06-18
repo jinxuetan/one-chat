@@ -1,8 +1,8 @@
 import type { CustomAnnotation, MessageWithMetadata } from "@/types";
+import { AISDKError } from "ai";
 import type { Model } from "./ai";
 import { type ModelConfig, OPENROUTER_MODEL_MAP } from "./ai/config";
 import { PROVIDER_CONFIGS } from "./api-keys";
-import { AISDKError } from "ai";
 
 export const generateUUID = (): string =>
   "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -241,13 +241,13 @@ export const handleAISDKError = (error: unknown): string => {
     if (error instanceof AISDKError) {
       // Safely get provider configs with fallback
       const providers = PROVIDER_CONFIGS ? Object.keys(PROVIDER_CONFIGS) : [];
-      
+
       // Safely check for responseBody with proper type guards
       const errorWithBody = error as { responseBody?: unknown };
       const responseBody = errorWithBody.responseBody;
-      
+
       // Only proceed if responseBody is a string
-      if (typeof responseBody === 'string' && providers.length > 0) {
+      if (typeof responseBody === "string" && providers.length > 0) {
         const provider = providers.find((providerName) => {
           try {
             return responseBody.includes(providerName);
@@ -255,20 +255,20 @@ export const handleAISDKError = (error: unknown): string => {
             return false;
           }
         });
-        
+
         if (provider) {
-          return `${provider.toUpperCase()}: ${error.message || 'Unknown error'}`;
+          return `${provider.toUpperCase()}: ${error.message || "Unknown error"}`;
         }
       }
-      
+
       // Fallback to just the error message
-      return error.message || 'AI SDK Error occurred';
+      return error.message || "AI SDK Error occurred";
     }
-    
+
     return "An error occurred";
   } catch (handlerError) {
     // Log the error for debugging but don't let it bubble up
-    console.error('Error in handleAISDKError:', handlerError);
+    console.error("Error in handleAISDKError:", handlerError);
     return "An error occurred";
   }
 };

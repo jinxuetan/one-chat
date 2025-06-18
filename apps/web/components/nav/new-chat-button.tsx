@@ -9,5 +9,9 @@ export const NewChatButton = () => {
     router.push("/");
     router.refresh();
   };
-  return <Button onClick={handleNewChat} className="cursor-pointer">New Chat</Button>;
+  return (
+    <Button onClick={handleNewChat} className="cursor-pointer">
+      New Chat
+    </Button>
+  );
 };

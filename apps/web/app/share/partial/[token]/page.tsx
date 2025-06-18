@@ -30,7 +30,8 @@ export async function generateMetadata({
           "The requested partial chat share could not be found or has expired.",
         openGraph: {
           title: "Shared Chat Not Found | One Chat",
-          description: "The requested partial chat share could not be found or has expired.",
+          description:
+            "The requested partial chat share could not be found or has expired.",
           type: "article",
           url: `/share/partial/${token}`,
           siteName: siteConfig.name,
@@ -47,7 +48,8 @@ export async function generateMetadata({
         twitter: {
           card: "summary_large_image",
           title: "Shared Chat Not Found | One Chat",
-          description: "The requested partial chat share could not be found or has expired.",
+          description:
+            "The requested partial chat share could not be found or has expired.",
           images: ["/opengraph-image.jpg"],
         },
       };

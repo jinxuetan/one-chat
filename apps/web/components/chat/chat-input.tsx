@@ -435,8 +435,8 @@ export const ChatInput = memo(
                 isProcessing
                   ? "AI is responding..."
                   : isUploading
-                  ? "Uploading files..."
-                  : "Ask me anything..."
+                    ? "Uploading files..."
+                    : "Ask me anything..."
               }
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -522,10 +522,10 @@ export const ChatInput = memo(
                       isUploading
                         ? "Files are uploading..."
                         : isProcessing
-                        ? "AI is responding..."
-                        : canSubmit
-                        ? "Send message"
-                        : "Enter a message"
+                          ? "AI is responding..."
+                          : canSubmit
+                            ? "Send message"
+                            : "Enter a message"
                     }
                   >
                     <ArrowUp className="size-4" />

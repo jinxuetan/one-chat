@@ -327,8 +327,8 @@ const ModelCard = memo(
     const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai) && !isRestrictedToOpenRouter
       : isRestrictedToOpenRouter
-      ? canUseModelWithKeys(modelKey)
-      : Boolean(keys[model.provider as keyof typeof keys]);
+        ? canUseModelWithKeys(modelKey)
+        : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -424,8 +424,8 @@ const ModelListItem = memo(
     const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai) && !isRestrictedToOpenRouter
       : isRestrictedToOpenRouter
-      ? canUseModelWithKeys(modelKey)
-      : Boolean(keys[model.provider as keyof typeof keys]);
+        ? canUseModelWithKeys(modelKey)
+        : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -590,12 +590,12 @@ const ProviderToggle = memo(
             {isRestrictedToOpenRouter
               ? "Routing all models through OpenRouter API"
               : onlyHasOpenRouter
-              ? "Only OpenRouter key available - native routing disabled"
-              : hasNativeKeys
-              ? hasOpenRouter
-                ? "Using native provider APIs automatically"
-                : "OpenRouter API key required to use OpenRouter routing"
-              : "Native provider API keys required for auto routing"}
+                ? "Only OpenRouter key available - native routing disabled"
+                : hasNativeKeys
+                  ? hasOpenRouter
+                    ? "Using native provider APIs automatically"
+                    : "OpenRouter API key required to use OpenRouter routing"
+                  : "Native provider API keys required for auto routing"}
           </p>
         </div>
       </div>

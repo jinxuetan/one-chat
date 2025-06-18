@@ -20,6 +20,7 @@ import {
 } from "@/lib/constants";
 import { OneChatSDKError } from "@/lib/errors";
 import { chatRequestSchema } from "@/lib/schema";
+import { handleAISDKError } from "@/lib/utils";
 import {
   createProviderOptions,
   createStreamAbortController,
@@ -27,9 +28,7 @@ import {
   getStreamingModel,
   stopChatStream,
 } from "@/lib/utils/chat";
-import { handleAISDKError } from "@/lib/utils";
 import {
-  AISDKError,
   type UIMessage,
   appendClientMessage,
   appendResponseMessages,
@@ -111,7 +110,7 @@ export const POST = async (request: NextRequest) => {
           ({
             ...messageItem,
             content: "",
-          } as UIMessage)
+          }) as UIMessage
       ),
       message: userMessage,
     });

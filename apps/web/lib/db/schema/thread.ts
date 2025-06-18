@@ -1,15 +1,15 @@
 import type { JSONValue } from "ai";
+import { sql } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
+  index,
   jsonb,
   pgEnum,
   pgTable,
   text,
   varchar,
-  index,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import { user } from "./auth";
 import { nanoid, timestamps } from "./index";
 

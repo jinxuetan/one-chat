@@ -15,9 +15,9 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 import {
   CheckCircle,
+  ExternalLink,
   Eye,
   EyeOff,
-  ExternalLink,
   Info,
   Loader,
   Trash2,
@@ -192,7 +192,7 @@ export const ProviderCard = ({
                       href={config.verificationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-neutral-400 dark:text-neutral-800 dark:hover:text-neutral-700 hover:text-neutral-300 hover:underline mb-1"
+                      className="mb-1 inline-flex items-center gap-1 text-neutral-400 text-xs hover:text-neutral-300 hover:underline dark:text-neutral-800 dark:hover:text-neutral-700"
                     >
                       Verify organization
                       <ExternalLink className="size-3" />

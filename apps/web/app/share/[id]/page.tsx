@@ -31,7 +31,8 @@ export async function generateMetadata({
           "The requested chat thread could not be found or is private.",
         openGraph: {
           title: "Chat Not Found | One Chat",
-          description: "The requested chat thread could not be found or is private.",
+          description:
+            "The requested chat thread could not be found or is private.",
           type: "article",
           url: `/share/${id}`,
           siteName: siteConfig.name,
@@ -48,7 +49,8 @@ export async function generateMetadata({
         twitter: {
           card: "summary_large_image",
           title: "Chat Not Found | One Chat",
-          description: "The requested chat thread could not be found or is private.",
+          description:
+            "The requested chat thread could not be found or is private.",
           images: ["/opengraph-image.jpg"],
         },
       };

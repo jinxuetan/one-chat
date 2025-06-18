@@ -111,22 +111,20 @@ export const Messages = ({
         "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10",
         {
           "pb-14": !isReadonly && messages.length > 0,
-          "justify-center items-center": isNewBranch,
+          "items-center justify-center": isNewBranch,
         }
       )}
     >
       {messages.length === 0 ? (
-        !isNewBranch ? (
-          hasKeys ? (
-            <EmptyMessage username={username} onMessageClick={append} />
-          ) : (
-            <BYOK />
-          )
-        ) : (
+        isNewBranch ? (
           <div className="flex h-full w-full items-center justify-center gap-2">
             <Loader className="size-4 animate-spin text-muted-foreground" />
             <TextShimmer className="text-lg">Cloning...</TextShimmer>
           </div>
+        ) : hasKeys ? (
+          <EmptyMessage username={username} onMessageClick={append} />
+        ) : (
+          <BYOK />
         )
       ) : null}
 

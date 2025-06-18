@@ -6,10 +6,10 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Box } from "lucide-react";
-import { BYOK } from "./index";
 import { useSidebar } from "@workspace/ui/components/sidebar";
 import { cn } from "@workspace/ui/lib/utils";
+import { Box } from "lucide-react";
+import { BYOK } from "./index";
 
 export const BYOKModel = () => {
   const { open } = useSidebar();
