@@ -2,6 +2,7 @@ import { Chat } from "@/components/chat";
 import { getThreadWithMessagesCached } from "@/lib/actions/thread";
 import type { Model } from "@/lib/ai";
 import { auth } from "@/lib/auth/server";
+import { siteConfig } from "@/lib/config";
 import { DEFAULT_CHAT_MODEL } from "@/lib/constants";
 import { resolveInitialModel } from "@/lib/utils";
 import type { MessageWithMetadata } from "@/types";
@@ -28,6 +29,28 @@ export async function generateMetadata({
         title: "Chat Not Found | One Chat",
         description:
           "The requested chat thread could not be found or is private.",
+        openGraph: {
+          title: "Chat Not Found | One Chat",
+          description: "The requested chat thread could not be found or is private.",
+          type: "article",
+          url: `/share/${id}`,
+          siteName: siteConfig.name,
+          images: [
+            {
+              url: "/opengraph-image.jpg",
+              width: 1200,
+              height: 630,
+              alt: siteConfig.name,
+              type: "image/jpeg",
+            },
+          ],
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: "Chat Not Found | One Chat",
+          description: "The requested chat thread could not be found or is private.",
+          images: ["/opengraph-image.jpg"],
+        },
       };
     }
 
@@ -53,12 +76,22 @@ export async function generateMetadata({
         description,
         type: "article",
         url: `/share/${id}`,
-        siteName: "One Chat",
+        siteName: siteConfig.name,
+        images: [
+          {
+            url: "/opengraph-image.jpg",
+            width: 1200,
+            height: 630,
+            alt: siteConfig.name,
+            type: "image/jpeg",
+          },
+        ],
       },
       twitter: {
-        card: "summary",
+        card: "summary_large_image",
         title: fullTitle,
         description,
+        images: ["/opengraph-image.jpg"],
       },
       robots: {
         index: true,
@@ -69,6 +102,28 @@ export async function generateMetadata({
     return {
       title: "Chat Not Found | One Chat",
       description: "The requested chat thread could not be found.",
+      openGraph: {
+        title: "Chat Not Found | One Chat",
+        description: "The requested chat thread could not be found.",
+        type: "article",
+        url: `/share/${id}`,
+        siteName: siteConfig.name,
+        images: [
+          {
+            url: "/opengraph-image.jpg",
+            width: 1200,
+            height: 630,
+            alt: siteConfig.name,
+            type: "image/jpeg",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Chat Not Found | One Chat",
+        description: "The requested chat thread could not be found.",
+        images: ["/opengraph-image.jpg"],
+      },
     };
   }
 }

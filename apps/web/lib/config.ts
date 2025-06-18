@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: "/opengraph-image.jpg",
+        url: `/opengraph-image.jpg`,
         width: 1200,
         height: 630,
         alt: siteConfig.name,
@@ -97,7 +97,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  manifest: "/site.webmanifest",
   robots: {
     index: true,
     follow: true,
