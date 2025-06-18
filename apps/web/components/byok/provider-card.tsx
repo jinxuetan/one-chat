@@ -17,6 +17,8 @@ import {
   CheckCircle,
   Eye,
   EyeOff,
+  ExternalLink,
+  Info,
   Loader,
   Trash2,
   XCircle,
@@ -168,6 +170,35 @@ export const ProviderCard = ({
                 <p className="text-sm">
                   One key unlocks all models available through OpenRouter
                 </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {provider === "openai" && config.requiresVerification && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className="h-5 border-amber-200 bg-amber-50 text-amber-700 text-xs dark:border-amber-800/50 dark:bg-amber-950/50 dark:text-amber-400"
+                >
+                  <Info className="mr-1 size-3" />
+                  Verification
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <div className="space-y-1">
+                  <p className="text-sm">{config.verificationNote}</p>
+                  {config.verificationUrl && (
+                    <a
+                      href={config.verificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-neutral-400 dark:text-neutral-800 dark:hover:text-neutral-700 hover:text-neutral-300 hover:underline mb-1"
+                    >
+                      Verify organization
+                      <ExternalLink className="size-3" />
+                    </a>
+                  )}
+                </div>
               </TooltipContent>
             </Tooltip>
           )}

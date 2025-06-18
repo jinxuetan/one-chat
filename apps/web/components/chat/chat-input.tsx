@@ -126,6 +126,7 @@ interface ChatInputProps {
   onExternalFileDrop?: (
     handleFiles: (files: FileList) => Promise<void>
   ) => void;
+  error?: Error;
 }
 
 const convertToAttachment = (file: SelectedFile): Attachment => ({
@@ -151,6 +152,7 @@ export const ChatInput = memo(
     isStreamInterrupted,
     disabled = false,
     onExternalFileDrop,
+    error,
   }: ChatInputProps) => {
     const [reasoningEffort, setReasoningEffort] = useState<Effort>("medium");
     const [searchStrategy, setSearchStrategy] = useState<SearchMode>("off");
@@ -364,7 +366,7 @@ export const ChatInput = memo(
             <div className="mx-auto w-[95%] rounded-lg rounded-b-none border border-destructive/30 border-b-0 bg-destructive/10 p-2 dark:border-destructive/20 dark:bg-destructive/5">
               <div className="flex items-center justify-between">
                 <p className="text-destructive text-sm sm:text-base dark:text-destructive/90">
-                  Something went wrong
+                  {error?.message}
                 </p>
                 {reload && (
                   <Button

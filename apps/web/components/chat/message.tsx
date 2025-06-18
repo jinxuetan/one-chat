@@ -100,14 +100,14 @@ export const Message = ({
             />
 
             {message.isErrored && (
-              <div className="flex w-fit items-center gap-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900 text-sm">
+              <div className="flex w-fit items-center gap-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900 text-sm dark:border-rose-800 dark:bg-rose-950 dark:text-rose-100">
                 <AlertTriangle className="size-4" />
                 <p>Error: {message.errorMessage || "Unknown error"}</p>
               </div>
             )}
 
             {message.isStopped && (
-              <div className="flex w-fit items-center gap-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900 text-sm">
+              <div className="flex w-fit items-center gap-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-rose-900 text-sm dark:border-rose-800 dark:bg-rose-950 dark:text-rose-100">
                 <AlertTriangle className="size-4" />
                 <p>Stopped</p>
               </div>

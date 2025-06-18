@@ -131,6 +131,7 @@ export const Chat = ({
     messages,
     setMessages,
     reload,
+    error
   } = useChat({
     id: threadId,
     initialMessages,
@@ -376,6 +377,7 @@ export const Chat = ({
           isStreamInterrupted={isStreamInterrupted}
           disabled={!hasKeys}
           onExternalFileDrop={handleFileHandlerSet}
+          error={error}
         />
       )}
       <DragDropOverlay isVisible={isDragOverlay} isDragOver={isDragOver} />

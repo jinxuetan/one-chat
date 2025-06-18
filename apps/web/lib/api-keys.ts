@@ -16,6 +16,9 @@ export interface ProviderConfig {
   description: string;
   validationEndpoint: string;
   testMethod: string;
+  requiresVerification?: boolean;
+  verificationNote?: string;
+  verificationUrl?: string;
 }
 
 export const PROVIDER_CONFIGS: Record<ApiProvider, ProviderConfig> = {
@@ -26,6 +29,9 @@ export const PROVIDER_CONFIGS: Record<ApiProvider, ProviderConfig> = {
     description: "o4-mini, GPT-4o, GPT-4.1, o3, and ImageGen",
     validationEndpoint: "https://api.openai.com/v1/models",
     testMethod: "GET",
+    requiresVerification: true,
+    verificationNote: "Organization verification required for reasoning (o3, o1) and image models",
+    verificationUrl: "https://platform.openai.com/settings/organization/general",
   },
   anthropic: {
     name: "Anthropic",

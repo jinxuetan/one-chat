@@ -27,7 +27,9 @@ import {
   getStreamingModel,
   stopChatStream,
 } from "@/lib/utils/chat";
+import { handleAISDKError } from "@/lib/utils";
 import {
+  AISDKError,
   type UIMessage,
   appendClientMessage,
   appendResponseMessages,
@@ -235,9 +237,14 @@ export const POST = async (request: NextRequest) => {
                 });
               }
             }
+
             cleanup();
           },
         });
+
+        dataStreamWriter.onError = (error) => {
+          return handleAISDKError(error);
+        };
 
         result.mergeIntoDataStream(dataStreamWriter, {
           sendReasoning: true,

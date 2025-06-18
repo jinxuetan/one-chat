@@ -1,4 +1,5 @@
 export type ErrorType =
+  | "ai_sdk_error"
   | "bad_request"
   | "unauthorized"
   | "forbidden"
