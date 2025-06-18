@@ -65,12 +65,12 @@ export const UserButton = () => {
         <div className="min-w-0 flex-1">
           {user.name && (
             <p className="truncate font-medium text-foreground text-sm">
-              Bharath
+              {user.name}
             </p>
           )}
           {user.email && (
             <p className="truncate text-muted-foreground text-xs">
-              bharathxxd@gmail.com
+              {user.email}
             </p>
           )}
         </div>
