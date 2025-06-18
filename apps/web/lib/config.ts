@@ -7,7 +7,6 @@ export const siteConfig = {
   description:
     "A blazing-fast, open-source AI chat platform with multi-model support, real-time streaming, and seamless user experience.",
   url: env.NEXT_PUBLIC_APP_URL,
-  ogImage: "/og-image.png",
   links: {
     twitter: "https://x.com/bharath_uwu",
     github: "https://github.com/BharathXD/one-chat",
@@ -67,7 +66,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [siteConfig.ogImage],
+    images: [`${siteConfig.url}/assets/opengraph-image.jpg`],
     creator: "@bharath_uwu",
   },
   icons: {
