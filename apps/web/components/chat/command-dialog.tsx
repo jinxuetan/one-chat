@@ -7,7 +7,6 @@ import {
   getThreadGroupsForDisplay,
   groupThreadsByTime,
 } from "@/lib/utils/thread-grouping";
-import { mockThreads } from "@/mocks/thread";
 import {
   CommandDialog,
   CommandEmpty,
@@ -74,15 +73,16 @@ export const ThreadCommandDialog = ({
   const [searchQuery, setSearchQuery] = useState("");
   const { pinnedThreadIds, isLoaded: pinnedThreadsLoaded } = usePinnedThreads();
 
-  const { data, isLoading } = trpc.thread.getUserThreads.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    retry: (failureCount, error) => {
-      if (error?.data?.code === "UNAUTHORIZED") return false;
-      return failureCount < 3;
-    },
-  });
-
-  const threads = mockThreads;
+  const { data: threads = [], isLoading } = trpc.thread.getUserThreads.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+      retry: (failureCount, error) => {
+        if (error?.data?.code === "UNAUTHORIZED") return false;
+        return failureCount < 3;
+      },
+    }
+  );
 
   const groupedThreads = useMemo(() => {
     if (!threads || !pinnedThreadsLoaded) return null;

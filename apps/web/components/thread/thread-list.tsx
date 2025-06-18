@@ -12,7 +12,6 @@ import {
   groupThreadsByTime,
 } from "@/lib/utils/thread-grouping";
 import { ThreadItem } from "./thread-item";
-import { mockThreads } from "@/mocks/thread";
 
 interface ThreadListProps {
   search: string;
@@ -97,16 +96,18 @@ export const ThreadList = ({ search }: ThreadListProps) => {
 
   const { pinnedThreadIds, isLoaded: isPinningLoaded } = usePinnedThreads();
 
-  const { data, isLoading, isError, error } =
-    trpc.thread.getUserThreads.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-      retry: (failureCount, error) => {
-        if (error?.data?.code === "UNAUTHORIZED") return false;
-        return failureCount < 3;
-      },
-    });
-
-  const threads = mockThreads;
+  const {
+    data: threads = [],
+    isLoading,
+    isError,
+    error,
+  } = trpc.thread.getUserThreads.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error) => {
+      if (error?.data?.code === "UNAUTHORIZED") return false;
+      return failureCount < 3;
+    },
+  });
 
   const filteredAndGroupedThreads = useMemo(() => {
     if (!threads || !isPinningLoaded) {
