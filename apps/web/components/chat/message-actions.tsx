@@ -52,29 +52,39 @@ export const MessageActions = memo<MessageActionsProps>(
     const [isTTSDropdownOpen, setIsTTSDropdownOpen] = useState(false);
 
     const createPartialShareMutation =
-      trpc.thread.createPartialShare.useMutation({
-        onSuccess: () => {
-          // Success feedback is already handled optimistically
-        },
-        onError: (error) => {
-          toast.error(error.message || "Failed to create partial share");
-        },
-      });
+      trpc.thread.createPartialShare.useMutation();
 
     const handlePartialShare = () => {
-      // Generate token on frontend for optimistic rendering
       const token = nanoid(12);
       const shareUrl = `${window.location.origin}/share/partial/${token}`;
 
-      // Immediately copy to clipboard and show success toast
-      navigator.clipboard.writeText(shareUrl);
-      toast.success("Partial share link copied to clipboard!");
+      const sharePromise = new Promise((resolve, reject) => {
+        createPartialShareMutation.mutate(
+          {
+            threadId,
+            messageId: message.id,
+            token,
+          },
+          {
+            onSuccess: () => {
+              navigator.clipboard.writeText(shareUrl);
+              resolve({ shareUrl });
+            },
+            onError: (error) => {
+              reject(error);
+            },
+          }
+        );
+      });
 
-      // Call backend to actually create the share
-      createPartialShareMutation.mutate({
-        threadId,
-        messageId: message.id,
-        token,
+      toast.promise(sharePromise, {
+        loading: "Creating share link...",
+        success: () => {
+          return "Partial share link copied to clipboard!";
+        },
+        error: (error) => {
+          return error?.message || "Failed to create partial share";
+        },
       });
     };
 
@@ -83,8 +93,6 @@ export const MessageActions = memo<MessageActionsProps>(
     const modelConfig = model && getModelByKey(model);
     const isAnyDropdownOpen =
       isReloadDropdownOpen || isBranchDropdownOpen || isTTSDropdownOpen;
-    const isPartialShareLoading =
-      createPartialShareMutation.status === "pending";
 
     return (
       <div
@@ -193,22 +201,14 @@ export const MessageActions = memo<MessageActionsProps>(
               size="icon"
               className="group/edit"
               onClick={handlePartialShare}
-              disabled={isPartialShareLoading}
             >
               <LinkIcon
                 size={14}
-                className={cn(
-                  "text-muted-foreground group-hover/edit:text-foreground",
-                  {
-                    "animate-pulse": isPartialShareLoading,
-                  }
-                )}
+                className="text-muted-foreground group-hover/edit:text-foreground"
               />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">
-            {isPartialShareLoading ? "Creating share..." : "Share up to here"}
-          </TooltipContent>
+          <TooltipContent side="bottom">Share up to here</TooltipContent>
         </Tooltip>
 
         {message.role === "assistant" && (
