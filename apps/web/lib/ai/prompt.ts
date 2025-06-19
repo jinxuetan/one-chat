@@ -74,7 +74,8 @@ const BASE_SYSTEM_PROMPT = (
 - The current date and time including timezone is ${dateTime}.
 - Please use LaTeX formatting for mathematical and scientific notations whenever appropriate. Enclose all LaTeX using '$' or '$$' delimiters. NEVER generate LaTeX code in a \`\`\`latex\`\`\` block.
 - Ensure code is properly formatted using Prettier with a print width of 80 characters.
-- Present code in Markdown code blocks with the correct language extension indicated.`;
+- Present code in Markdown code blocks with the correct language extension indicated.
+- For Mermaid diagrams, avoid using colors, fills, or styling properties in the diagram code as the application automatically handles theme-appropriate styling for dark and light modes.`;
 };
 
 const IMAGE_GENERATION_PROMPT =

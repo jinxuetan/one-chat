@@ -9,7 +9,10 @@ import {
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 import { DownloadIcon, FileText } from "lucide-react";
-import { useState } from "react";
+import {
+  useState,
+  Suspense,
+} from "react";
 import {
   type BundledLanguage,
   CodeBlock,
@@ -22,6 +25,7 @@ import {
   type CodeBlockProps,
   CodeBlockWrapButton,
 } from "./code-block";
+import MermaidDiagram, { MermaidDiagramFallback } from "./mermaid-diagram";
 
 const LANGUAGE_CLASS_REGEX = /language-(\w+)/;
 const TRAILING_NEWLINE_REGEX = /\n$/;
@@ -248,6 +252,34 @@ export const CodeComponent = ({
   const match = LANGUAGE_CLASS_REGEX.exec(className || "");
   const language = match?.[1] || "plaintext";
   const code = String(children).replace(TRAILING_NEWLINE_REGEX, "");
+
+  if (language === "mermaid") {
+    return (
+      <div className={cn("my-4 w-full", className)}>
+        <CodeBlock
+          className="max-w-3xl"
+          data={[{ language: "mermaid", code }]}
+          defaultValue="mermaid"
+        >
+          <CodeBlockHeader>
+            <div className="flex-1">
+              <CodeBlockFilename value={language}>
+                diagram.mmd
+              </CodeBlockFilename>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <CodeBlockCopyButton />
+            </div>
+          </CodeBlockHeader>
+          <div className="p-0">
+            <Suspense fallback={<MermaidDiagramFallback />}>
+              <MermaidDiagram code={code} />
+            </Suspense>
+          </div>
+        </CodeBlock>
+      </div>
+    );
+  }
 
   const data: CodeBlockProps["data"] = [
     {
