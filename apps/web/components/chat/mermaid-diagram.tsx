@@ -4,17 +4,19 @@ import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { DownloadIcon, ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
-import {
-  useState,
-  useEffect,
-  useRef,
-  memo,
-} from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
+
+// Global flag to track Mermaid initialization
+let mermaidInitialized = false;
+// Cache the mermaid module to avoid repeated dynamic imports
+let mermaidModule: any = null;
 
 // Dynamic import for Mermaid to avoid bundle bloat
 const importMermaid = async () => {
+  if (mermaidModule) return mermaidModule;
   const mermaid = await import("mermaid");
-  return mermaid.default;
+  mermaidModule = mermaid.default;
+  return mermaidModule;
 };
 
 // Mermaid theme configuration for consistent styling
@@ -148,7 +150,7 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
   const elementRef = useRef<HTMLDivElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleDownload = async () => {
+  const handleDownload = useCallback(async () => {
     if (!elementRef.current || !svg) return;
 
     try {
@@ -162,17 +164,20 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
     } finally {
       setIsDownloading(false);
     }
-  };
+  }, [svg]);
 
-  const handleEditInMermaid = () => {
-    try {
-      const base64Code = btoa(code);
-      const mermaidUrl = `https://mermaid.live/edit#base64:${base64Code}`;
-      window.open(mermaidUrl, "_blank", "noopener,noreferrer");
-    } catch (error) {
-      console.error("Failed to open Mermaid Live Editor:", error);
-    }
-  };
+  const handleEditInMermaid = useCallback(() => {
+    if (!code.trim()) return;
+
+    const url = `https://mermaid.live/edit#base64:${btoa(
+      JSON.stringify({
+        code,
+        mermaid: { theme: theme === "dark" ? "dark" : "default" },
+      })
+    )}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
+  }, [code, theme]);
 
   useEffect(() => {
     let cancelled = false;
@@ -182,30 +187,43 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Show loading immediately on first render or theme change
-    setIsLoading(true);
-    setError("");
-
     const renderDiagram = async () => {
       try {
+        // Set loading state inside debounced function to avoid extra renders
+        if (!cancelled) {
+          setIsLoading(true);
+          setError("");
+        }
+
         const mermaid = await importMermaid();
         const isDark = theme === "dark";
 
-        // Configure mermaid with our theme
-        mermaid.initialize({
-          ...getMermaidTheme(isDark),
-          startOnLoad: false,
-          securityLevel: "strict",
-          suppressErrorRendering: true,
-        });
+        // Only initialize once globally to prevent conflicts
+        if (!mermaidInitialized) {
+          mermaid.initialize({
+            ...getMermaidTheme(isDark),
+            startOnLoad: false,
+            securityLevel: "strict",
+            suppressErrorRendering: true,
+          });
+          mermaidInitialized = true;
+        }
+
+        // Sanitize the code to ensure it's a valid string and not JSON
+        const sanitizedCode = typeof code === "string" ? code : String(code);
+
+        // Validate that the code looks like a Mermaid diagram
+        if (!sanitizedCode.trim()) {
+          throw new Error("Empty diagram code");
+        }
 
         // Generate unique ID for this diagram
         const id = `mermaid-${Date.now()}-${Math.random()
           .toString(36)
           .substring(2, 11)}`;
 
-        // Render the diagram
-        const { svg: renderedSvg } = await mermaid.render(id, code);
+        // Render the diagram with proper error handling
+        const { svg: renderedSvg } = await mermaid.render(id, sanitizedCode);
 
         if (!cancelled) {
           setSvg(renderedSvg);
@@ -226,7 +244,7 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
       if (!cancelled) {
         renderDiagram();
       }
-    }, 500); // Wait 500ms after code stops changing
+    }, 300);
 
     return () => {
       cancelled = true;
@@ -300,7 +318,7 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
             <ExternalLink className="size-4" />
             <span className="sr-only">Edit in Mermaid Live Editor</span>
           </Button>
-          
+
           {/* Download button */}
           <Button
             variant="ghost"
@@ -332,7 +350,11 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
 MermaidDiagram.displayName = "MermaidDiagram";
 
 // Loading fallback component
-export const MermaidDiagramFallback = ({ className }: { className?: string }) => (
+export const MermaidDiagramFallback = ({
+  className,
+}: {
+  className?: string;
+}) => (
   <div
     className={cn(
       "flex items-center justify-center rounded-md border bg-muted/30 p-8",
@@ -346,4 +368,4 @@ export const MermaidDiagramFallback = ({ className }: { className?: string }) =>
   </div>
 );
 
-export default MermaidDiagram; 
+export default MermaidDiagram;
