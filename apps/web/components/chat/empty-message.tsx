@@ -31,7 +31,7 @@ export const EmptyMessage = ({
   return (
     <div className="flex h-full flex-col items-start justify-center px-4">
       {/* Header Section */}
-      <div className="mb-16 text-center">
+      <div className="mb-6 md:mb-16 text-center">
         {/* Simplified Logo */}
         <div className="mb-6 flex justify-start">
           <div className="mb-4 grid size-16 place-items-center rounded-2xl border border-neutral-200/60 bg-gradient-to-br from-neutral-100 to-neutral-200 shadow-xs dark:border-neutral-800/40 dark:from-neutral-800 dark:to-neutral-900">
@@ -44,7 +44,7 @@ export const EmptyMessage = ({
         <h1 className="mb-4 text-left font-light text-4xl text-foreground tracking-tight">
           What's on your mind, {username}?
         </h1>
-        <p className="mx-auto max-w-md text-lg text-muted-foreground leading-relaxed">
+        <p className="mr-auto max-w-md text-lg text-start text-muted-foreground leading-relaxed">
           Start a conversation with our multi-modal AI assistant
         </p>
       </div>
@@ -57,7 +57,7 @@ export const EmptyMessage = ({
             <button
               type="button"
               key={index}
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200/60 bg-neutral-50/50 p-4 backdrop-blur-sm dark:border-neutral-800/40 dark:bg-neutral-900/20"
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200/60 bg-neutral-50/50 p-4 backdrop-blur-sm dark:border-neutral-800/40 dark:bg-neutral-900/20 w-full"
               onClick={() => onMessageClick(message.text)}
             >
               <IconComponent

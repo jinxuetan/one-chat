@@ -907,23 +907,26 @@ export const ModelSelectionPopover = ({
     <Button
       variant="outline"
       size="sm"
-      className={cn("min-w-[120px] justify-between", className)}
+      className={cn(
+        "min-w-[80px] max-w-[140px] justify-between sm:min-w-[120px] sm:max-w-none",
+        className
+      )}
       disabled={disabled}
     >
-      <span className="truncate">
+      <span className="min-w-0 truncate">
         {selectedModelConfig?.name ? (
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <ProviderIcon
               provider={selectedModelConfig.provider}
-              className="size-4"
+              className="size-4 flex-shrink-0"
             />
-            <span className="truncate">{selectedModelConfig.name}</span>
+            <span className="min-w-0 truncate">{selectedModelConfig.name}</span>
           </div>
         ) : (
           "Select Model"
         )}
       </span>
-      <ChevronDown className="size-4" />
+      <ChevronDown className="size-4 flex-shrink-0" />
     </Button>
   );
 
