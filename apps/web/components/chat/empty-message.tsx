@@ -29,7 +29,7 @@ export const EmptyMessage = ({
   onMessageClick,
 }: EmptyMessageProps) => {
   return (
-    <div className="flex h-full flex-col items-start justify-center px-4">
+    <div className="flex h-full flex-col items-start justify-center px-4 md:px-8">
       {/* Header Section */}
       <div className="mb-6 md:mb-16 text-center">
         {/* Simplified Logo */}
