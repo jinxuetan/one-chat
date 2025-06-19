@@ -18,11 +18,14 @@ interface ThreadItemProps {
 
 export const ThreadItem = ({ thread }: ThreadItemProps) => {
   const router = useRouter();
-  const params = useParams();
   const { isPinned, togglePin } = usePinnedThreads();
   const [isDeleting, setIsDeleting] = useState(false);
+  const params = useParams();
 
-  const isActive = params.id === thread.id;
+  const threadIdFromUrl =
+    params.id ?? window?.location?.pathname?.split("/").pop();
+
+  const isActive = threadIdFromUrl === thread.id;
 
   const trpcUtils = trpc.useUtils();
   const pinned = isPinned(thread.id);
