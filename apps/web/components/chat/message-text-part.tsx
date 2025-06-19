@@ -3,7 +3,7 @@ import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { SourceUIPart, ToolInvocationUIPart } from "@ai-sdk/ui-utils";
 import { cn } from "@workspace/ui/lib/utils";
-import { memo } from "react";
+import { memo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { EditMessage } from "./edit-message";
 import { Markdown } from "./markdown";
@@ -46,6 +46,8 @@ export const MessageTextPart = memo<MessageTextPartProps>(
     isBranching,
     threadId,
   }) => {
+    const [isMobileActionsVisible, setIsMobileActionsVisible] = useState(false);
+
     const webSearchTool = message.parts.find(
       (part): part is ToolInvocationUIPart =>
         part.type === "tool-invocation" &&
@@ -58,19 +60,38 @@ export const MessageTextPart = memo<MessageTextPartProps>(
 
     const allSources = sources.concat(toolSearch ?? []);
 
+    const handleMobileTouch = () => {
+      if (isReadonly || displayMode === "edit") return;
+      setIsMobileActionsVisible(true);
+    };
+
+    const handleBlur = (e: React.FocusEvent) => {
+      // Only hide if focus is moving completely outside the message container
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+        setIsMobileActionsVisible(false);
+      }
+    };
+
     return (
       <div
         className={cn("group relative mb-12 gap-2", {
           "ml-auto": message.role === "user",
           "w-full": message.role === "user" && displayMode === "edit",
         })}
+        onBlur={handleBlur}
       >
         <div className="flex w-full flex-col gap-3">
           {displayMode === "view" ? (
             <div
+              role="button"
               className={cn("flex w-full flex-col gap-3", {
                 "rounded-xl bg-primary px-3 py-2": message.role === "user",
+                "cursor-pointer touch-manipulation select-none md:cursor-default":
+                  !isReadonly,
               })}
+              onClick={handleMobileTouch}
+              onTouchStart={handleMobileTouch}
+              tabIndex={isReadonly ? undefined : 0}
             >
               <Markdown
                 className={cn({
@@ -109,6 +130,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
           isBranching={isBranching}
           textContent={text}
           threadId={threadId}
+          isMobileActionsVisible={isMobileActionsVisible}
         />
       </div>
     );

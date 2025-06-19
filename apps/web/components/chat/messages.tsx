@@ -102,13 +102,11 @@ export const Messages = ({
   const requiresScrollPadding = (index: number) =>
     hasSentMessage && isLastMessage(index);
 
-  console.info({ messages });
-
   return (
     <div
       ref={containerRef}
       className={cn(
-        "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-3 pt-10",
+        "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-0 pt-20 md:px-3 md:pt-10",
         {
           "pb-14": !isReadonly && messages.length > 0,
           "items-center justify-center": isNewBranch,

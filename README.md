@@ -90,13 +90,13 @@ Two different search options:
 
 2. **Environment setup**
    ```bash
-   cp .env.example .env.local
+   cd apps/web && cp .env.example .env.local
    # Add your database URLs and other config
    ```
 
 3. **Database setup**
    ```bash
-   pnpm db:migrate
+   pnpm db:generate && pnpm db:push
    ```
 
 4. **Start development server**

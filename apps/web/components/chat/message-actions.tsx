@@ -29,6 +29,7 @@ interface MessageActionsProps {
   isBranching: boolean;
   textContent: string;
   threadId: string;
+  isMobileActionsVisible?: boolean;
 }
 
 export const MessageActions = memo<MessageActionsProps>(
@@ -44,6 +45,7 @@ export const MessageActions = memo<MessageActionsProps>(
     isBranching,
     textContent,
     threadId,
+    isMobileActionsVisible = false,
   }) => {
     const [isReloadDropdownOpen, setIsReloadDropdownOpen] = useState(false);
     const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
@@ -91,7 +93,7 @@ export const MessageActions = memo<MessageActionsProps>(
           {
             "right-0": message.role === "user",
             "left-0": message.role === "assistant",
-            "opacity-100": isAnyDropdownOpen,
+            "opacity-100": isAnyDropdownOpen || isMobileActionsVisible,
           }
         )}
       >

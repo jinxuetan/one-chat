@@ -1,14 +1,19 @@
 {
-  "name": "shadcn-ui-monorepo",
+  "name": "onechat",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "clean": "turbo clean",
     "build": "turbo build",
     "dev": "turbo dev",
-    "start": "turbo start",
+    "start": "pnpm --filter web start",
     "lint": "ultracite lint",
-    "format": "ultracite format"
+    "format": "ultracite format",
+    "db:generate": "pnpm --filter web db:generate",
+    "db:push": "pnpm --filter web db:push",
+    "db:studio": "pnpm --filter web db:studio",
+    "ui:shadcn": "pnpm --filter web shadcn@canary add",
+    "wh": "ngrok http http://localhost:3000 --domain prompt-tightly-gar.ngrok-free.app --host-header rewrite",
+    "clean": "rm -rf .next node_modules && rm -f pnpm-lock.yaml bun.lockb yarn.lock package-lock.json"
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",

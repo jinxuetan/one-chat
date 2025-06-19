@@ -130,7 +130,7 @@ export const UserSettingsDialog = ({
       <DialogContent
         className={cn(
           "max-h-[90dvh] w-[95vw] max-w-4xl overflow-y-auto md:min-w-3xl",
-          sidebarOpen && "left-[calc(50%+8rem)]"
+          sidebarOpen && "md:left-[calc(50%+8rem)]"
         )}
       >
         <DialogHeader>

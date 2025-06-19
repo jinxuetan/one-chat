@@ -143,7 +143,7 @@ export const ProviderCard = ({
       )}
     >
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-start">
         <div className="flex items-center gap-3">
           <ProviderIcon provider={provider} className="size-8" />
           <div>
@@ -155,7 +155,7 @@ export const ProviderCard = ({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {provider === "openrouter" && (
             <Tooltip>
               <TooltipTrigger asChild>

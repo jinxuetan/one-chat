@@ -42,7 +42,7 @@ export const BYOK = () => {
       </div>
 
       {/* Provider List */}
-      <div className="space-y-6 rounded-xl border border-border/30 bg-card/30 p-6 backdrop-blur-sm dark:border-border/20 dark:bg-card/20">
+      <div className="space-y-6 rounded-xl border border-border/30 bg-card/30 p-4 backdrop-blur-sm sm:p-6 dark:border-border/20 dark:bg-card/20">
         {PROVIDER_ORDER.map((provider) => (
           <ProviderCard
             key={provider}

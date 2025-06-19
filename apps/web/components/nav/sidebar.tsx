@@ -9,12 +9,10 @@ import { BYOKModel } from "../byok/model";
 import { InfoDialog } from "../settings/info-dialog";
 import { NewChatButton } from "./new-chat-button";
 import { SidebarContent } from "./sidebar-content";
-import { SidebarActions } from "./sidebar-header";
 
 export const AppSidebar = () => (
   <Sidebar variant="sidebar">
     <SidebarHeader className="relative m-1 mb-0 flex flex-col gap-2 space-y-1 py-1">
-      <SidebarActions />
       <div className="flex shrink-0 items-center justify-center py-3 text-lg text-muted-foreground transition-opacity delay-75 duration-75">
         <Image
           src="/assets/one-chat-logo.svg"

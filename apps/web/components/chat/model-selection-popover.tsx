@@ -36,6 +36,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+import { useIsMobile } from "@workspace/ui/hooks/use-mobile";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   Brain,
@@ -62,6 +63,7 @@ import {
   Zap,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as Drawer from "vaul";
 
 type ViewMode = "grid" | "list";
 type CapabilityFilter = Exclude<keyof typeof CAPABILITY_ICONS, "tools">;
@@ -327,8 +329,8 @@ const ModelCard = memo(
     const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai) && !isRestrictedToOpenRouter
       : isRestrictedToOpenRouter
-        ? canUseModelWithKeys(modelKey)
-        : Boolean(keys[model.provider as keyof typeof keys]);
+      ? canUseModelWithKeys(modelKey)
+      : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -424,8 +426,8 @@ const ModelListItem = memo(
     const canUse = requiresOpenAIDirectly
       ? Boolean(keys.openai) && !isRestrictedToOpenRouter
       : isRestrictedToOpenRouter
-        ? canUseModelWithKeys(modelKey)
-        : Boolean(keys[model.provider as keyof typeof keys]);
+      ? canUseModelWithKeys(modelKey)
+      : Boolean(keys[model.provider as keyof typeof keys]);
 
     const handleClick = useCallback(() => {
       if (canUse) {
@@ -590,12 +592,12 @@ const ProviderToggle = memo(
             {isRestrictedToOpenRouter
               ? "Routing all models through OpenRouter API"
               : onlyHasOpenRouter
-                ? "Only OpenRouter key available - native routing disabled"
-                : hasNativeKeys
-                  ? hasOpenRouter
-                    ? "Using native provider APIs automatically"
-                    : "OpenRouter API key required to use OpenRouter routing"
-                  : "Native provider API keys required for auto routing"}
+              ? "Only OpenRouter key available - native routing disabled"
+              : hasNativeKeys
+              ? hasOpenRouter
+                ? "Using native provider APIs automatically"
+                : "OpenRouter API key required to use OpenRouter routing"
+              : "Native provider API keys required for auto routing"}
           </p>
         </div>
       </div>
@@ -757,7 +759,9 @@ const ModelList = memo(
         )}
         <div
           className={cn(
-            viewMode === "grid" ? "grid grid-cols-2 gap-2" : "space-y-2"
+            viewMode === "grid"
+              ? "grid grid-cols-1 gap-2 sm:grid-cols-2"
+              : "space-y-2"
           )}
         >
           {models.map((model) => {
@@ -842,6 +846,7 @@ export const ModelSelectionPopover = ({
     CapabilityFilter[]
   >([]);
   const [isShowingAllModels, setIsShowingAllModels] = useState(false);
+  const isMobile = useIsMobile();
 
   const { handleRoutingChange } = useProviderRouting(
     onIsRestrictedToOpenRouterChange
@@ -894,105 +899,145 @@ export const ModelSelectionPopover = ({
     setIsShowingAllModels((prev) => !prev);
   }, []);
 
+  useEffect(() => {
+    setViewMode(isMobile ? "list" : "grid");
+  }, [isMobile]);
+
+  const trigger = (
+    <Button
+      variant="outline"
+      size="sm"
+      className={cn("min-w-[120px] justify-between", className)}
+      disabled={disabled}
+    >
+      <span className="truncate">
+        {selectedModelConfig?.name ? (
+          <div className="flex items-center gap-2">
+            <ProviderIcon
+              provider={selectedModelConfig.provider}
+              className="size-4"
+            />
+            <span className="truncate">{selectedModelConfig.name}</span>
+          </div>
+        ) : (
+          "Select Model"
+        )}
+      </span>
+      <ChevronDown className="size-4" />
+    </Button>
+  );
+
+  const header = (
+    <div className="space-y-3 border-border border-b p-4">
+      <ModelSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <ProviderToggle
+        isRestrictedToOpenRouter={isRestrictedToOpenRouter}
+        onRoutingChange={handleRoutingChange}
+      />
+    </div>
+  );
+
+  const mainContent = (
+    <>
+      <ModelList
+        models={recommendedModels}
+        selectedModel={selectedModel}
+        onModelSelect={handleModelSelect}
+        viewMode={viewMode}
+        title="Recommended"
+        showIcon
+        isRestrictedToOpenRouter={isRestrictedToOpenRouter}
+      />
+
+      {additionalModels.length > 0 && shouldShowAllModels && (
+        <>
+          {recommendedModels.length > 0 && <Separator />}
+          <ModelList
+            models={additionalModels}
+            selectedModel={selectedModel}
+            onModelSelect={handleModelSelect}
+            viewMode={viewMode}
+            title="All Models"
+            isRestrictedToOpenRouter={isRestrictedToOpenRouter}
+          />
+        </>
+      )}
+
+      {hasNoResults && <EmptyState />}
+    </>
+  );
+
+  const footer = (
+    <>
+      {additionalModels.length > 0 && !shouldAutoExpand && (
+        <ShowAllModelsButton
+          additionalModelsCount={additionalModels.length}
+          isShowingAllModels={isShowingAllModels}
+          onToggle={handleToggleAllModels}
+        />
+      )}
+
+      <div className="ml-auto flex items-center gap-2">
+        <FilterControls
+          selectedCapabilities={selectedCapabilities}
+          onCapabilitiesChange={setSelectedCapabilities}
+          availableCapabilities={availableCapabilities}
+        />
+        <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer.Root
+        shouldScaleBackground
+        open={isPopoverOpen}
+        onOpenChange={handlePopoverOpenChange}
+      >
+        <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+          <Drawer.Content className="fixed right-0 bottom-0 left-0 z-20 flex h-[85vh] flex-col rounded-t-lg bg-background">
+            <div className="mx-auto my-3 h-1.5 w-12 flex-shrink-0 rounded-full bg-muted-foreground/20" />
+            {header}
+            <div className="relative flex-1">
+              <div className="absolute inset-0 overflow-y-auto" ref={scrollRef}>
+                {mainContent}
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t p-4">
+              {footer}
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    );
+  }
+
   return (
     <Popover open={isPopoverOpen} onOpenChange={handlePopoverOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn("min-w-[120px] justify-between", className)}
-          disabled={disabled}
-        >
-          <span className="truncate">
-            {selectedModelConfig?.name ? (
-              <div className="flex items-center gap-2">
-                <ProviderIcon
-                  provider={selectedModelConfig.provider}
-                  className="size-4"
-                />
-                <span className="truncate">{selectedModelConfig.name}</span>
-              </div>
-            ) : (
-              "Select Model"
-            )}
-          </span>
-          <ChevronDown className="size-4" />
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
 
       <PopoverContent
         className="min-h-[50vh] w-[540px] overflow-hidden rounded-xl p-0 shadow-sm"
         align="start"
         sideOffset={8}
       >
-        {/* Header */}
-        <div className="space-y-3 border-border border-b p-4">
-          <ModelSearch
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
-          <ProviderToggle
-            isRestrictedToOpenRouter={isRestrictedToOpenRouter}
-            onRoutingChange={handleRoutingChange}
-          />
-        </div>
-
-        {/* Content */}
+        {header}
         <div className="relative h-[50vh]">
           <div
             className="absolute inset-0 overflow-y-auto overscroll-contain pb-16"
             ref={scrollRef}
           >
-            <ModelList
-              models={recommendedModels}
-              selectedModel={selectedModel}
-              onModelSelect={handleModelSelect}
-              viewMode={viewMode}
-              title="Recommended"
-              showIcon
-              isRestrictedToOpenRouter={isRestrictedToOpenRouter}
-            />
-
-            {additionalModels.length > 0 && shouldShowAllModels && (
-              <>
-                {recommendedModels.length > 0 && <Separator />}
-                <ModelList
-                  models={additionalModels}
-                  selectedModel={selectedModel}
-                  onModelSelect={handleModelSelect}
-                  viewMode={viewMode}
-                  title="All Models"
-                  isRestrictedToOpenRouter={isRestrictedToOpenRouter}
-                />
-              </>
-            )}
-
-            {hasNoResults && <EmptyState />}
+            {mainContent}
           </div>
 
           <GradientOverlay isVisible={!isAtBottom} />
 
           {/* Bottom Controls */}
           <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between">
-            {additionalModels.length > 0 && !shouldAutoExpand && (
-              <ShowAllModelsButton
-                additionalModelsCount={additionalModels.length}
-                isShowingAllModels={isShowingAllModels}
-                onToggle={handleToggleAllModels}
-              />
-            )}
-
-            <div className="ml-auto flex items-center gap-2">
-              <FilterControls
-                selectedCapabilities={selectedCapabilities}
-                onCapabilitiesChange={setSelectedCapabilities}
-                availableCapabilities={availableCapabilities}
-              />
-              <ViewModeToggle
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-              />
-            </div>
+            {footer}
           </div>
         </div>
       </PopoverContent>

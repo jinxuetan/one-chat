@@ -15,7 +15,6 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:introspect": "drizzle-kit introspect",
-    "ui:shadcn": "pnpx shadcn@canary add",
     "wh": "ngrok http http://localhost:3000 --domain prompt-tightly-gar.ngrok-free.app --host-header rewrite"
   },
   "dependencies": {
@@ -67,6 +66,7 @@
     "resumable-stream": "^2.2.0",
     "shiki": "^3.6.0",
     "uuid": "^11.1.0",
+    "vaul": "^1.1.2",
     "ws": "^8.18.2",
     "zod": "^3.25.60",
     "zustand": "^5.0.5"

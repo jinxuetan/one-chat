@@ -37,8 +37,8 @@ export const InfoDialog = () => {
       </DialogTrigger>
       <DialogContent
         className={cn(
-          "max-h-[90vh] max-w-lg overflow-y-auto md:max-w-2xl",
-          sidebarOpen && "left-[calc(50%+8rem)]"
+          "max-h-[90vh] max-w-[90%] overflow-y-auto md:max-w-2xl",
+          sidebarOpen && "md:left-[calc(50%+8rem)]"
         )}
         showCloseButton={false}
       >

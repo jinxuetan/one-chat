@@ -23,8 +23,8 @@ export const BYOKModel = () => {
       </DialogTrigger>
       <DialogContent
         className={cn(
-          "max-h-[90vh] max-w-2xl overflow-y-auto",
-          open && "left-[calc(50%+8rem)]"
+          "max-h-[90vh] w-full max-w-[90%] overflow-y-auto md:w-fit md:max-w-2xl",
+          open && "md:left-[calc(50%+8rem)]"
         )}
       >
         <BYOK />

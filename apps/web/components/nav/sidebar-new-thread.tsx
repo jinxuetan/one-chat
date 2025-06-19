@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export const SidebarNewThread = () => {
-  const { open } = useSidebar();
+  const { open, openMobile, isMobile } = useSidebar();
   const router = useRouter();
 
   const handleNewChat = () => {
@@ -14,16 +14,19 @@ export const SidebarNewThread = () => {
     router.refresh();
   };
 
-  if (open) return null;
+  const sidebarOpen = isMobile ? openMobile : open;
+
+  if (sidebarOpen) return null;
 
   return (
     <button
+      type="button"
       onClick={handleNewChat}
       className={buttonVariants({
         variant: "ghost",
         size: "sm",
         className:
-          "!rounded-[6px] text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-accent/60",
+          "!rounded-[6px] text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:hover:bg-neutral-700",
       })}
       aria-label="Start new chat"
     >
