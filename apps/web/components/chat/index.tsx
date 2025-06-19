@@ -336,7 +336,7 @@ export const Chat = ({
       aria-label="Chat interface with file drag and drop support"
     >
       {!isReadonly && (
-        <div className="pointer-events-auto fixed top-2 right-2 z-50 flex flex-row gap-0.5 rounded-md border border-border/50 bg-neutral-50 p-1 shadow-xs backdrop-blur-sm transition-all duration-200 dark:border-border/30 dark:bg-neutral-800/90">
+        <div className="pointer-events-auto fixed top-2.5 right-2 z-50 flex flex-row gap-0.5 rounded-md border border-border/50 bg-neutral-50 p-1 shadow-xs backdrop-blur-sm transition-all duration-200 dark:border-border/30 dark:bg-neutral-800/90">
           {pathname !== "/" && (
             <ShareButton
               threadId={threadId}
