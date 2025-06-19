@@ -63,7 +63,7 @@ import {
   Zap,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import * as Drawer from "vaul";
+import { Drawer } from "vaul";
 
 type ViewMode = "grid" | "list";
 type CapabilityFilter = Exclude<keyof typeof CAPABILITY_ICONS, "tools">;
