@@ -9,10 +9,7 @@ import {
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 import { DownloadIcon, FileText } from "lucide-react";
-import {
-  useState,
-  Suspense,
-} from "react";
+import { Suspense, useState } from "react";
 import {
   type BundledLanguage,
   CodeBlock,

@@ -50,6 +50,13 @@
       "when": 1750197914688,
       "tag": "0006_shiny_famine",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1750400124907,
+      "tag": "0007_lethal_machine_man",
+      "breakpoints": true
     }
   ]
 }

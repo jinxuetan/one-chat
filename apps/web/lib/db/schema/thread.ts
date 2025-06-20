@@ -1,4 +1,4 @@
-import type { JSONValue } from "ai";
+import type { Attachment } from "ai";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -64,8 +64,9 @@ export const message = pgTable(
     parts: jsonb("parts").notNull(),
     content: text("content"),
     role: roleEnum("role").notNull(),
-    annotations: jsonb("annotations").$type<JSONValue[]>().default([]),
+    annotations: jsonb("annotations").$type<Attachment[]>().default([]),
     model: varchar("model"),
+    attachments: jsonb("attachments").$type<Attachment[]>().default([]),
     status: statusEnum("status").notNull().default("done"),
     isErrored: boolean("is_errored").notNull().default(false),
     isStopped: boolean("is_stopped").notNull().default(false),

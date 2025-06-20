@@ -3,6 +3,7 @@ import type { Model } from "@/lib/ai";
 import type { MessageWithMetadata } from "@/types";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { cn } from "@workspace/ui/lib/utils";
+import type { Attachment } from "ai";
 import { AlertTriangle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { SVGProps } from "react";
@@ -78,7 +79,12 @@ export const Message = ({
             })}
           >
             <MessageAttachments
-              attachments={message.experimental_attachments || []}
+              attachments={
+                (message as unknown as { attachments: Attachment[] })
+                  .attachments ||
+                message.experimental_attachments ||
+                []
+              }
             />
 
             <MessagePartRenderer

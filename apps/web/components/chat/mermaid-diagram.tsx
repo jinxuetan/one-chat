@@ -4,7 +4,7 @@ import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { DownloadIcon, ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect, useRef, memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 // Global flag to track Mermaid initialization
 let mermaidInitialized = false;
@@ -56,7 +56,7 @@ interface MermaidDiagramProps {
 // Convert SVG to PNG and download
 const downloadMermaidAsPNG = async (
   svgElement: SVGElement,
-  filename: string = "diagram.png"
+  filename = "diagram.png"
 ) => {
   try {
     // Create a canvas and get context
@@ -258,7 +258,7 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
     // Fallback to code display if Mermaid fails
     return (
       <div className={cn("bg-destructive/5 p-4", className)}>
-        <div className="text-destructive text-sm font-medium mb-2">
+        <div className="mb-2 font-medium text-destructive text-sm">
           Failed to render Mermaid diagram
         </div>
         <pre className="overflow-auto rounded bg-muted p-3 text-sm">
@@ -272,7 +272,7 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
     return (
       <div
         className={cn(
-          "flex items-center justify-center bg-neutral-50/80 dark:bg-neutral-900 p-8",
+          "flex items-center justify-center bg-neutral-50/80 p-8 dark:bg-neutral-900",
           className
         )}
       >
@@ -285,10 +285,10 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
   }
 
   return (
-    <div className={cn("relative group", className)}>
+    <div className={cn("group relative", className)}>
       <div
         className={cn(
-          "overflow-auto rounded-none bg-neutral-50/80 dark:bg-neutral-900 p-4",
+          "overflow-auto rounded-none bg-neutral-50/80 p-4 dark:bg-neutral-900",
           "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border/30 hover:scrollbar-thumb-border/50"
         )}
         ref={elementRef}
@@ -303,7 +303,7 @@ const MermaidDiagram = memo<MermaidDiagramProps>(({ code, className }) => {
 
       {/* Action buttons - only show when diagram is loaded */}
       {svg && (
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
           {/* Edit in Mermaid Live button */}
           <Button
             variant="ghost"
