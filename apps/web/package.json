@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack≠",
+    "build": "next build --turbopack",
     "start": "next start",
     "tc": "tsc --noEmit",
     "lint": "ultracite lint",
