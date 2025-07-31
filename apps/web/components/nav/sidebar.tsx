@@ -27,13 +27,8 @@ export const AppSidebar = () => (
       </div>
     </SidebarHeader>
     <SidebarContent />
-    <SidebarFooter>
-      <div className="flex items-center gap-2">
-        <div className="flex-1">
-          <BYOKModel />
-        </div>
-        <InfoDialog />
-      </div>
+    <SidebarFooter className="flex items-center gap-2">
+      <BYOKModel />
       <UserButton />
     </SidebarFooter>
   </Sidebar>

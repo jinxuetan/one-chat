@@ -8,41 +8,50 @@ const AuthPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+
   if (session?.session) return redirect("/");
+
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
-      <div className="flex max-w-md flex-col gap-4">
-        <div className="space-y-2">
-          <h1 className="flex items-center font-semibold text-3xl">
-            Welcome to{" "}
-            <span className="relative ml-2">
-              <span className="absolute inset-y-1/2 h-0.5 w-full bg-black dark:bg-white" />
-              <Image
-                src="/assets/t3chat.svg"
-                alt="T3.Chat"
-                width={76}
-                height={20}
-              />
-            </span>{" "}
-            <span className="ml-2">
-              <Image
-                src="/assets/one-chat-logo.svg"
-                alt="OneChat"
-                width={126}
-                height={25}
-                className="transition-all duration-200 dark:invert"
-              />
-            </span>
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Access multiple premium AI models including GPT-4.1, Claude, and
-            more. Experience the best AI models in a clean, simple chat
-            interface.
+    <main className="flex h-screen w-screen" role="main">
+      <section
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden border-r border-border/60"
+        aria-label="Application branding"
+      >
+        <Image
+          src="/assets/dark-bg.webp"
+          alt="OneChat application background"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/20" />
+        <header className="absolute top-8 left-8 z-10">
+          <Image
+            src="/assets/one-chat-logo.svg"
+            alt="OneChat logo"
+            width={120}
+            height={24}
+            quality={100}
+            className="invert"
+            priority
+          />
+        </header>
+      </section>
+
+      <section
+        className="w-full lg:w-1/2 flex items-center justify-center bg-background p-8"
+        aria-label="Authentication form"
+      >
+        <div className="space-y-4 w-full max-w-sm">
+          <OAuthButton />
+          <p className="text-center text-sm text-muted-foreground">
+            By continuing, you agree to our{" "}
+            <span className="underline">terms of service</span> and{" "}
+            <span className="underline">privacy policy</span>.
           </p>
         </div>
-        <OAuthButton />
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
