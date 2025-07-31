@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --turbopack",
     "start": "next start",
     "tc": "tsc --noEmit",
     "lint": "ultracite lint",
@@ -53,7 +53,7 @@
     "mermaid": "^11.6.0",
     "motion": "^12.17.0",
     "nanoid": "^5.1.5",
-    "next": "^15.3.3",
+    "next": "^15.4.5",
     "next-themes": "^0.4.6",
     "next-view-transitions": "^0.3.4",
     "nextjs-toploader": "^3.8.16",
