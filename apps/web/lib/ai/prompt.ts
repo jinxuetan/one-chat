@@ -41,11 +41,13 @@ const getPersonalizationSection = (userSettings: UserSettings): string => {
     personalization += `\n- The user is a ${occupation}`;
   }
 
-  if (traits.length > 0) {
-    personalization += `\n- Adopt these traits: ${traits.slice(0, 5).join(", ")}`;
+  if (traits && traits.length > 0) {
+    personalization += `\n- Adopt these traits: ${traits
+      .slice(0, 5)
+      .join(", ")}`;
   }
 
-  if (responseStyle !== "balanced") {
+  if (responseStyle && responseStyle !== "balanced") {
     const styleMap = {
       concise: "Keep responses brief and to the point",
       detailed: "Provide comprehensive, detailed explanations",
@@ -53,8 +55,10 @@ const getPersonalizationSection = (userSettings: UserSettings): string => {
     personalization += `\n- ${styleMap[responseStyle]}`;
   }
 
-  if (additionalContext.trim()) {
-    personalization += `\n- Context: ${additionalContext.slice(0, 200)}${additionalContext.length > 200 ? "..." : ""}`;
+  if (additionalContext?.trim()) {
+    personalization += `\n- Context: ${additionalContext.slice(0, 200)}${
+      additionalContext.length > 200 ? "..." : ""
+    }`;
   }
 
   return personalization;
