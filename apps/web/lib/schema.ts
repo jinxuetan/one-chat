@@ -23,12 +23,12 @@ export const chatRequestSchema = z.object({
   // User settings for personalization
   userSettings: z
     .object({
-      name: z.string(),
-      occupation: z.string(),
-      traits: z.array(z.string()),
-      additionalContext: z.string(),
-      responseStyle: z.enum(["concise", "detailed", "balanced"]),
-      usePersonalization: z.boolean(),
+      name: z.string().optional(),
+      occupation: z.string().optional(),
+      traits: z.array(z.string()).optional(),
+      additionalContext: z.string().optional(),
+      responseStyle: z.enum(["concise", "detailed", "balanced"]).optional(),
+      usePersonalization: z.boolean().optional(),
     })
     .optional(),
 

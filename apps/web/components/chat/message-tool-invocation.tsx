@@ -33,7 +33,7 @@ export const MessageToolInvocation = memo<MessageToolInvocationProps>(
 
     if (state === "result" && toolName === "webSearch") {
       return (
-        <div className="flex w-fit items-center gap-1 rounded-md border border-border border-dashed bg-muted px-1 py-0.5 text-sm">
+        <div className="flex w-full items-center gap-1 rounded-md border border-border bg-muted p-1.5 pl-2 text-sm">
           <Search className="size-3.5" />
           <span>Searched the web</span>
         </div>

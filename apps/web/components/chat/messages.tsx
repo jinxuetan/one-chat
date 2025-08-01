@@ -122,7 +122,9 @@ export const Messages = ({
         ) : hasKeys ? (
           <EmptyMessage username={username} onMessageClick={append} />
         ) : (
-          <BYOK />
+          <div className="flex h-full w-full items-center justify-center gap-2">
+            <BYOK />
+          </div>
         )
       ) : null}
 

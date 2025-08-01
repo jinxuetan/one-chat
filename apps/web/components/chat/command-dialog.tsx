@@ -16,6 +16,8 @@ import {
   CommandList,
   CommandShortcut,
 } from "@workspace/ui/components/command";
+import { useSidebar } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 import { Loader, Pin, Split } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -72,6 +74,7 @@ export const ThreadCommandDialog = ({
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const { pinnedThreadIds, isLoaded: pinnedThreadsLoaded } = usePinnedThreads();
+  const { open: sidebarOpen } = useSidebar();
 
   const { data: threads = [], isLoading } = trpc.thread.getUserThreads.useQuery(
     undefined,
@@ -127,6 +130,7 @@ export const ThreadCommandDialog = ({
       title="Search Threads"
       description="Search and navigate to your conversations"
       showCloseButton={false}
+      className={cn(sidebarOpen && "md:left-[calc(50%+8rem)]")}
     >
       <CommandInput
         placeholder="Search threads..."

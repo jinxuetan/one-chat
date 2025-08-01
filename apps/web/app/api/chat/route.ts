@@ -110,7 +110,7 @@ export const POST = async (request: NextRequest) => {
           ({
             ...messageItem,
             content: "",
-          }) as unknown as UIMessage
+          } as unknown as UIMessage)
       ),
       message: userMessage,
     });
@@ -191,11 +191,13 @@ export const POST = async (request: NextRequest) => {
             }
           },
           onFinish: async ({ response, sources }) => {
-            // biome-ignore lint/style/noNonNullAssertion: <explanation>
-            let assistantMessage = appendResponseMessages({
+            const responseMessagesArray = appendResponseMessages({
               messages: conversationMessages,
               responseMessages: response.messages,
-            }).at(-1)!;
+            });
+
+            let assistantMessage =
+              responseMessagesArray[responseMessagesArray.length - 1]!;
 
             if (searchStrategy === "native") {
               assistantMessage = {
@@ -299,7 +301,7 @@ export const GET = async (request: NextRequest) => {
     }
 
     const chatHistory = await loadChat(chatId);
-    const lastMessage = chatHistory.at(-1);
+    const lastMessage = chatHistory[chatHistory.length - 1];
 
     if (!lastMessage || lastMessage.role !== "assistant") {
       return new Response(createEmptyDataStream(), { status: 200 });

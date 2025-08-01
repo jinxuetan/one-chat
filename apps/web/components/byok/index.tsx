@@ -2,7 +2,6 @@
 
 import { useApiKeys } from "@/hooks/use-api-keys";
 import type { ApiProvider } from "@/lib/api-keys";
-import { Key } from "lucide-react";
 import { ProviderCard } from "./provider-card";
 
 const PROVIDER_ORDER: ApiProvider[] = [
@@ -23,26 +22,18 @@ export const BYOK = () => {
   } = useApiKeys();
 
   return (
-    <div className="m-auto max-w-xl space-y-6">
+    <div className="mx-auto max-w-2xl space-y-4">
       {/* Header */}
-      <div className="space-y-4 text-center">
-        <div className="inline-flex rounded-full border border-border bg-accent/50 p-2 transition-colors duration-200 dark:border-border/60 dark:bg-accent/20">
-          <Key className="size-5 text-muted-foreground" />
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="font-semibold text-foreground text-xl">
-            Connect Your AI Models
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Use your own API keys for unlimited access. Stored securely in your
-            browser.
-          </p>
-        </div>
+      <div className="space-y-2 text-left">
+        <h1 className="font-medium text-lg text-foreground">API Keys</h1>
+        <p className="text-muted-foreground text-sm">
+          Add your API keys to access AI models. Keys are stored locally in your
+          browser.
+        </p>
       </div>
 
       {/* Provider List */}
-      <div className="space-y-6 rounded-xl border border-border/30 bg-card/30 p-4 backdrop-blur-sm sm:p-6 dark:border-border/20 dark:bg-card/20">
+      <div className="space-y-4">
         {PROVIDER_ORDER.map((provider) => (
           <ProviderCard
             key={provider}
@@ -56,14 +47,6 @@ export const BYOK = () => {
             onClearValidation={clearValidation}
           />
         ))}
-      </div>
-
-      {/* Footer Info */}
-      <div className="text-center text-muted-foreground text-sm">
-        <div className="space-y-1">
-          <p className="font-medium text-foreground">Your keys, your control</p>
-          <p>Stored locally • Never shared • Always private</p>
-        </div>
       </div>
     </div>
   );

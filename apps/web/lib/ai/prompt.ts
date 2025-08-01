@@ -1,10 +1,10 @@
 interface UserSettings {
-  name: string;
-  occupation: string;
-  traits: string[];
-  additionalContext: string;
-  responseStyle: "concise" | "detailed" | "balanced";
-  usePersonalization: boolean;
+  name?: string;
+  occupation?: string;
+  traits?: string[];
+  additionalContext?: string;
+  responseStyle?: "concise" | "detailed" | "balanced";
+  usePersonalization?: boolean;
 }
 
 interface SystemPromptOptions {

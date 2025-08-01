@@ -9,6 +9,7 @@ import { EditMessage } from "./edit-message";
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { MessageSources } from "./message-sources";
+import { TextShimmer } from "@workspace/ui/components/text-shimmer";
 
 interface MessageTextPartProps {
   message: MessageWithMetadata;
@@ -24,6 +25,7 @@ interface MessageTextPartProps {
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
   isReloading: boolean;
+  isLoading: boolean;
   isBranching: boolean;
   threadId: string;
 }
@@ -43,6 +45,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
     setMessages,
     reload,
     isReloading,
+    isLoading,
     isBranching,
     threadId,
   }) => {
@@ -86,7 +89,7 @@ export const MessageTextPart = memo<MessageTextPartProps>(
               role="button"
               className={cn("flex w-full flex-col gap-3", {
                 "rounded-xl bg-primary px-3 py-2": message.role === "user",
-                "cursor-pointer touch-manipulation select-none md:cursor-default":
+                "cursor-pointer touch-manipulation md:cursor-default":
                   !isReadonly,
               })}
               onClick={handleMobileTouch}
@@ -115,6 +118,10 @@ export const MessageTextPart = memo<MessageTextPartProps>(
 
           <MessageSources sources={allSources} />
         </div>
+
+        {isLoading && message.role === "assistant" && (
+          <TextShimmer className="text-4xl font-bold -mt-2">...</TextShimmer>
+        )}
 
         <MessageActions
           message={message}

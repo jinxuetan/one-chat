@@ -7,18 +7,11 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { CopyButton } from "@workspace/ui/components/copy-button";
 import { Input } from "@workspace/ui/components/input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   CheckCircle,
-  ExternalLink,
   Eye,
   EyeOff,
-  Info,
   Loader,
   Trash2,
   XCircle,
@@ -137,188 +130,104 @@ export const ProviderCard = ({
   };
 
   return (
-    <div
-      className={cn(
-        "space-y-3 border-border/20 border-b pb-6 last:border-b-0 last:pb-0 dark:border-border/10"
-      )}
-    >
+    <div className="space-y-4 border border-border rounded-lg p-4">
       {/* Header */}
-      <div className="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-start">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <ProviderIcon provider={provider} className="size-8" />
+          <ProviderIcon provider={provider} className="size-6" />
           <div>
-            <h3 className="font-medium text-base text-foreground">
+            <h3 className="font-medium text-sm text-foreground">
               {config.name}
             </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="text-muted-foreground text-xs">
               {config.description}
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           {provider === "openrouter" && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="h-5 border-blue-200 bg-blue-50 text-blue-700 text-xs dark:border-blue-800/50 dark:bg-blue-950/50 dark:text-blue-400"
-                >
-                  Recommended
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm">
-                  One key unlocks all models available through OpenRouter
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-          {provider === "openai" && config.requiresVerification && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="h-5 border-amber-200 bg-amber-50 text-amber-700 text-xs dark:border-amber-800/50 dark:bg-amber-950/50 dark:text-amber-400"
-                >
-                  <Info className="mr-1 size-3" />
-                  Verification
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <div className="space-y-1">
-                  <p className="text-sm">{config.verificationNote}</p>
-                  {config.verificationUrl && (
-                    <a
-                      href={config.verificationUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mb-1 inline-flex items-center gap-1 text-neutral-400 text-xs hover:text-neutral-300 hover:underline dark:text-neutral-800 dark:hover:text-neutral-700"
-                    >
-                      Verify organization
-                      <ExternalLink className="size-3" />
-                    </a>
-                  )}
-                </div>
-              </TooltipContent>
-            </Tooltip>
+            <Badge variant="secondary" className="text-xs">
+              Recommended
+            </Badge>
           )}
           {hasExistingKey ? (
-            <Badge
-              variant="default"
-              className="h-5 border-green-200 bg-green-100 text-green-700 text-xs dark:border-green-800/50 dark:bg-green-950/50 dark:text-green-400"
-            >
+            <Badge variant="default" className="text-xs">
               <CheckCircle className="mr-1 size-3" />
-              Ready
+              Connected
             </Badge>
           ) : (
-            <Badge
-              variant="outline"
-              className="h-5 border-orange-200 bg-orange-50 text-orange-700 text-xs dark:border-orange-800/50 dark:bg-orange-950/50 dark:text-orange-400"
-            >
-              Setup required
+            <Badge variant="outline" className="text-xs">
+              Not configured
             </Badge>
           )}
         </div>
       </div>
 
-      {/* Input with inline button */}
+      {/* Input */}
       <div className="space-y-2">
-        <label htmlFor={`${provider}-api-key`} className="sr-only">
-          {config.name} API Key
-        </label>
-
-        <div className="flex w-full gap-2">
+        <div className="flex gap-2">
           <div className="relative flex-1">
-            <form autoComplete="off">
-              <Input
-                id={`${provider}-api-key`}
-                type={showKey ? "text" : "password"}
-                value={hasExistingKey ? displayKey : key}
-                onChange={(e) => setKey(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onBlur={handleBlur}
-                placeholder={`${config.name} API key (${config.keyPrefix}...)`}
-                disabled={hasExistingKey}
-                autoComplete="new-password"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck="false"
-                data-form-type="other"
-                data-lpignore="true"
-                aria-invalid={validationResult?.isValid === false}
-                aria-describedby={
-                  validationResult?.error ? `${provider}-error` : undefined
-                }
-                className={cn(
-                  "h-9 border-border bg-background pr-10 text-base transition-colors duration-200 focus-visible:border-border/80 dark:border-border/60 dark:bg-card/50 dark:focus-visible:border-border/80",
-                  validationResult?.isValid === false &&
-                    "border-destructive/50 focus-visible:border-destructive dark:border-destructive/30 dark:focus-visible:border-destructive/80"
-                )}
-              />
-
-              {hasExistingKey ? (
-                <div className="absolute top-0 right-0 flex size-9 items-center justify-center">
-                  <CopyButton
-                    onCopy={handleCopyKey}
-                    className="rounded-sm transition-colors duration-200 hover:bg-accent dark:hover:bg-accent/60"
-                  />
-                </div>
-              ) : (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-0 right-0 size-9 px-0 transition-colors duration-200 hover:bg-accent dark:hover:bg-accent/60"
-                  onClick={() => setShowKey(!showKey)}
-                  aria-label={showKey ? "Hide API key" : "Show API key"}
-                >
-                  {showKey ? (
-                    <EyeOff className="size-3.5 text-muted-foreground" />
-                  ) : (
-                    <Eye className="size-3.5 text-muted-foreground" />
-                  )}
-                </Button>
+            <Input
+              id={`${provider}-api-key`}
+              type={showKey ? "text" : "password"}
+              value={hasExistingKey ? displayKey : key}
+              onChange={(e) => setKey(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              placeholder={`Enter ${config.name} API key`}
+              disabled={hasExistingKey}
+              className={cn(
+                "pr-10",
+                validationResult?.isValid === false && "border-destructive"
               )}
-            </form>
+            />
+
+            {hasExistingKey ? (
+              <div className="absolute right-0.5 top-1/2 -translate-y-1/2">
+                <CopyButton onCopy={handleCopyKey} className="rounded-sm" />
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0.5 rounded-sm top-1/2 size-8 -translate-y-1/2 px-0"
+                onClick={() => setShowKey(!showKey)}
+              >
+                {showKey ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </Button>
+            )}
           </div>
 
           {hasExistingKey ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRemoveKey}
-                  className="h-9 text-muted-foreground text-sm transition-all duration-200 hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive dark:hover:border-destructive/20 dark:hover:bg-destructive/5"
-                >
-                  <Trash2 className="size-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm">Delete API key</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRemoveKey}
+              className="text-destructive hover:bg-destructive/10 size-9"
+            >
+              <Trash2 className="size-4" />
+            </Button>
           ) : (
             <Button
               onClick={handleSaveKey}
               disabled={isButtonDisabled}
               size="sm"
-              className="h-9 w-16 bg-primary text-sm transition-all duration-200 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary dark:hover:bg-primary/90"
+              className="h-9"
             >
-              {isSaving ? <Loader className="size-3 animate-spin" /> : "Save"}
+              {isSaving ? <Loader className="size-4 animate-spin" /> : "Save"}
             </Button>
           )}
         </div>
 
         {validationResult?.error && (
-          <div
-            id={`${provider}-error`}
-            role="alert"
-            aria-live="polite"
-            className="flex max-w-full items-start gap-1.5 rounded-r-md border-destructive/20 border-l-2 bg-destructive/5 py-2 pl-2 text-destructive text-sm dark:border-destructive/10 dark:bg-destructive/5 dark:text-destructive/90"
-          >
-            <XCircle className="mt-0.5 size-3 flex-shrink-0" />
-            <span className="min-w-0 flex-1 break-words">
+          <div className="flex items-start gap-2 rounded border-l-2 border-destructive bg-destructive/5 p-2 text-sm text-destructive">
+            <XCircle className="mt-0.5 size-4 flex-shrink-0" />
+            <span>
               {validationResult.error.includes("format")
                 ? getValidationHint()
                 : validationResult.error}
@@ -326,11 +235,6 @@ export const ProviderCard = ({
           </div>
         )}
       </div>
-      {provider === "openrouter" && (
-        <p className="text-muted-foreground text-sm">
-          One key unlocks all models available through OpenRouter
-        </p>
-      )}
     </div>
   );
 };
