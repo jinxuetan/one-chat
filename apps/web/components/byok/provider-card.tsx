@@ -146,17 +146,17 @@ export const ProviderCard = ({
         </div>
         <div className="flex items-center gap-2">
           {provider === "openrouter" && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs rounded-sm px-1.5">
               Recommended
             </Badge>
           )}
           {hasExistingKey ? (
-            <Badge variant="default" className="text-xs">
+            <Badge variant="default" className="text-xs rounded-sm px-1.5">
               <CheckCircle className="mr-1 size-3" />
               Connected
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs rounded-sm px-1.5">
               Not configured
             </Badge>
           )}
@@ -177,7 +177,7 @@ export const ProviderCard = ({
               placeholder={`Enter ${config.name} API key`}
               disabled={hasExistingKey}
               className={cn(
-                "pr-10",
+                "pr-10 rounded-sm",
                 validationResult?.isValid === false && "border-destructive"
               )}
             />
@@ -191,7 +191,7 @@ export const ProviderCard = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute right-0.5 rounded-sm top-1/2 size-8 -translate-y-1/2 px-0"
+                className="absolute right-0.5 rounded-[3.75px] top-1/2 size-8 -translate-y-1/2 px-0"
                 onClick={() => setShowKey(!showKey)}
               >
                 {showKey ? (
@@ -208,7 +208,7 @@ export const ProviderCard = ({
               variant="outline"
               size="sm"
               onClick={handleRemoveKey}
-              className="text-destructive hover:bg-destructive/10 size-9"
+              className="hover:bg-destructive/10 size-9 rounded-sm w-12"
             >
               <Trash2 className="size-4" />
             </Button>
@@ -217,7 +217,7 @@ export const ProviderCard = ({
               onClick={handleSaveKey}
               disabled={isButtonDisabled}
               size="sm"
-              className="h-9"
+              className="h-9 rounded-sm w-12"
             >
               {isSaving ? <Loader className="size-4 animate-spin" /> : "Save"}
             </Button>
@@ -225,7 +225,7 @@ export const ProviderCard = ({
         </div>
 
         {validationResult?.error && (
-          <div className="flex items-start gap-2 rounded border-l-2 border-destructive bg-destructive/5 p-2 text-sm text-destructive">
+          <div className="flex items-start gap-2 rounded border-1 border-destructive bg-destructive/5 p-2 text-sm text-destructive">
             <XCircle className="mt-0.5 size-4 flex-shrink-0" />
             <span>
               {validationResult.error.includes("format")

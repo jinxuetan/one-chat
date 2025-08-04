@@ -1,6 +1,7 @@
 "use client";
 
 import { trpc } from "@/lib/trpc/client";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { CopyButton } from "@workspace/ui/components/copy-button";
 import { Input } from "@workspace/ui/components/input";
@@ -22,38 +23,37 @@ interface ShareButtonProps {
   disabled?: boolean;
 }
 
+interface VisibilityToggleProps {
+  isPublic: boolean;
+  onToggle: () => void;
+  isLoading: boolean;
+}
+
 const VisibilityToggle = ({
   isPublic,
   onToggle,
   isLoading,
-}: {
-  isPublic: boolean;
-  onToggle: () => void;
-  isLoading: boolean;
-}) => (
-  <div className="group flex items-center justify-between rounded-lg border border-border/60 bg-background/60 p-4 transition-all duration-200 hover:border-border hover:bg-background/80 dark:border-border/40 dark:bg-card/30 dark:hover:border-border/60 dark:hover:bg-card/50">
+}: VisibilityToggleProps) => (
+  <div className="flex items-center justify-between border border-border rounded-lg p-4 mx-4">
     <div className="flex items-center gap-3">
-      <div className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent/80 to-accent/60 shadow-sm transition-all duration-200 group-hover:from-accent group-hover:to-accent/80 group-hover:shadow dark:from-accent/30 dark:to-accent/20 dark:group-hover:from-accent/40 dark:group-hover:to-accent/30">
-        {isPublic ? (
-          <Globe className="size-4 text-foreground dark:text-foreground/90" />
-        ) : (
-          <Lock className="size-4 text-foreground/70 dark:text-foreground/60" />
-        )}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <div className="font-semibold text-foreground text-sm leading-none">
+      {isPublic ? (
+        <Globe className="size-8 text-foreground/80" strokeWidth={1.5} />
+      ) : (
+        <Lock className="size-8 text-foreground/80" strokeWidth={1.5} />
+      )}
+      <div>
+        <h4 className="font-medium text-sm text-foreground">
           {isPublic ? "Public" : "Private"}
-        </div>
-        <div className="text-foreground/60 text-xs leading-none dark:text-foreground/50">
+        </h4>
+        <p className="text-muted-foreground text-xs">
           {isPublic ? "Shareable with anyone" : "Visible to you only"}
-        </div>
+        </p>
       </div>
     </div>
     <Switch
       checked={isPublic}
       onCheckedChange={onToggle}
       disabled={isLoading}
-      className="data-[state=checked]:bg-foreground data-[state=unchecked]:bg-border/60 dark:data-[state=checked]:bg-foreground/90 dark:data-[state=unchecked]:bg-border/40"
     />
   </div>
 );
@@ -64,7 +64,7 @@ export const ShareButton = ({
   className,
   children,
   disabled = false,
-}: ShareButtonProps & { children?: React.ReactNode }) => {
+}: ShareButtonProps & React.PropsWithChildren) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPublic, setIsPublic] = useState(initialVisibility === "public");
   const [deletingTokens, setDeletingTokens] = useState<string[]>([]);
@@ -176,17 +176,17 @@ export const ShareButton = ({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-80 rounded-xl border border-border/80 bg-background p-0 shadow-lg backdrop-blur-sm dark:border-border/50 dark:bg-card"
+        className="w-80 rounded-lg border border-border bg-background p-0"
         align="end"
         sideOffset={8}
       >
-        <div className="space-y-6 p-6">
-          <div className="space-y-3 border-border/20">
-            <h3 className="flex items-center gap-2.5 font-semibold text-foreground text-lg">
-              <Share className="size-4.5" />
+        <div className="space-y-4 py-4">
+          <div className="space-y-2 px-4">
+            <h3 className="flex items-center gap-2 font-medium text-foreground text-sm">
+              <Share className="size-4" />
               Share conversation
             </h3>
-            <p className="text-foreground/60 text-sm dark:text-foreground/50">
+            <p className="text-muted-foreground text-xs">
               Control access to this chat thread
             </p>
           </div>
@@ -197,84 +197,69 @@ export const ShareButton = ({
             isLoading={toggleVisibility.status === "pending"}
           />
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-foreground/70 text-xs uppercase tracking-wide dark:text-foreground/60">
-                Share Link
-              </span>
-              {isPublic && (
-                <div className="flex items-center gap-2 rounded-full border border-green-300 bg-green-50 px-2.5 py-1 dark:border-green-700/60 dark:bg-green-950/60">
-                  <div className="size-1.5 rounded-full bg-green-500 shadow-sm" />
-                  <span className="font-medium text-green-700 text-xs dark:text-green-400">
-                    Active
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex w-full items-center gap-3">
+          <div className="space-y-2 px-4">
+            <p className="font-medium text-foreground text-xs">Share Link</p>
+            <div className="flex gap-2">
               <Input
                 value={shareUrl}
                 readOnly
                 disabled={!isPublic}
                 className={cn(
-                  "h-11 min-w-0 flex-1 font-mono text-xs",
+                  "h-9 min-w-0 w-full flex-1 font-mono text-xs rounded-sm",
                   !isPublic && "cursor-not-allowed opacity-60"
                 )}
                 placeholder={isPublic ? "" : "Enable sharing to generate link"}
-                shellClassName="w-full"
               />
               <CopyButton
                 onCopy={handleCopyShareLink}
                 className={cn(
-                  "flex-shrink-0",
-                  !isPublic && "pointer-events-none border-border/50 opacity-50"
+                  "rounded-sm size-9",
+                  !isPublic && "pointer-events-none opacity-50"
                 )}
                 disabled={!isPublic}
               />
             </div>
-
             {!isPublic && (
-              <p className="text-foreground/60 text-xs dark:text-foreground/50">
+              <p className="text-muted-foreground text-xs">
                 Turn on sharing to generate a public link
               </p>
             )}
           </div>
 
           {partialShares.length > 0 && (
-            <div className="space-y-4 border-border/40 border-t pt-6 dark:border-border/30">
+            <div className="space-y-2 border-border border-t pt-4 px-4">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-foreground/70 text-xs uppercase tracking-wide dark:text-foreground/60">
+                <label className="font-medium text-foreground text-xs">
                   Partial Shares
-                </span>
-                <span className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5 font-medium text-foreground/70 text-xs dark:border-border/50 dark:bg-card/30 dark:text-foreground/60">
+                </label>
+                <Badge variant="outline" className="text-xs rounded-sm px-1.5">
                   {partialShares.length}
-                </span>
+                </Badge>
               </div>
 
-              <div className="max-h-40 space-y-3 overflow-y-auto">
+              <div className="max-h-32 space-y-2 overflow-y-auto">
                 {partialShares.map((share) => (
                   <div
                     key={share.token}
-                    className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/70 p-3.5 shadow-sm transition-all dark:bg-card/30 dark:hover:border-border/70 dark:hover:bg-card/50"
+                    className="flex items-center gap-2 border border-border rounded-lg p-3"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="truncate font-mono text-foreground/70 text-xs dark:text-foreground/60">
+                      <div className="truncate font-mono text-foreground text-xs">
                         {share.token}
                       </div>
-                      <div className="mt-1.5 text-foreground/50 text-xs dark:text-foreground/40">
+                      <div className="mt-1 text-muted-foreground text-xs">
                         Created {new Date(share.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <CopyButton
                         onCopy={() => handleCopyPartialShare(share.token)}
-                        className="size-8"
+                        className="size-8 rounded-sm"
                       />
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="size-8 border border-transparent bg-background/40 p-0 text-foreground/60 hover:border-red-300 hover:bg-red-50 hover:text-red-600 hover:shadow-sm dark:bg-card/20 dark:text-foreground/50 dark:hover:border-red-700/60 dark:hover:bg-red-950/60 dark:hover:text-red-400"
+                        className="size-8 rounded-sm p-0 hover:bg-destructive/10"
                         onClick={() => handleDeletePartialShare(share.token)}
                       >
                         <X className="size-4" />
@@ -284,7 +269,7 @@ export const ShareButton = ({
                 ))}
               </div>
 
-              <p className="text-foreground/60 text-xs leading-relaxed dark:text-foreground/50">
+              <p className="text-muted-foreground text-xs">
                 Partial shares allow others to view this conversation up to a
                 specific message.
               </p>

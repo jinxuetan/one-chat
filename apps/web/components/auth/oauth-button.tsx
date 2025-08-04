@@ -31,22 +31,22 @@ export const OAuthButton = () => {
 
   return (
     <Button
-      className="border w-full border-border bg-background py-6 text-foreground text-lg transition-all duration-200 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-border/60 dark:bg-card dark:hover:bg-accent/80"
+      className="border w-full border-border bg-background py-5 sm:py-6 text-foreground text-base sm:text-lg font-medium transition-all duration-200 hover:bg-accent hover:border-accent-foreground/20 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-border/60 dark:bg-card dark:hover:bg-accent/80 shadow-sm hover:shadow-md"
       onClick={handleClick}
       disabled={isPending}
       variant="outline"
       aria-label="Continue with Google"
     >
       {isPending ? (
-        <Loader className="mr-1 size-4.5 animate-spin text-muted-foreground" />
+        <Loader className="mr-2 size-4 sm:size-4.5 animate-spin text-muted-foreground" />
       ) : (
         <Image
           src="/assets/google-logo.svg"
           alt="Google"
           priority
-          width={16}
-          height={16}
-          className="mr-1"
+          width={18}
+          height={18}
+          className="mr-2"
         />
       )}
       Continue with Google

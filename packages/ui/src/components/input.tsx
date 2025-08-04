@@ -14,7 +14,7 @@ function Input({
   shellClassName?: string;
 }) {
   return (
-    <div className={cn("relative", shellClassName)}>
+    <div className={cn("relative w-full", shellClassName)}>
       <input
         type={type}
         data-slot="input"

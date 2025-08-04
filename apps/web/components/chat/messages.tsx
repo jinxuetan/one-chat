@@ -122,7 +122,7 @@ export const Messages = ({
         ) : hasKeys ? (
           <EmptyMessage username={username} onMessageClick={append} />
         ) : (
-          <div className="flex h-full w-full items-center justify-center gap-2">
+          <div className="flex h-full w-full items-center justify-center gap-2 px-4 md:px-0">
             <BYOK />
           </div>
         )

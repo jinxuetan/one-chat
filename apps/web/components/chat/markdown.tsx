@@ -92,7 +92,7 @@ export const Markdown = memo(
     return (
       <div
         className={cn(
-          "prose !w-full prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0",
+          "prose !w-full prose-pre:m-0 prose-pre:bg-transparent prose-pre:p-0 prose-p:my-1",
           role === "user"
             ? "prose-invert dark:prose-neutral"
             : "prose-neutral dark:prose-invert max-w-none",

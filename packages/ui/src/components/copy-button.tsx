@@ -11,6 +11,7 @@ interface CopyButtonProps {
   onCopy: () => Promise<void> | void;
   className?: string;
   disabled?: boolean;
+  shellClassName?: string;
 }
 
 const easeOut = cubicBezier(0.4, 0, 0.2, 1);
@@ -214,7 +215,10 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
         onMouseLeave={handleMouseLeave}
         variant="ghost"
         size="icon"
-        className="relative h-8 w-8 cursor-pointer bg-none text-muted-foreground transition duration-300 ease-out hover:scale-105 hover:bg-transparent hover:text-foreground dark:hover:text-white"
+        className={cn(
+          "relative cursor-pointer bg-none text-muted-foreground transition duration-300 ease-out hover:scale-105 hover:bg-transparent hover:text-foreground dark:hover:text-white",
+          className
+        )}
         aria-label="Copy code"
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}

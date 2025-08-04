@@ -39,16 +39,51 @@ const AuthPage = async () => {
       </section>
 
       <section
-        className="w-full lg:w-1/2 flex items-center justify-center bg-background p-8"
+        className="w-full lg:w-1/2 flex flex-col justify-center bg-background px-6 py-8 sm:px-8 lg:px-12 relative"
         aria-label="Authentication form"
       >
-        <div className="space-y-4 w-full max-w-sm">
-          <OAuthButton />
-          <p className="text-center text-sm text-muted-foreground">
+        <header className="lg:hidden mb-6 flex justify-center">
+          <Image
+            src="/assets/one-chat-logo.svg"
+            alt="OneChat logo"
+            width={140}
+            height={28}
+            quality={100}
+            className="dark:invert"
+            priority
+          />
+        </header>
+
+        <div className="flex flex-col items-center space-y-8 w-full max-w-sm mx-auto">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              Welcome to OneChat
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              Access multiple AI models in one seamless experience
+            </p>
+          </div>
+
+          <div className="w-full space-y-4">
+            <OAuthButton />
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground sm:text-sm px-4">
             By continuing, you agree to our{" "}
-            <span className="underline">terms of service</span> and{" "}
-            <span className="underline">privacy policy</span>.
+            <button className="underline underline-offset-4 hover:text-foreground transition-colors">
+              terms of service
+            </button>{" "}
+            and{" "}
+            <button className="underline underline-offset-4 hover:text-foreground transition-colors">
+              privacy policy
+            </button>
+            .
           </p>
+        </div>
+
+        <div className="lg:hidden absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl" />
         </div>
       </section>
     </main>
