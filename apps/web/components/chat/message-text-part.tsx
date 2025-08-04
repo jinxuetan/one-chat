@@ -122,23 +122,24 @@ export const MessageTextPart = memo<MessageTextPartProps>(
         {isLoading && message.role === "assistant" && (
           <TextShimmer className="text-4xl font-bold -mt-2">...</TextShimmer>
         )}
-
-        <MessageActions
-          message={message}
-          model={model}
-          isReadonly={isReadonly}
-          onReload={onReload}
-          onEdit={() =>
-            onModeChange((prev) => (prev === "view" ? "edit" : "view"))
-          }
-          onBranchOut={onBranchOut}
-          onCopy={onCopy}
-          isReloading={isReloading}
-          isBranching={isBranching}
-          textContent={text}
-          threadId={threadId}
-          isMobileActionsVisible={isMobileActionsVisible}
-        />
+        {displayMode === "view" && (
+          <MessageActions
+            message={message}
+            model={model}
+            isReadonly={isReadonly}
+            onReload={onReload}
+            onEdit={() =>
+              onModeChange((prev) => (prev === "view" ? "edit" : "view"))
+            }
+            onBranchOut={onBranchOut}
+            onCopy={onCopy}
+            isReloading={isReloading}
+            isBranching={isBranching}
+            textContent={text}
+            threadId={threadId}
+            isMobileActionsVisible={isMobileActionsVisible}
+          />
+        )}
       </div>
     );
   }

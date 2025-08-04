@@ -107,10 +107,7 @@ export const Messages = ({
       ref={containerRef}
       className={cn(
         "relative mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col px-0 pt-20 md:px-3 md:pt-10",
-        {
-          "pb-14": !isReadonly && messages.length > 0,
-          "items-center justify-center": isNewBranch,
-        }
+        { "items-center justify-center": isNewBranch }
       )}
     >
       {messages.length === 0 ? (
